@@ -25,7 +25,6 @@ func main() {
 		"internal/infrastructure/events",
 		"internal/infrastructure/grpc",
 		"internal/infrastructure/repository",
-		"pkg/types",
 	}
 
 	for _, dir := range dirs {
