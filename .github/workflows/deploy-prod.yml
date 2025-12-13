@@ -18,7 +18,7 @@ jobs:
       environment: production
 
   # If you have Go tests
-  go-tests:
+  run-tests:
     uses: ./.github/workflows/run-tests.yml
     secrets: inherit
     with:
