@@ -2,8 +2,8 @@ name: Deploy to Dev
 concurrency: development
 on:
   workflow_dispatch:
-    push:
-      branches: ["develop"]
+  push:
+    branches: ["develop"]
 
 permissions:
   id-token: write
