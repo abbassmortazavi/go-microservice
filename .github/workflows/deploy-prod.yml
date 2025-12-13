@@ -19,14 +19,14 @@ jobs:
 
   # If you have Go tests
   go-tests:
-    uses: ./.github/workflows/go-tests.yml
+    uses: ./.github/workflows/run-tests.yml
     secrets: inherit
     with:
       environment: production
 
   build:
     uses: ./.github/workflows/run-build.yml
-    needs: [php-tests, go-tests]  # Wait for both test jobs
+    needs: [php-tests,run-tests]  # Wait for both test jobs
     secrets: inherit
     concurrency: build
     with:
