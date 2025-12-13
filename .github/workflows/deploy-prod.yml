@@ -1,0 +1,31 @@
+name: Deploy to Prod
+concurrency: production
+on:
+  workflow_dispatch:
+    push:
+      branches: ["main"]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  tests:
+    uses: ./.github/workflows/run-tests.yml
+    secrets: inherit
+    with:
+      environment: production
+  build:
+    uses: ./.github/workflows/run-build.yml
+    needs: tests
+    secrets: inherit
+    concurrency: build
+    with:
+      environment: production
+  deploy-prod:
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
+    needs: build
+    concurrency: deploy-prod
+    with:
+      environment: production
