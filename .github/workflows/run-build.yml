@@ -25,7 +25,7 @@ jobs:
       matrix:
         service:
           - name: api-gateway
-            dockerfile: services/api-gateway/api-gateway.Dockerfile
+            dockerfile: infra/development/docker/api-gateway/api-gateway.Dockerfile
             context: .
           # Add more services here in the future:
           # - name: user-service
