@@ -5,4 +5,4 @@ WORKDIR /app
 
 ADD build build
 
-ENTRYPOINT exec build/api-gateway
+ENTRYPOINT  build/api-gateway
