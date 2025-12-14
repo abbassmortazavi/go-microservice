@@ -42,15 +42,4 @@ spec:
                 configMapKeyRef:
                   name: app-config
                   key: GATEWAY_HTTP_ADDR
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: api-gateway
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8081
-      targetPort: 8081
-  selector:
-    app: api-gateway
+

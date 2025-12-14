@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   - api-gateway-deployment.yaml
   - app-config.yaml
+  - api-gateway-service.yaml
 
 # This namespace will be applied to ALL resources in the list
 namespace: production
