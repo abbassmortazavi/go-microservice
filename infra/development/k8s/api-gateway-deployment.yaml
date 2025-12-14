@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api-gateway
-  namespace: production
 spec:
   replicas: 1
   selector:
@@ -16,9 +15,20 @@ spec:
       containers:
         - name: api-gateway
           image: abbass69/microservice:api-gateway-latest
-          imagePullPolicy: Always
           ports:
             - containerPort: 8081
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 15
+            periodSeconds: 10
           resources:
             requests:
               memory: "128Mi"
@@ -30,18 +40,6 @@ spec:
             - name: GATEWAY_HTTP_ADDR
               valueFrom:
                 configMapKeyRef:
-                  key: GATEWAY_HTTP_ADDR
                   name: app-config
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: api-gateway
-  namespace: production
-spec:
-  type: LoadBalancer
-  ports:
-    - port: 8081
-      targetPort: 8081
-  selector:
-    app: api-gateway
+                  key: GATEWAY_HTTP_ADDR
+
