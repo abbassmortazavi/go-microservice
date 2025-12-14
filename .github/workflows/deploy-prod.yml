@@ -10,13 +10,6 @@ permissions:
   contents: read
 
 jobs:
-  # If you have PHP tests
-  php-tests:
-    uses: ./.github/workflows/run-tests.yml
-    secrets: inherit
-    with:
-      environment: production
-
   # If you have Go tests
   run-tests:
     uses: ./.github/workflows/run-tests.yml
@@ -26,7 +19,7 @@ jobs:
 
   build:
     uses: ./.github/workflows/run-build.yml
-    needs: [php-tests,run-tests]  # Wait for both test jobs
+    needs: [run-tests]  # Wait for both test jobs
     secrets: inherit
     concurrency: build
     with:
