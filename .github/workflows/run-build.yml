@@ -11,6 +11,7 @@ on:
 
 env:
   DOCKER_HUB_ORG: abbass69
+  PROJECT_NAME: microservice  # 👈 Add project name
 
 permissions:
   contents: read
@@ -67,26 +68,36 @@ jobs:
           echo "Dockerfile: ${{ matrix.service.dockerfile }}"
           echo "Context: ${{ matrix.service.context }}"
           
-          REPO_NAME="$DOCKER_HUB_ORG/$SERVICE_NAME"
-          echo "Repository: $REPO_NAME"
-          echo "Image tag: $IMAGE_TAG"
+          # Format 1: abbass69/microservice:api-gateway-latest
+          REPO_NAME="$DOCKER_HUB_ORG/$PROJECT_NAME"
+          SERVICE_TAG="$SERVICE_NAME-latest"
+          SHA_TAG="$SERVICE_NAME-$IMAGE_TAG"
           
-          # Build the image
-          docker build -t $REPO_NAME:latest \
-                      -t $REPO_NAME:$IMAGE_TAG \
+          echo "Repository: $REPO_NAME"
+          echo "Service tag: $SERVICE_TAG"
+          echo "SHA tag: $SHA_TAG"
+          
+          # Build the image with multiple tags
+          docker build -t $REPO_NAME:$SERVICE_TAG \
+                      -t $REPO_NAME:$SHA_TAG \
+                      -t $REPO_NAME:$SERVICE_NAME:latest \
+                      -t $REPO_NAME:$SERVICE_NAME:$IMAGE_TAG \
                       -f ${{ matrix.service.dockerfile }} \
                       ${{ matrix.service.context }}
           
-          # Push the images
+          # Push all tags
           echo "Pushing images to Docker Hub..."
-          docker push $REPO_NAME:latest
-          docker push $REPO_NAME:$IMAGE_TAG
+          docker push $REPO_NAME:$SERVICE_TAG
+          docker push $REPO_NAME:$SHA_TAG
+          docker push $REPO_NAME:$SERVICE_NAME:latest
+          docker push $REPO_NAME:$SERVICE_NAME:$IMAGE_TAG
           
-          # Output the image name for other jobs
-          echo "image=$REPO_NAME:$IMAGE_TAG" >> $GITHUB_OUTPUT
-          echo "✅ Successfully built and pushed $REPO_NAME:$IMAGE_TAG"
+          # Output the image names for other jobs
+          echo "image=$REPO_NAME:$SERVICE_NAME:latest" >> $GITHUB_OUTPUT
+          echo "image_sha=$REPO_NAME:$SERVICE_NAME:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "✅ Successfully built and pushed $REPO_NAME:$SERVICE_NAME:latest"
 
       - name: Image digest for ${{ matrix.service.name }}
         run: |
-          echo "Image: ${{ steps.build-image.outputs.image }}"
-          echo "Digest output available for other jobs"
+          echo "Latest image: ${{ steps.build-image.outputs.image }}"
+          echo "SHA image: ${{ steps.build-image.outputs.image_sha }}"
