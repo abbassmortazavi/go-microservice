@@ -1,24 +1,20 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: microservice
-  namespace: argocd
+  name: api-gateway
+  namespace: production
 spec:
   project: default
   source:
     repoURL: 'https://github.com/abbassmortazavi/go-microservice'
     targetRevision: HEAD
-    path: 'infra/development/k8s'
-    directory:
-      recurse: true
+    path: infra/development/k8s
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: production
+    namespace: production # Must match the namespace in your manifests
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - ApplyOutOfSyncOnly=true
-
