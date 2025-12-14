@@ -1,9 +1,10 @@
+# infra/k8s/kustomization.yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-
-namespace: production
 
 resources:
   - api-gateway-deployment.yaml
   - app-config.yaml
 
+# This namespace will be applied to ALL resources in the list
+namespace: production

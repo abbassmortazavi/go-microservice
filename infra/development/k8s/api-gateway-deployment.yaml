@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api-gateway
-  namespace: argocd
+  namespace: production
 spec:
   replicas: 1
   selector:
@@ -13,12 +13,9 @@ spec:
       labels:
         app: api-gateway
     spec:
-      imagePullSecrets:
-        - name: dockerhub-secret
       containers:
         - name: api-gateway
           image: abbass69/microservice:api-gateway-latest
-#          image: microservice/api-gateway
           imagePullPolicy: Always
           ports:
             - containerPort: 8081
@@ -40,7 +37,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: api-gateway
-  namespace: argocd
+  namespace: production
 spec:
   type: LoadBalancer
   ports:
