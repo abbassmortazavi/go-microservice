@@ -19,7 +19,7 @@ func main() {
 	log.Println("Starting API Gateway")
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /test-url", func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Preview called")
+		log.Println("Preview called from abbass")
 	})
 
 	server := &http.Server{
