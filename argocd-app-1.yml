@@ -5,30 +5,17 @@ metadata:
   namespace: argocd
 spec:
   project: default
-
-  # Source of the application manifests
   source:
     repoURL: 'https://github.com/abbassmortazavi/go-microservice'
     targetRevision: HEAD
     path: infra/development/k8s
-
-  # Destination cluster and namespace to deploy the application
   destination:
-    server: https://kubernetes.default.svc
-    namespace: production
-
+    server: 'https://kubernetes.default.svc'
+    namespace: production # Must match the namespace in your manifests
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - Validate=true
       - CreateNamespace=true
       - ApplyOutOfSyncOnly=true
-    retry:
-      limit: 5
-      backoff:
-        duration: 5s
-        factor: 2
-        maxDuration: 3m
-
