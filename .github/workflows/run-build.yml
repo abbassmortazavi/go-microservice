@@ -58,16 +58,13 @@ jobs:
       - name: Build, tag, and push ${{ matrix.service.name }}
         id: build-image
         env:
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ github.sha }}      # Using Git commit SHA as the tag
           SERVICE_NAME: ${{ matrix.service.name }}
         run: |
           echo "Building service: $SERVICE_NAME"
           echo "Dockerfile: ${{ matrix.service.dockerfile }}"
           echo "Context: ${{ matrix.service.context }}"
-          
-          # Valid Docker tag formats (choose ONE):
-          
-          # Option A: With hyphen (recommended)
+
           REPO_NAME="$DOCKER_HUB_ORG/$PROJECT_NAME"
           LATEST_TAG="$SERVICE_NAME-latest"
           SHA_TAG="$SERVICE_NAME-$IMAGE_TAG"
@@ -75,19 +72,19 @@ jobs:
           echo "Repository: $REPO_NAME"
           echo "Latest tag: $LATEST_TAG"
           echo "SHA tag: $SHA_TAG"
-          
-          # Build with two tags
+
+          # Build Docker image with two tags
           docker build -t $REPO_NAME:$LATEST_TAG \
                       -t $REPO_NAME:$SHA_TAG \
                       -f ${{ matrix.service.dockerfile }} \
                       ${{ matrix.service.context }}
           
-          # Push both tags
+          # Push images with both tags
           echo "Pushing images to Docker Hub..."
           docker push $REPO_NAME:$LATEST_TAG
           docker push $REPO_NAME:$SHA_TAG
           
-          # Output the image names for other jobs
+          # Output the image names for use in other jobs
           echo "image=$REPO_NAME:$LATEST_TAG" >> $GITHUB_OUTPUT
           echo "image_sha=$REPO_NAME:$SHA_TAG" >> $GITHUB_OUTPUT
           echo "✅ Successfully built and pushed $REPO_NAME:$LATEST_TAG"
@@ -96,3 +93,28 @@ jobs:
         run: |
           echo "Latest image: ${{ steps.build-image.outputs.image }}"
           echo "SHA image: ${{ steps.build-image.outputs.image_sha }}"
+
+      # Step to Update Kustomize for the new image tag
+      - name: Update Kustomize with new image tag
+        run: |
+          echo "Updating Kustomize with image tag: ${{ steps.build-image.outputs.image_sha }}"
+          IMAGE_TAG="${{ steps.build-image.outputs.image_sha }}"
+          
+          KUSTOMIZATION_FILE="infra/development/k8s/kustomization.yml"
+      
+          if [ ! -f "$KUSTOMIZATION_FILE" ]; then
+          echo "❌ ERROR: Kustomization file not found at $KUSTOMIZATION_FILE"
+          exit 1
+          fi
+
+          sed -i "s|abbass69/microservice:api-gateway.*|$IMAGE_TAG|" "$KUSTOMIZATION_FILE"
+         
+          if git diff --quiet "$KUSTOMIZATION_FILE"; then
+          echo "No changes detected in $KUSTOMIZATION_FILE, skipping commit."
+          else
+          git config --global user.name "abbass"
+          git config --global user.email "abbassmortazavi@gmail.com"
+          git add "$KUSTOMIZATION_FILE"
+          git commit -m "Update Kustomize with new image tag: $IMAGE_TAG"
+          git push
+          fi
