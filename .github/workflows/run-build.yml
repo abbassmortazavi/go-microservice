@@ -100,7 +100,7 @@ jobs:
           echo "Updating Kustomize with image tag: ${{ steps.build-image.outputs.image_sha }}"
           IMAGE_TAG="${{ steps.build-image.outputs.image_sha }}"
           
-          KUSTOMIZATION_FILE="infra/development/k8s/kustomization.yaml"
+          KUSTOMIZATION_FILE="infra/development/k8s/kustomization.yml"
       
           if [ ! -f "$KUSTOMIZATION_FILE" ]; then
           echo "❌ ERROR: Kustomization file not found at $KUSTOMIZATION_FILE"
