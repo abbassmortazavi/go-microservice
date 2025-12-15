@@ -99,7 +99,7 @@ jobs:
         run: |
           echo "Updating Kustomize with image tag: ${{ steps.build-image.outputs.image_sha }}"
           IMAGE_TAG="${{ steps.build-image.outputs.image_sha }}"
-          sed -i "s|abbass69/microservice:api-gateway.*|$IMAGE_TAG|" infra/development/k8s/overlays/${{ inputs.environment }}/kustomization.yaml
+          sed -i "s|abbass69/microservice:api-gateway.*|$IMAGE_TAG|" infra/development/k8s/${{ inputs.environment }}/kustomization.yaml
           git add infra/development/k8s/overlays/${{ inputs.environment }}/kustomization.yaml
           git commit -m "Update Kustomize with new image tag: $IMAGE_TAG"
           git push
