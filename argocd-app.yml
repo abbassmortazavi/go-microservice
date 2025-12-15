@@ -2,17 +2,16 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: api-gateway
-  namespace: argocd
+  namespace: argocd   # ⚠️ حتماً namespace خود argo
 spec:
   project: default
 
-  # Source of the application manifests
   source:
-    repoURL: 'https://github.com/abbassmortazavi/go-microservice'
-    targetRevision: HEAD
+    repoURL: https://github.com/abbassmortazavi/go-microservice
+    targetRevision: main
     path: infra/development/k8s
+    kustomize: {}
 
-  # Destination cluster and namespace to deploy the application
   destination:
     server: https://kubernetes.default.svc
     namespace: production
@@ -22,13 +21,4 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-      - Validate=true
       - CreateNamespace=true
-      - ApplyOutOfSyncOnly=true
-    retry:
-      limit: 5
-      backoff:
-        duration: 5s
-        factor: 2
-        maxDuration: 3m
-
