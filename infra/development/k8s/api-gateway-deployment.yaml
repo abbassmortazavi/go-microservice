@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api-gateway
+  namespace: production
 spec:
   replicas: 1
   selector:
@@ -15,20 +16,25 @@ spec:
       containers:
         - name: api-gateway
           image: abbass69/microservice:api-gateway-latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8081
+          # 👇 CHANGE TO TCP PROBES (No /health endpoint needed) 👇
           readinessProbe:
-            httpGet:
-              path: /health
+            tcpSocket:
               port: 8081
             initialDelaySeconds: 5
-            periodSeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
           livenessProbe:
-            httpGet:
-              path: /health
+            tcpSocket:
               port: 8081
             initialDelaySeconds: 15
-            periodSeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 3
+          # 👆 TCP PROBES ADDED 👆
           resources:
             requests:
               memory: "128Mi"
@@ -40,6 +46,5 @@ spec:
             - name: GATEWAY_HTTP_ADDR
               valueFrom:
                 configMapKeyRef:
-                  name: app-config
                   key: GATEWAY_HTTP_ADDR
-
+                  name: app-config
