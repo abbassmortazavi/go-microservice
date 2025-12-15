@@ -108,7 +108,8 @@ jobs:
           fi
 
           sed -i "s|abbass69/microservice:api-gateway.*|$IMAGE_TAG|" "$KUSTOMIZATION_FILE"
-          
+          git config --global user.name "abbass"
+          git config --global user.email "abbassmortazavi@gmail.com"
           git add "$KUSTOMIZATION_FILE"
           git commit -m "Update Kustomize with new image tag: $IMAGE_TAG"
           git push
