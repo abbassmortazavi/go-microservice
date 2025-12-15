@@ -19,7 +19,7 @@ func main() {
 	log.Println("Starting API Gateway")
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /test-url", func(w http.ResponseWriter, r *http.Request) {
-		log.Println("this is the last change!!!")
+		log.Println("this is the last change!!!!")
 	})
 
 	server := &http.Server{
