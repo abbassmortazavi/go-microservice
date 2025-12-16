@@ -14,7 +14,7 @@ env:
   PROJECT_NAME: microservice
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
