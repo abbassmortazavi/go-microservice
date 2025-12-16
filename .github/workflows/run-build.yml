@@ -107,8 +107,8 @@ jobs:
           exit 1
           fi
 
-          sed -i "s|abbass69/microservice:api-gateway.*|$IMAGE_TAG|" "$KUSTOMIZATION_FILE"
-         
+          sed -i "s/newTag: .*/newTag: ${IMAGE_TAG##*:}/" "$KUSTOMIZATION_FILE"
+
           if git diff --quiet "$KUSTOMIZATION_FILE"; then
           echo "No changes detected in $KUSTOMIZATION_FILE, skipping commit."
           else
