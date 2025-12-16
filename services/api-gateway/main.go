@@ -21,6 +21,7 @@ func main() {
 	mux.HandleFunc("POST /test-url", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("this is the last change!!!")
 		log.Println("thats ok")
+		log.Println("jafar.com")
 	})
 
 	server := &http.Server{
