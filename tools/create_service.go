@@ -30,6 +30,7 @@ func main() {
 		"internal/interface/grpc",
 		"internal/usecase",
 		"docker",
+		"migrations",
 	}
 
 	for _, dir := range dirs {

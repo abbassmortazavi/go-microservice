@@ -1,0 +1,10 @@
+syntax="proto3";
+package auth;
+
+option go_package = "microservice/pkg/proto/auth;authpb";
+
+service AuthService {
+  rpc Register (RegisterRequest) return(RegisterResponse);
+  rpc Login (LoginRequest) return(LoginResponse);
+  rpc Register (RegisterRequest) return(RegisterResponse);
+}
