@@ -21,10 +21,15 @@ func main() {
 	dirs := []string{
 		"cmd",
 		"internal/domain",
-		"internal/service",
-		"internal/infrastructure/events",
-		"internal/infrastructure/grpc",
-		"internal/infrastructure/repository",
+		"internal/domain/entity",
+		"internal/domain/repository",
+		"internal/domain/service",
+		"internal/infrastructure/config",
+		"internal/infrastructure/db",
+		"internal/infrastructure/messaging",
+		"internal/interface/grpc",
+		"internal/usecase",
+		"docker",
 	}
 
 	for _, dir := range dirs {
