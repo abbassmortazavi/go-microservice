@@ -1,6 +1,6 @@
 PROTO_DIR := proto
 PROTO_SRC := $(wildcard $(PROTO_DIR)/*.proto)
-GO_OUT := .
+GO_OUT := pkg/proto
 
 .PHONY: generate-proto
 generate-proto:
