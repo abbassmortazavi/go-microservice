@@ -6,7 +6,7 @@ import (
 
 type PasswordHasher interface {
 	Hash(password string) (string, error)
-	Compare(hashPassword, password string) (bool, error)
+	Compare(hashPassword, password string) bool
 }
 
 type BcryptHasher struct{}
@@ -20,10 +20,10 @@ func (b *BcryptHasher) Hash(password string) (string, error) {
 	return string(bytes), err
 }
 
-func (b *BcryptHasher) Compare(hashPassword, password string) (bool, error) {
+func (b *BcryptHasher) Compare(hashPassword, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashPassword), []byte(password))
 	if err != nil {
-		return false, err
+		return false
 	}
-	return true, nil
+	return true
 }

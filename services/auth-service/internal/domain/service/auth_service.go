@@ -1,60 +1,59 @@
 package service
 
 import (
+	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/entity"
+	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/repository"
+	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/security"
+	"context"
 	"errors"
-	"time"
-
-	"github.com/golang-jwt/jwt/v5"
+	"strconv"
 )
 
-type AuthService interface {
-	GenerateAccessToken(userID, role string) (string, error)
-	GenerateRefreshToken(userID string) (string, error)
-	ValidateToken(token string) (*jwt.RegisteredClaims, error)
+type AuthService struct {
+	userRepo     repository.UserRepository
+	hasher       security.PasswordHasher
+	TokenService TokenService
 }
 
-type JWTSecret struct {
-	secret []byte
-}
-
-type Claims struct {
-	UserID    int    `json:"user_id"`
-	Username  string `json:"username"`
-	TokenType string `json:"token_type"`
-	jwt.RegisteredClaims
-}
-
-func NewJWTSecret(secret []byte) *JWTSecret {
-	return &JWTSecret{secret: secret}
-}
-func (s *JWTSecret) GenerateAccessToken(userID, role string) (string, error) {
-	claims := jwt.MapClaims{
-		"sub":  userID,
-		"role": role,
-		"exp":  time.Now().Add(time.Minute * 5).Unix(),
+func NewAuthService(repo repository.UserRepository, hasher security.PasswordHasher, tokenService TokenService) *AuthService {
+	return &AuthService{
+		userRepo:     repo,
+		hasher:       hasher,
+		TokenService: tokenService,
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(s.secret)
 }
-
-func (s *JWTSecret) GenerateRefreshToken(userID string) (string, error) {
-	claims := jwt.RegisteredClaims{
-		Subject:   userID,
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(7 * 24 * time.Hour)),
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(s.secret)
-}
-func (s *JWTSecret) ValidateToken(token string) (*jwt.RegisteredClaims, error) {
-	tkn, err := jwt.ParseWithClaims(token, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return s.secret, nil
-	})
+func (a *AuthService) Register(ctx context.Context, email, password, name string) error {
+	hashed, err := a.hasher.Hash(password)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	claims, ok := tkn.Claims.(*jwt.RegisteredClaims)
-	if !ok || !tkn.Valid {
-		return nil, errors.New("invalid token")
+	user := entity.User{
+		Email:    email,
+		Password: hashed,
+		Name:     name,
+		Role:     "user",
 	}
-	return claims, nil
+	err = a.userRepo.Create(ctx, &user)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (a *AuthService) Login(ctx context.Context, email, password string) (string, string, error) {
+	user, err := a.userRepo.FindByEmail(ctx, email)
+	if err != nil {
+		return "", "", err
+	}
+	if err := a.hasher.Compare(user.Password, password); err == false {
+		return "", "", errors.New("password incorrect")
+	}
+	access, err := a.TokenService.GenerateAccessToken(strconv.FormatInt(user.ID, 10), user.Role)
+	if err != nil {
+		return "", "", err
+	}
+	refreshToken, err := a.TokenService.GenerateRefreshToken(strconv.FormatInt(user.ID, 10))
+	if err != nil {
+		return "", "", err
+	}
+	return access, refreshToken, nil
 }
