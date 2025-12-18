@@ -13,7 +13,6 @@ import (
 
 func Connect() {
 	cfg := config.Load()
-
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		cfg.Host,
 		cfg.Port,
@@ -29,15 +28,12 @@ func Connect() {
 
 	db.SetMaxIdleConns(cfg.MaxIdle)
 	db.SetMaxOpenConns(cfg.MaxConn)
-	duration, err := time.ParseDuration(cfg.MaxIdleTimeout)
-	if err != nil {
-		log.Fatal(err)
-	}
-	db.SetConnMaxIdleTime(duration)
+	db.SetConnMaxIdleTime(cfg.MaxIdleTimeout)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := db.PingContext(ctx); err != nil {
 		log.Fatal(err)
 	}
+	log.Println("Connected to database")
 	DB = db
 }

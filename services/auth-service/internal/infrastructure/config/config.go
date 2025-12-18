@@ -1,17 +1,16 @@
 package config
 
-import "os"
+import (
+	"abbassmortazavi/go-microservice/pkg/env"
+)
 
 type Config struct {
-	DB_URL     string `envconfig:"DB_URL"`
-	JWT_SECRET string `envconfig:"JWT_SECRET"`
+	HTTP_ADDR string `config:"HTTP_ADDR"`
 }
 
-// "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable"
 func Load() *Config {
 	cfg := &Config{
-		DB_URL:     os.Getenv("DB_URL"),
-		JWT_SECRET: os.Getenv("JWT_SECRET"),
+		HTTP_ADDR: env.GetString("HTTP_ADDR", ":9091"),
 	}
 	return cfg
 }
