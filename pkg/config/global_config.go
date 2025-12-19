@@ -20,7 +20,7 @@ type GlobalConfig struct {
 
 func Load() *GlobalConfig {
 	cfg := &GlobalConfig{
-		JWT_SECRET:     env.GetString("JWT_SECRET", ""),
+		JWT_SECRET:     env.GetString("JWT_SECRET", "secret"),
 		Host:           env.GetString("DB_HOST", "postgres-service"),
 		Port:           env.GetString("DB_PORT", "5432"),
 		Debug:          env.GetString("APP_DEBUG", "false"),
