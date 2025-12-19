@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	httpAddr = env.GetString("GATEWAY_HTTP_ADDR", ":8080")
+	httpAddr = env.GetString("GATEWAY_HTTP_ADDR", ":8081")
 )
 
 func main() {

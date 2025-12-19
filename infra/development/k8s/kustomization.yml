@@ -2,13 +2,19 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - api-gateway-deployment.yaml
+  - api-gateway/api-gateway-deployment.yaml
   - app-config.yaml
-  - api-gateway-service.yaml
+  - api-gateway/api-gateway-service.yaml
+  - auth-service/auth-service.yaml
+  - auth-service/auth-service-deployment.yaml
+  - postgres-service/postgres-deployment.yaml
+  - postgres-service/postgres-service.yaml
+  - rabbitmq-service/rabbitmq-deployment.yaml
+  - rabbitmq-service/rabbitmq-service.yaml
 
 namespace: production
 
 images:
   - name: abbass69/microservice
     newName: abbass69/microservice
-    newTag: api-gateway-3b13b107fe74523bc30017498c94b644d89c0c7f
+    newTag: api-gateway-9b33e7f96dbd0fd1625f2f86d357c5efa422ce1b
