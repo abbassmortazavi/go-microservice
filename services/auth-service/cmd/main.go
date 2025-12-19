@@ -23,6 +23,7 @@ import (
 )
 
 func main() {
+	log.Println("Starting service Auth Service...")
 	rabbitmqURL := env.GetString("RABBITMQ_URL", "amqp://guest:guest@rabbitmq:5672/")
 	gcfg := global.Load()
 	cfg := config.Load()
