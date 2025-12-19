@@ -3,17 +3,14 @@ FROM golang:1.25.5 AS builder
 
 WORKDIR /app
 
-# Copy go mod files (go.sum may not exist for new projects)
-COPY go.mod ./
+# Copy go mod files
+COPY go.mod go.sum ./
+RUN go mod download
 
-# Check if go.sum exists, if not run go mod tidy
-RUN if [ ! -f go.sum ]; then go mod tidy; fi
-
-# Copy source code
-COPY auth-service .
+# Copy the entire project
+COPY . .
 
 # Build the application
-# Adjust the path based on where your main.go is located
 RUN CGO_ENABLED=0 GOOS=linux go build -o /app/auth-service ./services/auth-service
 
 # Runtime stage
@@ -24,7 +21,7 @@ RUN apk --no-cache add ca-certificates
 WORKDIR /app
 
 # Copy the binary from builder stage
-COPY --from=builder /app/auth-service /app/
+COPY --from=builder /app/auth-service .
 
 # Run the binary
 ENTRYPOINT ["/app/auth-service"]
