@@ -17,4 +17,4 @@ namespace: production
 images:
   - name: abbass69/microservice
     newName: abbass69/microservice
-    newTag: api-gateway-f8d524289710e9a499d8e72362713c9eb326a2c3
+    newTag: api-gateway-1e79edbc9d175ad1a3c08cf1f409aef2a93b7bcb
