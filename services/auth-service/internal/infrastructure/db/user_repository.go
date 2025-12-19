@@ -2,7 +2,7 @@ package db
 
 import (
 	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/entity"
-	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/repository"
+	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/repository_interface"
 	"context"
 	"database/sql"
 	"errors"
@@ -12,7 +12,7 @@ type UserRepository struct {
 	db *sql.DB
 }
 
-func NewUserRepository(db *sql.DB) repository.UserRepositoryInterface {
+func NewUserRepository(db *sql.DB) repository_interface.UserRepositoryInterface {
 	return &UserRepository{
 		db: db,
 	}

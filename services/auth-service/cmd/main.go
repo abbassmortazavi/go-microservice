@@ -3,10 +3,12 @@ package main
 import (
 	global "abbassmortazavi/go-microservice/pkg/config"
 	"abbassmortazavi/go-microservice/pkg/database"
+	"abbassmortazavi/go-microservice/pkg/env"
 	authpb "abbassmortazavi/go-microservice/pkg/proto/auth"
 	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/service"
 	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/config"
 	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/db"
+	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/messaging"
 	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/security"
 	"abbassmortazavi/go-microservice/services/auth-service/internal/interface/grpc"
 	"context"
@@ -21,6 +23,7 @@ import (
 )
 
 func main() {
+	rabbitmqURL := env.GetString("RABBITMQ_URL", "amqp://guest:guest@rabbitmq:5672/")
 	gcfg := global.Load()
 	cfg := config.Load()
 
@@ -46,7 +49,26 @@ func main() {
 	hasher := security.NewBcryptHasher()
 	tokenService := service.NewJWTSecret([]byte(gcfg.JWT_SECRET))
 
-	authService := service.NewAuthService(userRepo, hasher, tokenService)
+	// ---- RabbitMQ ----
+	conn, ch := messaging.NewRabbitMQ(rabbitmqURL)
+	defer conn.Close()
+	defer ch.Close()
+
+	err = ch.ExchangeDeclare(
+		cfg.USER_EXCHANGE,
+		"topic",
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	publisher := messaging.NewPublisher(ch, cfg.USER_EXCHANGE)
+
+	authService := service.NewAuthService(userRepo, hasher, tokenService, publisher)
 
 	authHandler := grpc.NewAuthHandler(authService)
 

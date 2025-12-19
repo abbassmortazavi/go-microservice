@@ -1,0 +1,11 @@
+syntax = "proto3";
+package events;
+
+
+option go_package = "events;eventpb";
+
+message UserRegistered {
+  string user_id = 1;
+  string email = 2;
+  string role = 3;
+}

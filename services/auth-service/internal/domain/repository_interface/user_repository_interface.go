@@ -1,4 +1,4 @@
-package repository
+package repository_interface
 
 import (
 	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/entity"
