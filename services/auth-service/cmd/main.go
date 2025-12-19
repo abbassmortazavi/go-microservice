@@ -41,6 +41,7 @@ func main() {
 	database.Connect()
 
 	userRepo := db.NewUserRepository(database.DB)
+	//db.Run(database.DB)
 
 	hasher := security.NewBcryptHasher()
 	tokenService := service.NewJWTSecret([]byte(gcfg.JWT_SECRET))

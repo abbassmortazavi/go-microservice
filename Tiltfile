@@ -40,6 +40,8 @@ k8s_resource('api-gateway', port_forwards=8081,
              resource_deps=['api-gateway-compile'], labels="services")
 ### End of API Gateway ###
 
+
+
 ### Auth Service ###
 auth_compile_cmd = 'CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/auth-service ./services/auth-service/cmd/main.go'
 if os.name == 'nt':

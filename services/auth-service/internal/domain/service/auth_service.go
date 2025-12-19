@@ -10,12 +10,12 @@ import (
 )
 
 type AuthService struct {
-	userRepo     repository.UserRepository
+	userRepo     repository.UserRepositoryInterface
 	hasher       security.PasswordHasher
 	TokenService TokenService
 }
 
-func NewAuthService(repo repository.UserRepository, hasher security.PasswordHasher, tokenService TokenService) *AuthService {
+func NewAuthService(repo repository.UserRepositoryInterface, hasher security.PasswordHasher, tokenService TokenService) *AuthService {
 	return &AuthService{
 		userRepo:     repo,
 		hasher:       hasher,
