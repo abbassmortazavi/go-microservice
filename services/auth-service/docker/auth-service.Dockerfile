@@ -23,8 +23,5 @@ WORKDIR /app
 # Copy the binary from builder stage
 COPY --from=builder /app/auth-service .
 
-# Copy migrations folder
-COPY --from=builder /app/services/auth-service/migrations ./migrations/
-
 # Run the binary
 ENTRYPOINT ["/app/auth-service"]
