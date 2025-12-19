@@ -5,6 +5,12 @@ load('ext://restart_process', 'docker_build_with_restart')
 k8s_yaml('./infra/development/k8s/app-config.yaml')
 ### End k8s Config ###
 
+
+### RabbitMQ ###
+k8s_yaml('./infra/development/k8s/rabbitmq-service/rabbitmq-deployment.yaml')
+k8s_resource('rabbitmq', port_forwards=['5672', '15672'], labels='tooling')
+### End RabbitMQ ###
+
 ### PostgresDB ###
 k8s_yaml('./infra/development/k8s/postgres-service/postgres-deployment.yaml')
 k8s_resource('postgres', port_forwards=5432, labels='databases')
