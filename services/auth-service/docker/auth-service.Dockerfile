@@ -10,7 +10,7 @@ RUN go mod download
 # Copy the entire project
 COPY . .
 
-# Build the application
+# Build the application - مسیر صحیح
 RUN CGO_ENABLED=0 GOOS=linux go build -o /app/auth-service ./services/auth-service
 
 # Runtime stage
