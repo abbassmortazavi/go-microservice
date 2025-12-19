@@ -29,7 +29,7 @@ jobs:
             dockerfile: infra/development/docker/api-gateway/api-gateway.Dockerfile
             context: .
           - name: auth-service
-            dockerfile: infra/development/docker/auth-service/auth-service.Dockerfile
+            dockerfile: services/auth-service/docker/auth-service.Dockerfile
             context: .
           # Add more services here in the future:
           # - name: user-service
