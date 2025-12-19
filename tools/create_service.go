@@ -22,7 +22,7 @@ func main() {
 		"cmd",
 		"internal/domain",
 		"internal/domain/entity",
-		"internal/domain/repository",
+		"internal/domain/repository_interface",
 		"internal/domain/service",
 		"internal/infrastructure/config",
 		"internal/infrastructure/db",
@@ -30,6 +30,7 @@ func main() {
 		"internal/interface/grpc",
 		"internal/usecase",
 		"docker",
+		"migrations",
 	}
 
 	for _, dir := range dirs {
@@ -61,7 +62,7 @@ services/%s-service/
 │   └── infrastructure/   # External dependencies implementations (abstractions)
 │       ├── events/       # Event handling (RabbitMQ)
 │       ├── grpc/         # gRPC server handlers
-│       └── repository/   # Data persistence
+│       └── repository_interface/   # Data persistence
 ├── pkg/                  # Public packages
 │   └── types/           # Shared types and models
 └── README.md            # This file
@@ -76,11 +77,11 @@ services/%s-service/
 
 2. **Service Layer** (`+"`internal/service/`"+`)
    - Implements business logic
-   - Uses repository interfaces
+   - Uses repository_interface interfaces
    - Coordinates between different parts of the system
 
 3. **Infrastructure Layer** (`+"`internal/infrastructure/`"+`)
-   - `+"`repository/`"+`: Implements data persistence
+   - `+"`repository_interface/`"+`: Implements data persistence
    - `+"`events/`"+`: Handles event publishing and consuming
    - `+"`grpc/`"+`: Handles gRPC communication
 
@@ -115,7 +116,7 @@ services/%s-service/
 │   └── infrastructure/   # External dependencies implementations (abstractions)
 │       ├── events/       # Event handling (RabbitMQ)
 │       ├── grpc/         # gRPC server handlers
-│       └── repository/   # Data persistence
+│       └── repository_interface/   # Data persistence
 ├── pkg/                  # Public packages
 │   └── types/           # Shared types and models
 └── README.md            # This file

@@ -5,8 +5,12 @@ resources:
   - api-gateway/api-gateway-deployment.yaml
   - app-config.yaml
   - api-gateway/api-gateway-service.yaml
-  - auth-service/auth-service-service.yaml
+  - auth-service/auth-service.yaml
   - auth-service/auth-service-deployment.yaml
+  - postgres-service/postgres-deployment.yaml
+  - postgres-service/postgres-service.yaml
+  - rabbitmq-service/rabbitmq-deployment.yaml
+  - rabbitmq-service/rabbitmq-service.yaml
 
 namespace: production
 
