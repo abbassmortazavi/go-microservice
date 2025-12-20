@@ -1,22 +1,18 @@
 name: Build And Push to Docker Hub
-
 on:
   workflow_dispatch:
   workflow_call:
-    inputs:
-      environment:
-        required: false
-        type: string
-        default: 'production'
-
+      inputs:
+        environment:
+          required: false
+          type: string
+          default: 'production'
 env:
   DOCKER_HUB_ORG: abbass69
-  PROJECT_NAME: microservice
+  # ❌ PROJECT_NAME دیگر نیاز نیست
   COMMON_SHA: ${{ github.sha }}
-
 permissions:
   contents: write
-
 jobs:
   build-api-gateway:
     name: Build API Gateway
@@ -24,7 +20,8 @@ jobs:
     environment: ${{ inputs.environment }}
 
     outputs:
-      tag: ${{ steps.set-output.outputs.tag }}
+      image_name: ${{ steps.set-output.outputs.image_name }}
+      image_tag: ${{ steps.set-output.outputs.image_tag }}
 
     steps:
       - name: Checkout
@@ -41,22 +38,27 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Set tag output
+      - name: Set outputs
         id: set-output
         run: |
+          REPO="${{ env.DOCKER_HUB_ORG }}/api-gateway"
           TAG="api-gateway-${{ env.COMMON_SHA }}"
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-          echo "API Gateway tag: $TAG"
+          
+          echo "image_name=$REPO" >> $GITHUB_OUTPUT
+          echo "image_tag=$TAG" >> $GITHUB_OUTPUT
+          
+          echo "API Gateway: $REPO:$TAG"
 
       - name: Build and push
         run: |
-          REPO="${{ env.DOCKER_HUB_ORG }}/${{ env.PROJECT_NAME }}"
-          TAG="${{ steps.set-output.outputs.tag }}"
+          REPO="${{ steps.set-output.outputs.image_name }}"
+          TAG="${{ steps.set-output.outputs.image_tag }}"
           
           echo "Building $REPO:$TAG"
           
           docker build -t $REPO:$TAG \
             -f infra/development/docker/api-gateway/api-gateway.Dockerfile .
+          
           
           echo "Pushing $REPO:$TAG"
           docker push $REPO:$TAG
@@ -67,7 +69,8 @@ jobs:
     environment: ${{ inputs.environment }}
 
     outputs:
-      tag: ${{ steps.set-output.outputs.tag }}
+      image_name: ${{ steps.set-output.outputs.image_name }}
+      image_tag: ${{ steps.set-output.outputs.image_tag }}
 
     steps:
       - name: Checkout
@@ -84,19 +87,24 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Set tag output
+
+      - name: Set outputs
         id: set-output
         run: |
+          REPO="${{ env.DOCKER_HUB_ORG }}/auth-service"
           TAG="auth-service-${{ env.COMMON_SHA }}"
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-          echo "Auth Service tag: $TAG"
+          
+          echo "image_name=$REPO" >> $GITHUB_OUTPUT
+          echo "image_tag=$TAG" >> $GITHUB_OUTPUT
+          
+          echo "Auth Service: $REPO:$TAG"
 
       - name: Build and push
         run: |
-          REPO="${{ env.DOCKER_HUB_ORG }}/${{ env.PROJECT_NAME }}"
-          TAG="${{ steps.set-output.outputs.tag }}"
+          REPO="${{ steps.set-output.outputs.image_name }}"
+          TAG="${{ steps.set-output.outputs.image_tag }}"
           
-          echo "Building $REPO:$TAG"
+           echo "Building $REPO:$TAG"
           
           docker build -t $REPO:$TAG \
             -f services/auth-service/docker/auth-service.Dockerfile .
@@ -110,87 +118,100 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout on develop branch  # نام step برای clarity
+      - name: Checkout on develop branch
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
-          ref: develop  # 🔥 این خط حیاتی است - روی develop checkout کن
-
-      - name: Debug outputs
-        run: |
-          echo "API Gateway tag: ${{ needs.build-api-gateway.outputs.tag }}"
-          echo "Auth Service tag: ${{ needs.build-auth-service.outputs.tag }}"
-          echo "COMMON_SHA: ${{ env.COMMON_SHA }}"
+          ref: develop
 
       - name: Update kustomization.yml
         run: |
           KUSTOMIZATION_FILE="infra/development/k8s/kustomization.yml"
-          
-          # دریافت tags از outputs
-          API_TAG="${{ needs.build-api-gateway.outputs.tag }}"
-          AUTH_TAG="${{ needs.build-auth-service.outputs.tag }}"
-          
-          # fallback اگر خالی بود
-          [ -z "$API_TAG" ] && API_TAG="api-gateway-${{ env.COMMON_SHA }}"
-          [ -z "$AUTH_TAG" ] && AUTH_TAG="auth-service-${{ env.COMMON_SHA }}"
-          
-          echo "Updating kustomization:"
-          echo "  api-gateway -> $API_TAG"
-          echo "  auth-service -> $AUTH_TAG"
-          
-          # بررسی ساختار فایل
-          echo "=== Original kustomization.yml ==="
-          cat "$KUSTOMIZATION_FILE"
-          echo "================================="
-          
-          # اگر فقط یک image entry دارید، آن را به api-gateway آپدیت کنید
-          # اگر دو entry دارید، هر دو را آپدیت کنید
-          if grep -q "name: auth-service" "$KUSTOMIZATION_FILE"; then
-            echo "Found auth-service entry, updating both..."
-            sed -i "s|newTag: api-gateway-.*|newTag: $API_TAG|" "$KUSTOMIZATION_FILE"
-            sed -i "s|newTag: auth-service-.*|newTag: $AUTH_TAG|" "$KUSTOMIZATION_FILE"
-          else
-            echo "Only api-gateway entry found, updating it..."
-            sed -i "s|newTag: api-gateway-.*|newTag: $API_TAG|" "$KUSTOMIZATION_FILE"
-            echo "Note: Add auth-service entry to kustomization.yml to update both services"
-          fi
-          
-          echo "=== Updated kustomization.yml ==="
-          cat "$KUSTOMIZATION_FILE"
-          echo "================================="
 
-      - name: Commit and push changes
-        env:
-          GIT_USERNAME: "github-actions[bot]"
-          GIT_EMAIL: "github-actions[bot]@users.noreply.github.com"
-        run: |
-          # بررسی تغییرات
-          if git diff --quiet; then
-            echo "No changes detected in kustomization.yml"
-            exit 0
-          fi
+          # اطلاعات api-gateway
+          API_GATEWAY_NAME="${{ needs.build-api-gateway.outputs.image_name }}"
+          API_GATEWAY_TAG="${{ needs.build-api-gateway.outputs.image_tag }}"
           
-          echo "Changes detected:"
-          git diff
+           # اطلاعات auth-service
+          AUTH_SERVICE_NAME="${{ needs.build-auth-service.outputs.image_name }}"
+          AUTH_SERVICE_TAG="${{ needs.build-auth-service.outputs.image_tag }}"
           
-          # تنظیم git config
+            echo "Updating kustomization:"
+          echo "  api-gateway: $API_GATEWAY_NAME:$API_GATEWAY_TAG"
+          echo "  auth-service: $AUTH_SERVICE_NAME:$AUTH_SERVICE_TAG"
+          
+          
+          # ایجاد یا آپدیت فایل
+          cat > "$KUSTOMIZATION_FILE" << EOF
+          apiVersion: kustomize.config.k8s.io/v1beta1
+          kind: Kustomization
+        
+          namespace: production
+        
+          resources:
+              - api-gateway/api-gateway-deployment.yaml
+              - app-config.yaml
+              - api-gateway/api-gateway-service.yaml
+              - auth-service/auth-service.yaml
+              - auth-service/auth-service-deployment.yaml
+              - postgres-service/postgres-deployment.yaml
+              - postgres-service/postgres-service.yaml
+              - rabbitmq-service/rabbitmq-deployment.yaml
+              - rabbitmq-service/rabbitmq-service.yaml
+          
+          images:
+            - name: api-gateway  # باید با container name در deployment هماهنگ باشد
+              newName: $API_GATEWAY_NAME
+              newTag: $API_GATEWAY_TAG
+            
+            - name: auth-service  # باید با container name در deployment هماهنگ باشد
+              newName: $AUTH_SERVICE_NAME
+              newTag: $AUTH_SERVICE_TAG
+            EOF
+          
+            echo "Updated kustomization.yml:"
+            cat "$KUSTOMIZATION_FILE"
+            
+            - name: Commit and push changes
+              env:
+                GIT_USERNAME: "github-actions[bot]"
+                GIT_EMAIL: "github-actions[bot]@users.noreply.github.com"
+              run: |
+                if git diff --quiet; then
+                  echo "No changes detected"
+                  exit 0
+                fi
+          
+          
           git config user.name "$GIT_USERNAME"
           git config user.email "$GIT_EMAIL"
           
-          # اضافه کردن remote با token
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           
-          # اضافه، commit
           git add infra/development/k8s/kustomization.yml
-          git commit -m "ci: update image tags to ${{ env.COMMON_SHA }} [skip ci]"
+          git commit -m "ci: update image tags [skip ci]"
           
-          # pull latest قبل از push
-          echo "Pulling latest changes from develop..."
           git pull origin develop --rebase
-          
-          # push به develop
-          echo "Pushing to develop..."
           git push origin develop
           
           echo "✅ Successfully updated kustomization.yml"
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
