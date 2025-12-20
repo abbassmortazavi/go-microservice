@@ -1,5 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+
+namespace: production
+
 resources:
   - api-gateway/api-gateway-deployment.yaml
   - app-config.yaml
@@ -10,11 +13,12 @@ resources:
   - postgres-service/postgres-service.yaml
   - rabbitmq-service/rabbitmq-deployment.yaml
   - rabbitmq-service/rabbitmq-service.yaml
-namespace: production
+
 images:
-  - name: api-gateway
-    newName: abbass69/microservice
-    newTag: api-gateway-b4ee909ea66e1f241ddc5ace5c5b863cfa717604
-  - name: auth-service  # برای auth-service
-    newName: abbass69/microservice
-    newTag: auth-service-b4ee909ea66e1f241ddc5ace5c5b863cfa717604
+  - name: api-gateway  # باید با container name در deployment هماهنگ باشد
+    newName: 
+    newTag: api-gateway-c87ef9e94d083b425729af7426c4034b8c698e2f
+
+  - name: auth-service  # باید با container name در deployment هماهنگ باشد
+    newName: 
+    newTag: auth-service-c87ef9e94d083b425729af7426c4034b8c698e2f
