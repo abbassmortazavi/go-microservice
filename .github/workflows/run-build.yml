@@ -12,7 +12,6 @@ on:
 env:
   DOCKER_HUB_ORG: abbass69
   PROJECT_NAME: microservice
-  # اضافه کردن SHA مشترک برای همه jobs
   COMMON_SHA: ${{ github.sha }}
 
 permissions:
@@ -25,7 +24,6 @@ jobs:
     environment: ${{ inputs.environment }}
 
     outputs:
-      # خروجی tag فقط (نه کل image)
       tag: ${{ steps.set-output.outputs.tag }}
 
     steps:
@@ -112,11 +110,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout on develop branch  # نام step برای clarity
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}  # اضافه کردن token برای auth بهتر
+          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
+          ref: develop  # 🔥 این خط حیاتی است - روی develop checkout کن
 
       - name: Debug outputs
         run: |
@@ -128,7 +127,7 @@ jobs:
         run: |
           KUSTOMIZATION_FILE="infra/development/k8s/kustomization.yml"
           
-          # دریافت tags از outputs (اگر خالی بود از COMMON_SHA استفاده کن)
+          # دریافت tags از outputs
           API_TAG="${{ needs.build-api-gateway.outputs.tag }}"
           AUTH_TAG="${{ needs.build-auth-service.outputs.tag }}"
           
@@ -140,33 +139,29 @@ jobs:
           echo "  api-gateway -> $API_TAG"
           echo "  auth-service -> $AUTH_TAG"
           
-          # ابتدا فایل اصلی را ببین
+          # بررسی ساختار فایل
           echo "=== Original kustomization.yml ==="
           cat "$KUSTOMIZATION_FILE"
           echo "================================="
           
-          # روش ۱: استفاده از sed (مطمئن‌تر)
-          echo "Updating with sed..."
-          sed -i.bak "s|newTag: api-gateway-.*|newTag: $API_TAG|" "$KUSTOMIZATION_FILE"
-          sed -i "s|newTag: auth-service-.*|newTag: $AUTH_TAG|" "$KUSTOMIZATION_FILE"
-          
-          # روش ۲: اگر yq نصب است و می‌خواهی استفاده کنی
-          # if command -v yq &> /dev/null; then
-          #   echo "Updating with yq..."
-          #   yq eval -i "(.images[] | select(.name == \"api-gateway\").newTag) = \"$API_TAG\"" "$KUSTOMIZATION_FILE"
-          #   yq eval -i "(.images[] | select(.name == \"auth-service\").newTag) = \"$AUTH_TAG\"" "$KUSTOMIZATION_FILE"
-          # fi
+          # اگر فقط یک image entry دارید، آن را به api-gateway آپدیت کنید
+          # اگر دو entry دارید، هر دو را آپدیت کنید
+          if grep -q "name: auth-service" "$KUSTOMIZATION_FILE"; then
+            echo "Found auth-service entry, updating both..."
+            sed -i "s|newTag: api-gateway-.*|newTag: $API_TAG|" "$KUSTOMIZATION_FILE"
+            sed -i "s|newTag: auth-service-.*|newTag: $AUTH_TAG|" "$KUSTOMIZATION_FILE"
+          else
+            echo "Only api-gateway entry found, updating it..."
+            sed -i "s|newTag: api-gateway-.*|newTag: $API_TAG|" "$KUSTOMIZATION_FILE"
+            echo "Note: Add auth-service entry to kustomization.yml to update both services"
+          fi
           
           echo "=== Updated kustomization.yml ==="
           cat "$KUSTOMIZATION_FILE"
           echo "================================="
-          
-          # backup فایل را پاک کن
-          rm -f "$KUSTOMIZATION_FILE.bak"
 
       - name: Commit and push changes
         env:
-          # تنظیم git با اطلاعات صحیح
           GIT_USERNAME: "github-actions[bot]"
           GIT_EMAIL: "github-actions[bot]@users.noreply.github.com"
         run: |
@@ -183,22 +178,19 @@ jobs:
           git config user.name "$GIT_USERNAME"
           git config user.email "$GIT_EMAIL"
           
-          # اضافه کردن remote با token برای auth بهتر
+          # اضافه کردن remote با token
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           
-          # اضافه، commit و push
+          # اضافه، commit
           git add infra/development/k8s/kustomization.yml
           git commit -m "ci: update image tags to ${{ env.COMMON_SHA }} [skip ci]"
           
           # pull latest قبل از push
-          echo "Pulling latest changes..."
-          git pull --rebase origin develop || {
-            echo "Rebase failed, trying merge..."
-            git pull origin develop --no-rebase
-          }
+          echo "Pulling latest changes from develop..."
+          git pull origin develop --rebase
           
-          # push changes
-          echo "Pushing changes..."
+          # push به develop
+          echo "Pushing to develop..."
           git push origin develop
           
-          echo "✅ Successfully updated and pushed kustomization.yml"
+          echo "✅ Successfully updated kustomization.yml"
