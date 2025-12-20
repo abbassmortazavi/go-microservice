@@ -12,7 +12,7 @@ resources:
   - rabbitmq-service/rabbitmq-service.yaml
 namespace: production
 images:
-  - name: abbass69/microservice
+  - name: api-gateway
     newName: abbass69/microservice
     newTag: api-gateway-4c657fd4d8d7a2c12e32d1bc99573d1c53c71d73
   - name: auth-service  # برای auth-service
