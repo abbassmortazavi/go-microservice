@@ -2,14 +2,13 @@ name: Build And Push to Docker Hub
 on:
   workflow_dispatch:
   workflow_call:
-      inputs:
-        environment:
-          required: false
-          type: string
-          default: 'production'
+    inputs:
+      environment:
+        required: false
+        type: string
+        default: 'production'
 env:
   DOCKER_HUB_ORG: abbass69
-  # ❌ PROJECT_NAME دیگر نیاز نیست
   COMMON_SHA: ${{ github.sha }}
 permissions:
   contents: write
@@ -54,14 +53,17 @@ jobs:
           REPO="${{ steps.set-output.outputs.image_name }}"
           TAG="${{ steps.set-output.outputs.image_tag }}"
           
-          echo "Building $REPO:$TAG"
+          echo "Building $REPO:$TAG and $REPO:latest"
           
-          docker build -t $REPO:$TAG \
+          # ساخت ایمیج با دو تگ
+          docker build -t $REPO:$TAG -t $REPO:latest \
             -f infra/development/docker/api-gateway/api-gateway.Dockerfile .
-          
           
           echo "Pushing $REPO:$TAG"
           docker push $REPO:$TAG
+          
+          echo "Pushing $REPO:latest"
+          docker push $REPO:latest
 
   build-auth-service:
     name: Build Auth Service
@@ -87,7 +89,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-
       - name: Set outputs
         id: set-output
         run: |
@@ -104,13 +105,17 @@ jobs:
           REPO="${{ steps.set-output.outputs.image_name }}"
           TAG="${{ steps.set-output.outputs.image_tag }}"
           
-           echo "Building $REPO:$TAG"
+          echo "Building $REPO:$TAG and $REPO:latest"
           
-          docker build -t $REPO:$TAG \
+          # ساخت ایمیج با دو تگ
+          docker build -t $REPO:$TAG -t $REPO:latest \
             -f services/auth-service/docker/auth-service.Dockerfile .
           
           echo "Pushing $REPO:$TAG"
           docker push $REPO:$TAG
+          
+          echo "Pushing $REPO:latest"
+          docker push $REPO:latest
 
   update-kustomize:
     name: Update Kustomize
@@ -133,56 +138,54 @@ jobs:
           API_GATEWAY_NAME="${{ needs.build-api-gateway.outputs.image_name }}"
           API_GATEWAY_TAG="${{ needs.build-api-gateway.outputs.image_tag }}"
           
-           # اطلاعات auth-service
+          # اطلاعات auth-service
           AUTH_SERVICE_NAME="${{ needs.build-auth-service.outputs.image_name }}"
           AUTH_SERVICE_TAG="${{ needs.build-auth-service.outputs.image_tag }}"
           
-            echo "Updating kustomization:"
+          echo "Updating kustomization:"
           echo "  api-gateway: $API_GATEWAY_NAME:$API_GATEWAY_TAG"
           echo "  auth-service: $AUTH_SERVICE_NAME:$AUTH_SERVICE_TAG"
-          
           
           # ایجاد یا آپدیت فایل
           cat > "$KUSTOMIZATION_FILE" << EOF
           apiVersion: kustomize.config.k8s.io/v1beta1
           kind: Kustomization
-        
+          
           namespace: production
-        
+          
           resources:
-              - api-gateway/api-gateway-deployment.yaml
-              - app-config.yaml
-              - api-gateway/api-gateway-service.yaml
-              - auth-service/auth-service.yaml
-              - auth-service/auth-service-deployment.yaml
-              - postgres-service/postgres-deployment.yaml
-              - postgres-service/postgres-service.yaml
-              - rabbitmq-service/rabbitmq-deployment.yaml
-              - rabbitmq-service/rabbitmq-service.yaml
+            - api-gateway/api-gateway-deployment.yaml
+            - app-config.yaml
+            - api-gateway/api-gateway-service.yaml
+            - auth-service/auth-service.yaml
+            - auth-service/auth-service-deployment.yaml
+            - postgres-service/postgres-deployment.yaml
+            - postgres-service/postgres-service.yaml
+            - rabbitmq-service/rabbitmq-deployment.yaml
+            - rabbitmq-service/rabbitmq-service.yaml
           
           images:
             - name: api-gateway  # باید با container name در deployment هماهنگ باشد
               newName: $API_GATEWAY_NAME
               newTag: $API_GATEWAY_TAG
-            
+          
             - name: auth-service  # باید با container name در deployment هماهنگ باشد
               newName: $AUTH_SERVICE_NAME
               newTag: $AUTH_SERVICE_TAG
-            EOF
+          EOF
           
-            echo "Updated kustomization.yml:"
-            cat "$KUSTOMIZATION_FILE"
-            
-            - name: Commit and push changes
-              env:
-                GIT_USERNAME: "github-actions[bot]"
-                GIT_EMAIL: "github-actions[bot]@users.noreply.github.com"
-              run: |
-                if git diff --quiet; then
-                  echo "No changes detected"
-                  exit 0
-                fi
-          
+          echo "Updated kustomization.yml:"
+          cat "$KUSTOMIZATION_FILE"
+
+      - name: Commit and push changes
+        env:
+          GIT_USERNAME: "github-actions[bot]"
+          GIT_EMAIL: "github-actions[bot]@users.noreply.github.com"
+        run: |
+          if git diff --quiet; then
+            echo "No changes detected"
+            exit 0
+          fi
           
           git config user.name "$GIT_USERNAME"
           git config user.email "$GIT_EMAIL"
@@ -196,22 +199,3 @@ jobs:
           git push origin develop
           
           echo "✅ Successfully updated kustomization.yml"
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
