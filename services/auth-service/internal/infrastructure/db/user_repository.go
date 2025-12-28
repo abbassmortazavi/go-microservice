@@ -6,6 +6,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"log"
 )
 
 type UserRepository struct {
@@ -18,6 +19,7 @@ func NewUserRepository(db *sql.DB) repository_interface.UserRepositoryInterface 
 	}
 }
 func (u *UserRepository) Create(ctx context.Context, user *entity.User) error {
+	log.Println("creating user with repo")
 	query := `INSERT INTO users (id, email, password, role, created_at) VALUES ($1, $2, $3, $4, $5)`
 	_, err := u.db.ExecContext(ctx, query, user.ID, user.Email, user.Password, user.Role, user.CreatedAt)
 	if err != nil {

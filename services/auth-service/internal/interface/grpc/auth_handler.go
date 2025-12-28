@@ -4,6 +4,7 @@ import (
 	authpb "abbassmortazavi/go-microservice/pkg/proto/auth"
 	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/service"
 	"context"
+	"log"
 )
 
 type AuthHandler struct {
@@ -19,6 +20,7 @@ func NewAuthHandler(a *service.AuthService) *AuthHandler {
 
 func (h *AuthHandler) Register(ctx context.Context, req *authpb.RegisterRequest) (*authpb.RegisterResponse, error) {
 	// password hashing later
+	log.Println(2)
 	err := h.authService.Register(ctx, req.Email, req.Password, req.Name)
 	if err != nil {
 		return nil, err

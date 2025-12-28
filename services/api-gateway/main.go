@@ -22,6 +22,8 @@ func main() {
 		log.Println("everything work perfectly!!!!!")
 	})
 
+	mux.HandleFunc("POST /register", handelRegister)
+
 	server := &http.Server{
 		Addr:    httpAddr,
 		Handler: mux,

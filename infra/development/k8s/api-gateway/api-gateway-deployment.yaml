@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: abbass69/api-gateway:latest
+#          image: abbass69/api-gateway:latest
+          image: microservice/api-gateway
           imagePullPolicy: Always
           ports:
             - containerPort: 8081

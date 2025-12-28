@@ -12,7 +12,7 @@ type Config struct {
 
 func Load() *Config {
 	cfg := &Config{
-		HTTP_ADDR:     env.GetString("HTTP_ADDR", ":9091"),
+		HTTP_ADDR:     env.GetString("HTTP_ADDR", ":9092"),
 		RABBITMQ_URL:  env.GetString("RABBITMQ_URL", "amqp://guest:guest@rabbitmq:5672/"),
 		USER_EXCHANGE: env.GetString("USER_EXCHANGE", "user.events"),
 	}
