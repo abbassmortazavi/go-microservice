@@ -18,7 +18,7 @@ spec:
         - name: api-gateway
           image: abbass69/api-gateway:latest
 #          image: microservice/api-gateway
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 8081
           # 👇 CHANGE TO TCP PROBES (No /health endpoint needed) 👇
