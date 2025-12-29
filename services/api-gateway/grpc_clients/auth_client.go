@@ -29,8 +29,5 @@ func NewAuthServiceClient() (*AuthServiceClient, error) {
 	}, nil
 }
 func (c *AuthServiceClient) Close() error {
-	if err := c.Close(); err != nil {
-		return err
-	}
-	return nil
+	return c.Conn.Close()
 }
