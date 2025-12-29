@@ -23,6 +23,7 @@ import (
 )
 
 func main() {
+	log.Println("Starting service... auth")
 	log.Println("Starting service Auth Service...")
 	rabbitmqURL := env.GetString("RABBITMQ_URL", "amqp://guest:guest@rabbitmq:5672/")
 	gcfg := global.Load()
@@ -31,21 +32,17 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	go func() {
-		sigchan := make(chan os.Signal, 1)
-		signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
-		<-sigchan
-		cancel()
-	}()
+	// Setup signal handling
+	sigchan := make(chan os.Signal, 1)
+	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 
-	lis, err := net.Listen("tcp", cfg.HTTP_ADDR)
+	lis, err := net.Listen("tcp", ":9092")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	database.Connect()
 
 	userRepo := db.NewUserRepository(database.DB)
-	//db.Run(database.DB)
 
 	hasher := security.NewBcryptHasher()
 	tokenService := service.NewJWTSecret([]byte(gcfg.JWT_SECRET))
@@ -56,7 +53,7 @@ func main() {
 	defer ch.Close()
 
 	err = ch.ExchangeDeclare(
-		cfg.USER_EXCHANGE,
+		cfg.UserExchange,
 		"topic",
 		true,
 		false,
@@ -67,7 +64,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	publisher := messaging.NewPublisher(ch, cfg.USER_EXCHANGE)
+	publisher := messaging.NewPublisher(ch, cfg.UserExchange)
 
 	authService := service.NewAuthService(userRepo, hasher, tokenService, publisher)
 
@@ -76,16 +73,27 @@ func main() {
 	server := grpc2.NewServer()
 	authpb.RegisterAuthServiceServer(server, authHandler)
 
-	log.Printf("starting Auth Service grpc server at %s", lis.Addr().String())
-
+	// Run server in a goroutine
+	serverErr := make(chan error, 1)
 	go func() {
+		log.Printf("starting Auth Service grpc server at %s", lis.Addr().String())
 		if err := server.Serve(lis); err != nil {
-			log.Fatalf("failed to serve: %v", err)
-			cancel()
+			serverErr <- err
 		}
 	}()
 
-	<-ctx.Done()
+	// Wait for either server error or shutdown signal
+	select {
+	case err := <-serverErr:
+		log.Printf("gRPC server error: %v", err)
+		cancel()
+	case sig := <-sigchan:
+		log.Printf("Received signal: %v", sig)
+		cancel()
+	case <-ctx.Done():
+		// Context canceled by other means
+	}
+
 	log.Printf("shutting down Auth Service grpc server")
 	server.GracefulStop()
 }
