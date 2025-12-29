@@ -53,7 +53,7 @@ func main() {
 	defer ch.Close()
 
 	err = ch.ExchangeDeclare(
-		cfg.USER_EXCHANGE,
+		cfg.UserExchange,
 		"topic",
 		true,
 		false,
@@ -64,7 +64,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	publisher := messaging.NewPublisher(ch, cfg.USER_EXCHANGE)
+	publisher := messaging.NewPublisher(ch, cfg.UserExchange)
 
 	authService := service.NewAuthService(userRepo, hasher, tokenService, publisher)
 

@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
         - name: auth-service
-#          image: abbass69/auth-service:latest
-          image: microservice/auth-service
+          image: abbass69/auth-service:latest
+#          image: microservice/auth-service
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9092
