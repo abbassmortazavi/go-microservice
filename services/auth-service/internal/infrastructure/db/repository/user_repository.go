@@ -1,4 +1,4 @@
-package db
+package repository
 
 import (
 	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/entity"
@@ -20,7 +20,6 @@ func NewUserRepository(db *sql.DB) repository_interface.UserRepositoryInterface 
 }
 func (u *UserRepository) Create(ctx context.Context, user *entity.User) error {
 	log.Println("creating user with repo")
-	log.Println(user)
 	query := `INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)`
 	_, err := u.db.ExecContext(ctx, query, user.Name, user.Email, user.Password, user.Role)
 	if err != nil {
