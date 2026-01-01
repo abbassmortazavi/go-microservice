@@ -23,6 +23,7 @@ func main() {
 	})
 
 	mux.HandleFunc("POST /register", handelRegister)
+	mux.HandleFunc("POST /login", handelLogin)
 
 	server := &http.Server{
 		Addr:    httpAddr,

@@ -23,7 +23,6 @@ import (
 )
 
 func main() {
-	log.Println("Starting service... auth")
 	log.Println("Starting service Auth Service...")
 	rabbitmqURL := env.GetString("RABBITMQ_URL", "amqp://guest:guest@rabbitmq:5672/")
 	gcfg := global.Load()
@@ -43,9 +42,11 @@ func main() {
 	database.Connect()
 
 	userRepo := repository.NewUserRepository(database.DB)
+	tokenRepo := repository.NewTokenRepository(database.DB)
 
 	hasher := security.NewBcryptHasher()
-	tokenService := service.NewJWTSecret([]byte(gcfg.JWT_SECRET))
+	//tokenService := service.NewJWTSecret([]byte(gcfg.JWT_SECRET))
+	tokenService := service.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo)
 
 	// ---- RabbitMQ ----
 	conn, ch := messaging.NewRabbitMQ(rabbitmqURL)

@@ -6,6 +6,7 @@ import (
 	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/repository_interface"
 	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/messaging"
 	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/security"
+	"abbassmortazavi/go-microservice/services/auth-service/pkg/response"
 	"context"
 	"errors"
 	"log"
@@ -53,21 +54,30 @@ func (a *AuthService) Register(ctx context.Context, email, password, name string
 
 	return a.publisher.Publish(ctx, "user_registered", event)
 }
-func (a *AuthService) Login(ctx context.Context, email, password string) (string, string, error) {
+func (a *AuthService) Login(ctx context.Context, email, password string) (*response.LoginResponse, error) {
+	log.Println("this is service")
 	user, err := a.userRepo.FindByEmail(ctx, email)
 	if err != nil {
-		return "", "", err
+		return nil, err
 	}
 	if err := a.hasher.Compare(user.Password, password); err == false {
-		return "", "", errors.New("password incorrect")
+		return nil, errors.New("password is wrong")
 	}
-	access, err := a.TokenService.GenerateAccessToken(strconv.FormatInt(user.ID, 10), user.Role)
+	tokens, err := a.TokenService.GenerateToken(int(user.ID), user.Name)
 	if err != nil {
-		return "", "", err
+		return nil, err
 	}
-	refreshToken, err := a.TokenService.GenerateRefreshToken(strconv.FormatInt(user.ID, 10))
-	if err != nil {
-		return "", "", err
+
+	userEntity := entity.User{
+		ID:        user.ID,
+		Name:      user.Name,
+		Email:     user.Email,
+		Role:      user.Role,
+		CreatedAt: user.CreatedAt,
 	}
-	return access, refreshToken, nil
+
+	return &response.LoginResponse{
+		Tokens: tokens,
+		User:   userEntity,
+	}, nil
 }

@@ -1,4 +1,4 @@
-package main
+package requests
 
 import authpb "abbassmortazavi/go-microservice/pkg/proto/auth"
 
