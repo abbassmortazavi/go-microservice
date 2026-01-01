@@ -4,7 +4,7 @@ import "time"
 
 type Token struct {
 	ID        string    `json:"id"`
-	UserID    string    `json:"user_id"`
+	UserID    int       `json:"user_id"`
 	TokenType string    `json:"token_type"`
 	HashToken string    `json:"hash_token"`
 	ExpiredAt time.Time `json:"expired_at"`

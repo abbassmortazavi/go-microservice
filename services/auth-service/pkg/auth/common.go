@@ -1,3 +1,3 @@
 package auth
 
-//var JwtAuthenticator *JWT
+var JwtAuthenticator *JWT
