@@ -30,14 +30,27 @@ func (h *AuthHandler) Register(ctx context.Context, req *authpb.RegisterRequest)
 }
 
 func (h *AuthHandler) Login(ctx context.Context, req *authpb.LoginRequest) (*authpb.LoginResponse, error) {
-	access, refresh, err := h.authService.Login(ctx, req.Email, req.Password)
+	log.Println("im here")
+	res, err := h.authService.Login(ctx, req.Email, req.Password)
 	if err != nil {
 		return nil, err
 	}
-	return &authpb.LoginResponse{
-		AccessToken:  access,
-		RefreshToken: refresh,
-	}, nil
+
+	return res.ToProto(), nil
+	/*return &authpb.LoginResponse{
+		Tokens: &authpb.Token{
+			AccessToken:  res.Tokens.AccessToken,
+			RefreshToken: res.Tokens.RefreshToken,
+			ExpiredAt:    res.Tokens.ExpiresAt,
+		},
+		User: &authpb.User{
+			Id:        res.User.ID,
+			Name:      res.User.Name,
+			Email:     res.User.Email,
+			Role:      res.User.Role,
+			CreatedAt: res.User.CreatedAt.Unix(),
+		},
+	}, nil*/
 }
 func (h *AuthHandler) ValidateToken(ctx context.Context, req *authpb.ValidateTokenRequest) (*authpb.ValidateTokenResponse, error) {
 	claims, err := h.authService.TokenService.ValidateToken(req.Token)
