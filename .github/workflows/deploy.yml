@@ -7,18 +7,6 @@ on:
         required: true
         type: string
         default: "production"
-      cluster:
-        required: false
-        type: string
-        default: "production-cluster"
-
-env:
-  KUBERNETES_VERSION: "latest"
-
-# ❌ حذف permissions از اینجا
-# permissions:
-#   id-token: write
-#   contents: read
 
 jobs:
   deploy:
@@ -32,24 +20,35 @@ jobs:
 
       - name: Setup kubectl
         uses: azure/setup-kubectl@v3
-        with:
-          version: ${{ env.KUBERNETES_VERSION }}
+        # بدون version یا با latest
 
       - name: Configure kubectl context
         uses: azure/k8s-set-context@v3
         with:
           method: kubeconfig
-          kubeconfig: ${{ secrets.KUBECONFIG }}
-          namespace: ${{ inputs.environment == 'production' && 'production' || 'development' }}
+          kubeconfig: ${{ secrets.KUBECONFIG }}  # ✅ این خط مهم است
+          # namespace را در دستورات kubectl بعدی مشخص کنید
+
+      - name: Create namespace if needed
+        run: |
+          NAMESPACE="${{ inputs.environment == 'production' && 'production' || 'development' }}"
+          kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Deploy with Kustomize
         run: |
           echo "🚀 Deploying to ${{ inputs.environment }}..."
           
+          NAMESPACE="${{ inputs.environment == 'production' && 'production' || 'development' }}"
+          
           if [ "${{ inputs.environment }}" = "development" ]; then
-            kubectl apply -k infra/development/k8s
+            kubectl apply -k infra/development/k8s -n $NAMESPACE
           else
-            kubectl apply -k infra/production/k8s/base
+            kubectl apply -k infra/production/k8s/base -n $NAMESPACE
           fi
           
-          echo "✅ Deployment completed"
+          # Wait for deployments
+          echo "⏳ Waiting for deployments..."
+          kubectl wait --for=condition=available --timeout=300s deployment/api-gateway -n $NAMESPACE
+          kubectl wait --for=condition=available --timeout=300s deployment/auth-service -n $NAMESPACE
+          
+          echo "✅ Deployment completed to namespace: $NAMESPACE"
