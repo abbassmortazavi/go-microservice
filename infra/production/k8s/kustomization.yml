@@ -7,8 +7,8 @@ resources:
   - base/api-gateway/api-gateway-deployment.yaml
   - base/configs/app-config.yaml
   - base/api-gateway/api-gateway-service.yaml
-  - auth-service/auth-service.yaml
-  - auth-service/auth-service-deployment.yaml
+  - base/auth-service/auth-service.yaml
+  - base/auth-service/auth-service-deployment.yaml
   - base/postgres-service/postgres-deployment.yaml
   - base/postgres-service/postgres-service.yaml
   - base/rabbitmq-service/rabbitmq-deployment.yaml

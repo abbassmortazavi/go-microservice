@@ -20,8 +20,8 @@ resources:
   - api-gateway/api-gateway-deployment.yaml
   - api-gateway/api-gateway-service.yaml
 
-  - ../auth-service/auth-service-deployment.yaml
-  - ../auth-service/auth-service.yaml
+  - auth-service/auth-service-deployment.yaml
+  - auth-service/auth-service.yaml
 
 
 
