@@ -1,79 +1,110 @@
 # Load the restart_process extension
 load('ext://restart_process', 'docker_build_with_restart')
 
+### تنظیمات عمومی ###
+# تنظیم namespace برای Kubernetes
+k8s_namespace('microservice-dev')
+
+# تعیین contextهای مجاز
+allow_k8s_contexts(['docker-desktop', 'minikube', 'docker-for-desktop'])
+
 ### k8s Config ###
 k8s_yaml('./infra/development/k8s/app-config.yaml')
+k8s_yaml('./infra/development/k8s/secrets.yaml')
 ### End k8s Config ###
 
 ### RabbitMQ ###
 k8s_yaml('./infra/development/k8s/rabbitmq-service/rabbitmq-deployment.yaml')
-k8s_resource('rabbitmq', port_forwards=['5672', '15672'], labels='tooling')
+k8s_yaml('./infra/development/k8s/rabbitmq-service/rabbitmq-service.yaml')
+k8s_resource('rabbitmq',
+             port_forwards=[5672, 15672],
+             labels=['tooling', 'infra'],
+             extra_pod_selectors=[{'app': 'rabbitmq'}])
 ### End RabbitMQ ###
 
 ### PostgresDB ###
 k8s_yaml('./infra/development/k8s/postgres-service/postgres-deployment.yaml')
-k8s_resource('postgres', port_forwards=5432, labels='databases')
+k8s_yaml('./infra/development/k8s/postgres-service/postgres-service.yaml')
+k8s_resource('postgres',
+             port_forwards=[5432],
+             labels=['databases', 'infra'],
+             extra_pod_selectors=[{'app': 'postgres'}])
 ### End PostgresDB ###
 
 ### API Gateway ###
+# کامپایل API Gateway
 gateway_compile_cmd = 'CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/api-gateway ./services/api-gateway'
-if os.name == 'nt':
-    gateway_compile_cmd = './infra/development/docker/api-gateway/api-gateway-build.bat'
 
 local_resource(
-    'api-gateway-compile',
-    gateway_compile_cmd,
-    deps=['./services/api-gateway'], labels="compiles")
+    name='api-gateway-compile',
+    cmd=gateway_compile_cmd,
+    deps=['./services/api-gateway'],
+    ignore=['./services/api-gateway/vendor'],
+    labels=['compiles'],
+    trigger_mode=TRIGGER_MODE_AUTO)
 
-docker_build_with_restart(
-    'microservice/api-gateway',  # This image name must match what's in your k8s YAML
+# ساخت Docker image
+docker_build(
+    'microservice/api-gateway:dev',
     '.',
-    entrypoint=['/app/build/api-gateway'],
     dockerfile='./infra/development/docker/api-gateway/api-gateway.Dockerfile',
     only=[
+        './services/api-gateway',
         './build/api-gateway'
     ],
     live_update=[
-        sync('./build', '/app/build')
+        sync('./services/api-gateway', '/app'),
+        sync('./build/api-gateway', '/app/build/api-gateway')
     ]
 )
 
-# Load the Kubernetes YAML
+# کانفیگ Kubernetes مخصوص development
 k8s_yaml('./infra/development/k8s/api-gateway/api-gateway-deployment.yaml')
+k8s_yaml('./infra/development/k8s/api-gateway/api-gateway-service.yaml')
 
-# Tilt automatically associates the docker_build with k8s_yaml when image names match
 k8s_resource('api-gateway',
-             port_forwards=8081,
-             resource_deps=['api-gateway-compile'],
-             labels="services")
+             port_forwards=[8081],
+             labels=['services', 'gateway'],
+             extra_pod_selectors=[{'app': 'api-gateway'}])
 ### End of API Gateway ###
 
 ### Auth Service ###
-auth_compile_cmd = 'CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/auth-service ./services/auth-service/cmd/main.go'
-if os.name == 'nt':
-    auth_compile_cmd = './services/auth-service/docker/auth-service-build.bat'
+# کامپایل Auth Service
+auth_compile_cmd = 'CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/auth-service ./services/auth-service/cmd'
 
 local_resource(
-    'auth-service-compile',
-    auth_compile_cmd,
-    deps=['./services/auth-service'], labels="compiles")
+    name='auth-service-compile',
+    cmd=auth_compile_cmd,
+    deps=['./services/auth-service'],
+    ignore=['./services/auth-service/vendor'],
+    labels=['compiles'],
+    trigger_mode=TRIGGER_MODE_AUTO)
 
-docker_build_with_restart(
-    'microservice/auth-service',  # This image name must match what's in your k8s YAML
+# ساخت Docker image برای Auth Service
+docker_build(
+    'microservice/auth-service:dev',
     '.',
-    entrypoint=['/app/build/auth-service'],
     dockerfile='./services/auth-service/docker/auth-service.Dockerfile',
     only=[
+        './services/auth-service',
         './build/auth-service'
     ],
     live_update=[
-        sync('./build', '/app/build')
+        sync('./services/auth-service', '/app'),
+        sync('./build/auth-service', '/app/build/auth-service')
     ]
 )
 
-# Load the Kubernetes YAML
+# کانفیگ Kubernetes مخصوص development
 k8s_yaml('./infra/development/k8s/auth-service/auth-service-deployment.yaml')
+k8s_yaml('./infra/development/k8s/auth-service/auth-service.yaml')
+
 k8s_resource('auth-service',
-             resource_deps=['auth-service-compile'],
-             labels="services")
+             port_forwards=[9092],
+             labels=['services', 'auth'],
+             extra_pod_selectors=[{'app': 'auth-service'}])
 ### End Auth Service ###
+
+### نمایش وضعیت ###
+# غیرفعال کردن حذف خودکار images
+docker_prune_settings(disable=True)

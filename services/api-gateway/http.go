@@ -35,7 +35,7 @@ func handelRegister(w http.ResponseWriter, r *http.Request) {
 }
 
 func handelLogin(w http.ResponseWriter, r *http.Request) {
-	log.Println("handel login")
+	log.Println("mmmmmmmmmmmmmmmmmmmmm")
 	var req requests.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
