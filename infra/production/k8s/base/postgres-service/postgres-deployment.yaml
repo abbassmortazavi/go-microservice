@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
-  namespace: microservice-dev  # اضافه کردن namespace
+  namespace: production  # اضافه کردن namespace
 spec:
   replicas: 1
   selector:

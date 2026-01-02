@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: rabbitmq
-  namespace: microservice-dev  # تغییر به microservice-dev
+  namespace: production  # تغییر به microservice-dev
 spec:
   serviceName: "rabbitmq"
   replicas: 1

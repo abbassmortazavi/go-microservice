@@ -12,7 +12,7 @@ spec:
   project: default
 
   source:
-    repoURL: https://github.com/abbassmortazavi/microservice.git
+    repoURL: https://github.com/abbassmortazavi/go-microservice.git
     targetRevision: HEAD
     path: infra/production/k8s/base
     directory:
@@ -47,13 +47,3 @@ spec:
       value: Microservice Production Deployment
     - name: owner
       value: Platform Team
-
-  # Notifications
-  # notifications:
-  #   - triggers:
-  #       - on-sync-status-unknown
-  #       - on-deployed
-  #       - on-sync-failed
-  #     template: app-sync-status
-  #     recipients:
-  #       - slack: #deployments

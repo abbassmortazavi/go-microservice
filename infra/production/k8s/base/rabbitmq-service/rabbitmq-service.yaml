@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: rabbitmq
-  namespace: microservice-dev  # تغییر به microservice-dev
+  namespace: production  # تغییر به microservice-dev
 spec:
   selector:
     app: rabbitmq

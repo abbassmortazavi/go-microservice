@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: auth-service
-  namespace: microservice-dev
+  namespace: production
 spec:
   replicas: 1
   selector:
@@ -15,13 +15,13 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: microservice/auth-service:dev
-          imagePullPolicy: IfNotPresent
+          image: abbass69/auth-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 9092
           env:
             - name: ENVIRONMENT
-              value: "development"
+              value: "production"
             - name: DB_HOST
               value: "postgres-service"
             - name: DB_PORT
