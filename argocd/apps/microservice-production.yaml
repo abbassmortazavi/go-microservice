@@ -1,0 +1,59 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: microservice-production
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app.kubernetes.io/name: microservice
+    app.kubernetes.io/instance: production
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/abbassmortazavi/microservice.git
+    targetRevision: HEAD
+    path: infra/production/k8s/base
+    directory:
+      recurse: true
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: production
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+    - group: batch
+      kind: CronJob
+      jsonPointers:
+        - /spec/suspend
+
+  info:
+    - name: description
+      value: Microservice Production Deployment
+    - name: owner
+      value: Platform Team
+
+  # Notifications
+  # notifications:
+  #   - triggers:
+  #       - on-sync-status-unknown
+  #       - on-deployed
+  #       - on-sync-failed
+  #     template: app-sync-status
+  #     recipients:
+  #       - slack: #deployments

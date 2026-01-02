@@ -1,14 +1,20 @@
-name: Deploy
+name: Deploy to Kubernetes
+
 on:
   workflow_call:
     inputs:
       environment:
-        required: false
+        required: true
         type: string
         default: "production"
+      cluster:
+        required: false
+        type: string
+        default: "production-cluster"
+
 env:
-  REGION: ${{ vars.REGION }}
-  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+  KUBERNETES_VERSION: "1.27"
+  ARGOCD_VERSION: "2.8"
 
 permissions:
   id-token: write
@@ -20,6 +26,126 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
 
+    outputs:
+      deployed_version: ${{ steps.get-version.outputs.version }}
+      deployed_sha: ${{ github.sha }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: ${{ env.KUBERNETES_VERSION }}
+
+      - name: Configure kubectl context
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+          namespace: ${{ inputs.environment == 'production' && 'production' || 'development' }}
+
+      - name: Get current version
+        id: get-version
+        run: |
+          VERSION=$(git describe --tags --always --dirty)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "🔖 Version: $VERSION"
+
+      - name: Deploy with Kustomize (Direct - بدون ArgoCD)
+        if: inputs.environment == 'development'
+        run: |
+          echo "🚀 Deploying to development cluster..."
+          
+          # Apply development manifests
+          kubectl apply -k infra/development/k8s
+          
+          # Wait for deployments
+          echo "⏳ Waiting for deployments to be ready..."
+          kubectl wait --for=condition=available --timeout=300s deployment/api-gateway
+          kubectl wait --for=condition=available --timeout=300s deployment/auth-service
+          
+          echo "✅ Development deployment completed"
+
+      - name: Deploy with ArgoCD (برای Production)
+        if: inputs.environment == 'production'
+        run: |
+          echo "🚀 Deploying to production with ArgoCD..."
+          
+          # Setup ArgoCD CLI
+          ARGOCD_VERSION="2.8.0"
+          wget -q https://github.com/argoproj/argo-cd/releases/download/v${ARGOCD_VERSION}/argocd-linux-amd64
+          chmod +x argocd-linux-amd64
+          sudo mv argocd-linux-amd64 /usr/local/bin/argocd
+          
+          # Login to ArgoCD
+          argocd login ${{ secrets.ARGOCD_SERVER }} \
+            --username admin \
+            --password ${{ secrets.ARGOCD_ADMIN_PASSWORD }} \
+            --insecure
+          
+          # Sync application
+          APP_NAME="microservice-${{ inputs.environment }}"
+          
+          # Create or update application
+          if ! argocd app get $APP_NAME &>/dev/null; then
+            echo "📦 Creating ArgoCD application..."
+            argocd app create $APP_NAME \
+              --repo https://github.com/${{ github.repository }}.git \
+              --path infra/production/k8s/base \
+              --dest-server https://kubernetes.default.svc \
+              --dest-namespace production \
+              --sync-policy automated \
+              --auto-prune \
+              --self-heal \
+              --sync-option CreateNamespace=true \
+              --revision ${{ github.ref_name }}
+          fi
+          
+          # Sync application
+          echo "🔄 Syncing ArgoCD application..."
+          argocd app sync $APP_NAME
+          
+          # Wait for sync
+          argocd app wait $APP_NAME --health --timeout 600
+          
+          echo "✅ Production deployment via ArgoCD completed"
+
+      - name: Run smoke tests
+        run: |
+          echo "🧪 Running smoke tests..."
+          
+          # Determine namespace
+          NAMESPACE="${{ inputs.environment == 'production' && 'production' || 'development' }}"
+          
+          # Test API Gateway
+          echo "🔍 Testing API Gateway..."
+          kubectl run smoke-test-api -n $NAMESPACE --rm -i --restart=Never \
+            --image=curlimages/curl -- \
+            curl -f http://api-gateway:8080/health || exit 1
+          
+          # Test Auth Service
+          echo "🔍 Testing Auth Service..."
+          kubectl run smoke-test-auth -n $NAMESPACE --rm -i --restart=Never \
+            --image=curlimages/curl -- \
+            curl -f http://auth-service:9092/health || exit 1
+          
+          echo "✅ All smoke tests passed"
+
+      - name: Notify deployment status
+        if: always()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_CHANNEL: deployments
+          SLACK_COLOR: ${{ job.status == 'success' && 'good' || 'danger' }}
+          SLACK_TITLE: "Deployment ${{ job.status }} - ${{ inputs.environment }}"
+          SLACK_MESSAGE: |
+            *Repository*: ${{ github.repository }}
+            *Environment*: ${{ inputs.environment }}
+            *Version*: ${{ steps.get-version.outputs.version }}
+            *Commit*: ${{ github.sha }}
+            *Actor*: ${{ github.actor }}
+          SLACK_FOOTER: "GitHub Actions"
+          MSG_MINIMAL: true
