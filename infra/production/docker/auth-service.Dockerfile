@@ -1,9 +1,9 @@
-# Build stage
-FROM golang:1.25.5 AS builder
+# Build stage - استفاده از alpine base
+FROM golang:1.25.5-alpine AS builder
 
 WORKDIR /app
 
-# Install dependencies
+# Install dependencies (apk برای Alpine کار می‌کند)
 RUN apk add --no-cache git ca-certificates tzdata
 
 # Copy go mod files
@@ -25,13 +25,18 @@ FROM alpine:latest
 
 RUN apk --no-cache add ca-certificates tzdata
 
+# Create non-root user
+RUN addgroup -g 1000 -S app && \
+    adduser -u 1000 -S app -G app
+
 WORKDIR /app
 
 # Copy the binary from builder stage
 COPY --from=builder /app/auth-service .
+
 # Switch to non-root user
 USER app
 
-EXPOSE 9091
+EXPOSE 9092  # توجه: پورت باید 9092 باشد نه 9091
 
 CMD ["/app/auth-service"]
