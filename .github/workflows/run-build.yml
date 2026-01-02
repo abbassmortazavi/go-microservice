@@ -12,12 +12,6 @@ env:
   DOCKER_HUB_ORG: abbass69
   GITHUB_SHA_SHORT: ${{ github.sha }}
   REGISTRY: docker.io
-  BUILD_DATE: ${{ github.event.head_commit.timestamp || github.event.repository.updated_at }}
-
-# ❌ حذف permissions از اینجا - در سطح بالاتر تنظیم می‌شود
-# permissions:
-#   contents: write
-#   packages: write
 
 jobs:
   # Job برای build API Gateway
@@ -26,21 +20,15 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
 
+    outputs:
+      image_name: ${{ env.DOCKER_HUB_ORG }}/api-gateway
+      image_tag: ${{ env.GITHUB_SHA_SHORT }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: |
-            ${{ env.DOCKER_HUB_ORG }}/api-gateway
-          tags: |
-            type=sha,prefix=,format=short
-            type=raw,value=latest
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -51,13 +39,126 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
-      - name: Build and push
+      - name: Build and push API Gateway
         uses: docker/build-push-action@v5
         with:
           context: .
           file: infra/production/docker/api-gateway.Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: |
+            ${{ env.DOCKER_HUB_ORG }}/api-gateway:latest
+            ${{ env.DOCKER_HUB_ORG }}/api-gateway:${{ env.GITHUB_SHA_SHORT }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          platforms: linux/amd64
+
+  # Job برای build Auth Service
+  build-auth-service:
+    name: Build Auth Service
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    outputs:
+      image_name: ${{ env.DOCKER_HUB_ORG }}/auth-service
+      image_tag: ${{ env.GITHUB_SHA_SHORT }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - name: Build and push Auth Service
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: infra/production/docker/auth-service.Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_HUB_ORG }}/auth-service:latest
+            ${{ env.DOCKER_HUB_ORG }}/auth-service:${{ env.GITHUB_SHA_SHORT }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+
+  # Job برای update kustomize (اختیاری)
+  update-kustomize:
+    name: Update Kustomize Images
+    needs: [build-api-gateway, build-auth-service]
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.ref_name }}
+
+      - name: Install kustomize
+        run: |
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          sudo mv kustomize /usr/local/bin/
+
+      - name: Update kustomization for development
+        if: inputs.environment == 'development'
+        run: |
+          echo "🔄 Updating development kustomization..."
+          
+          cd infra/development/k8s
+          
+          # Update API Gateway image
+          kustomize edit set image api-gateway=${{ needs.build-api-gateway.outputs.image_name }}:${{ needs.build-api-gateway.outputs.image_tag }}
+          
+          # Update Auth Service image
+          kustomize edit set image auth-service=${{ needs.build-auth-service.outputs.image_name }}:${{ needs.build-auth-service.outputs.image_tag }}
+          
+          echo "✅ Development kustomization updated"
+
+      - name: Update kustomization for production
+        if: inputs.environment == 'production'
+        run: |
+          echo "🔄 Updating production kustomization..."
+          
+          cd infra/production/k8s
+          
+          # Update API Gateway image
+          kustomize edit set image api-gateway=${{ needs.build-api-gateway.outputs.image_name }}:${{ needs.build-api-gateway.outputs.image_tag }}
+          
+          # Update Auth Service image
+          kustomize edit set image auth-service=${{ needs.build-auth-service.outputs.image_name }}:${{ needs.build-auth-service.outputs.image_tag }}
+          
+          echo "✅ Production kustomization updated"
+
+      - name: Commit changes
+        if: inputs.environment == 'development'
+        env:
+          GIT_USER: "github-actions[bot]"
+          GIT_EMAIL: "github-actions[bot]@users.noreply.github.com"
+        run: |
+          if git diff --quiet; then
+            echo "📝 No changes to commit"
+            exit 0
+          fi
+          
+          git config user.name "$GIT_USER"
+          git config user.email "$GIT_EMAIL"
+          
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          
+          git add infra/
+          git commit -m "ci: update image tags for ${{ inputs.environment }} [skip ci]"
+          
+          git pull origin ${{ github.ref_name }} --rebase
+          git push origin ${{ github.ref_name }}
+          
+          echo "✅ Changes committed and pushed"
