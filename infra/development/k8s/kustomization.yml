@@ -17,8 +17,8 @@ resources:
 images:
   - name: api-gateway  # باید با container name در deployment هماهنگ باشد
     newName: 
-    newTag: api-gateway-de47d0820922c04c7ed04b94617bd8b175db398e
+    newTag: api-gateway-ae904dcf1e3caf7d4b910a6699be53a5f234fde0
 
   - name: auth-service  # باید با container name در deployment هماهنگ باشد
     newName: 
-    newTag: auth-service-de47d0820922c04c7ed04b94617bd8b175db398e
+    newTag: auth-service-ae904dcf1e3caf7d4b910a6699be53a5f234fde0
