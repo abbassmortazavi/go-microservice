@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: microservice-development
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: microservice
+    app.kubernetes.io/instance: development
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/abbassmortazavi/microservice.git
+    targetRevision: develop
+    path: infra/development/k8s
+    directory:
+      recurse: true
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: development
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true  # در development ممکن است manual sync بهتر باشد
+    syncOptions:
+      - CreateNamespace=true

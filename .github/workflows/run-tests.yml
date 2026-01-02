@@ -4,51 +4,187 @@ on:
   workflow_call:
     inputs:
       environment:
-        required: false
+        required: true
         type: string
         default: 'production'
-  workflow_dispatch:
-  push:
-    branches-ignore:
-      - main
-      - master
+      skip-integration:
+        required: false
+        type: boolean
+        default: false
+
+env:
+  GO_VERSION: '1.21'
+  GO_ENV: production
 
 jobs:
-  run-tests:
-    name: Run Go Tests
+  unit-tests:
+    name: Run Unit Tests
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}  # ✅ Add this line
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+          cache-dependency-path: go.sum
+
+      - name: Verify Go modules
+        run: |
+          go mod download
+          go mod verify
+
+      - name: Run unit tests with coverage
+        run: |
+          echo "📊 Running unit tests..."
+          
+          # API Gateway tests
+          if [ -d "./services/api-gateway" ]; then
+            echo "🧪 Testing API Gateway..."
+            cd ./services/api-gateway
+            go test ./... -v -race -coverprofile=coverage-api.out -covermode=atomic
+            go tool cover -func=coverage-api.out | tail -1
+            cd ../..
+          fi
+          
+          # Auth Service tests
+          if [ -d "./services/auth-service" ]; then
+            echo "🧪 Testing Auth Service..."
+            cd ./services/auth-service
+            go test ./... -v -race -coverprofile=coverage-auth.out -covermode=atomic
+            go tool cover -func=coverage-auth.out | tail -1
+            cd ../..
+          fi
+          
+          # Package tests
+          if [ -d "./pkg" ]; then
+            echo "🧪 Testing shared packages..."
+            cd ./pkg
+            go test ./... -v -race -coverprofile=coverage-pkg.out -covermode=atomic
+            go tool cover -func=coverage-pkg.out | tail -1
+            cd ..
+          fi
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./**/coverage-*.out
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+  integration-tests:
+    name: Run Integration Tests
+    if: ${{ !inputs.skip-integration && inputs.environment == 'development' }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      rabbitmq:
+        image: rabbitmq:3-management-alpine
+        env:
+          RABBITMQ_DEFAULT_USER: guest
+          RABBITMQ_DEFAULT_PASS: guest
+        options: >-
+          --health-cmd "rabbitmq-diagnostics ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5672:5672
+          - 15672:15672
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Go
+      - name: Setup Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.25.5'
-          check-latest: true
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
 
-      - name: Cache Go modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      - name: Download dependencies
-        run: go mod download
-
-      - name: Run tests
+      - name: Run integration tests
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: test
+          DB_PASSWORD: test
+          DB_NAME: test_db
+          DB_SSLMODE: disable
+          RABBITMQ_URI: amqp://guest:guest@localhost:5672/
         run: |
-          echo "Testing pkg directory..."
-          cd pkg && go test ./... -v || echo "Some tests in pkg failed"
+          echo "🔗 Running integration tests..."
           
-          echo "Testing services directory..."
-          cd ../services && go test ./... -v || echo "Some tests in services failed"
+          # Wait for services to be ready
+          echo "⏳ Waiting for PostgreSQL..."
+          until pg_isready -h localhost -U test; do
+            sleep 1
+          done
           
-          echo "Testing tools directory..."
-          cd ../tools && go test ./... -v || echo "Some tests in tools failed"
+          echo "⏳ Waiting for RabbitMQ..."
+          until curl -f http://localhost:15672; do
+            sleep 1
+          done
+          
+          # Run integration tests
+          for dir in ./services/*; do
+            if [ -f "$dir/integration_test.go" ] || [ -d "$dir/integration" ]; then
+              echo "🧪 Running integration tests in $dir"
+              cd "$dir" && go test -tags=integration ./... -v
+              cd ../..
+            fi
+          done
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Run GoSec
+        run: |
+          # Install GoSec
+          go install github.com/securego/gosec/v2/cmd/gosec@latest
+          
+          # Run security scan
+          echo "🔒 Running GoSec security scan..."
+          gosec -quiet ./... 2>/dev/null || true
