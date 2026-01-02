@@ -9,28 +9,31 @@ on:
   push:
     branches: ["develop", "feature/**", "bugfix/**"]
 
-# 🔥 تنظیم permissions در این سطح
 permissions:
-  contents: write  # برای push تغییرات
-  packages: write  # برای push به Docker Hub
-  id-token: write  # برای authentication
+  contents: write
+  packages: write
+  id-token: write
 
 jobs:
   # مرحله ۱: تست
   tests:
     uses: ./.github/workflows/run-tests.yml
     secrets: inherit
+    with:  # ✅ اضافه کردن with
+      environment: 'development'  # ✅ ارسال environment
 
   # مرحله ۲: ساخت images
   build:
     uses: ./.github/workflows/run-build.yml
     needs: tests
     secrets: inherit
+    with:  # ✅ اضافه کردن with
+      environment: 'development'  # ✅ ارسال environment
 
   # مرحله ۳: دیپلوی
   deploy:
     uses: ./.github/workflows/deploy.yml
     needs: build
     secrets: inherit
-    with:
-      environment: 'development'
+    with:  # ✅ اضافه کردن with
+      environment: 'development'  # ✅ ارسال environment
