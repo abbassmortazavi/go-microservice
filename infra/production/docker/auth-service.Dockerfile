@@ -3,7 +3,7 @@ FROM golang:1.25.5-alpine AS builder
 
 WORKDIR /app
 
-# Install dependencies (apk برای Alpine کار می‌کند)
+# Install dependencies
 RUN apk add --no-cache git ca-certificates tzdata
 
 # Copy go mod files
@@ -37,6 +37,6 @@ COPY --from=builder /app/auth-service .
 # Switch to non-root user
 USER app
 
-EXPOSE 9092  # توجه: پورت باید 9092 باشد نه 9091
+EXPOSE 9092
 
 CMD ["/app/auth-service"]
