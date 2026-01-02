@@ -3,20 +3,15 @@ FROM golang:1.25.5-alpine AS builder
 
 WORKDIR /app
 
-# Install dependencies
-RUN apk add --no-cache git ca-certificates tzdata
 
 # Copy go mod files
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy source code
-COPY services/auth-service ./services/auth-service
-COPY pkg ./pkg
-COPY proto ./proto
+# Copy the entire project
+COPY . .
 
-# Build the application
-WORKDIR /app/services/auth-service
+
 RUN CGO_ENABLED=0 GOOS=linux go build -o /app/auth-service ./services/auth-service/cmd/
 
 # Runtime stage
