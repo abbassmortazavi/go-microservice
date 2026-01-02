@@ -7,12 +7,164 @@ on:
         required: true
         type: string
         default: 'production'
+      skip-integration:  # ✅ اضافه کردن این input
+        required: false
+        type: boolean
+        default: false
+
+env:
+  GO_VERSION: '1.21.6'
+  GO_ENV: production
 
 jobs:
-  simple-tests:
-    name: Run Simple Tests
+  unit-tests:
+    name: Run Unit Tests
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+          cache-dependency-path: go.sum
+
+      - name: Run unit tests
+        run: |
+          echo "🧪 Running unit tests..."
+          
+          # ایجاد فایل برای جمع‌آوری نتایج
+          echo "# Test Results" > test-results.md
+          echo "## Unit Tests" >> test-results.md
+          
+          # تست API Gateway
+          if [ -d "./services/api-gateway" ]; then
+            echo "🧪 Testing API Gateway..."
+            cd ./services/api-gateway
+          
+            TEST_OUTPUT=$(go test ./... -v -race 2>&1)
+            TEST_EXIT_CODE=$?
+          
+            echo "### API Gateway" >> ../test-results.md
+            if [ $TEST_EXIT_CODE -eq 0 ]; then
+              echo "✅ All tests passed" >> ../test-results.md
+              echo "Exit Code: $TEST_EXIT_CODE" >> ../test-results.md
+            else
+              echo "❌ Tests failed" >> ../test-results.md
+              echo "Exit Code: $TEST_EXIT_CODE" >> ../test-results.md
+              echo "\`\`\`" >> ../test-results.md
+              echo "$TEST_OUTPUT" | tail -50 >> ../test-results.md
+              echo "\`\`\`" >> ../test-results.md
+            fi
+          
+            cd ../..
+          fi
+          
+          # تست Auth Service
+          if [ -d "./services/auth-service" ]; then
+            echo "🧪 Testing Auth Service..."
+            cd ./services/auth-service
+          
+            TEST_OUTPUT=$(go test ./... -v -race 2>&1)
+            TEST_EXIT_CODE=$?
+          
+            echo "### Auth Service" >> ../test-results.md
+            if [ $TEST_EXIT_CODE -eq 0 ]; then
+              echo "✅ All tests passed" >> ../test-results.md
+              echo "Exit Code: $TEST_EXIT_CODE" >> ../test-results.md
+            else
+              echo "❌ Tests failed" >> ../test-results.md
+              echo "Exit Code: $TEST_EXIT_CODE" >> ../test-results.md
+              echo "\`\`\`" >> ../test-results.md
+              echo "$TEST_OUTPUT" | tail -50 >> ../test-results.md
+              echo "\`\`\`" >> ../test-results.md
+            fi
+          
+            cd ../..
+          fi
+          
+          # تست shared packages
+          if [ -d "./pkg" ]; then
+            echo "🧪 Testing shared packages..."
+            cd ./pkg
+          
+            TEST_OUTPUT=$(go test ./... -v -race 2>&1)
+            TEST_EXIT_CODE=$?
+          
+            echo "### Shared Packages" >> ../test-results.md
+            if [ $TEST_EXIT_CODE -eq 0 ]; then
+              echo "✅ All tests passed" >> ../test-results.md
+              echo "Exit Code: $TEST_EXIT_CODE" >> ../test-results.md
+            else
+              echo "❌ Tests failed" >> ../test-results.md
+              echo "Exit Code: $TEST_EXIT_CODE" >> ../test-results.md
+              echo "\`\`\`" >> ../test-results.md
+              echo "$TEST_OUTPUT" | tail -50 >> ../test-results.md
+              echo "\`\`\`" >> ../test-results.md
+            fi
+          
+            cd ..
+          fi
+          
+          # نمایش نتایج
+          echo "📋 Test Results Summary:"
+          cat test-results.md
+          
+          # بررسی اگر تست‌ها fail شده‌اند
+          FAILED_COUNT=$(grep -c "❌ Tests failed" test-results.md)
+          if [ $FAILED_COUNT -gt 0 ]; then
+            echo "❌ Some tests failed. See details above."
+            exit 1
+          fi
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ github.run_id }}
+          path: test-results.md
+
+  # 🔥 بخش integration tests فقط در صورت نیاز اجرا شود
+  integration-tests:
+    name: Run Integration Tests
+    if: ${{ !inputs.skip-integration && inputs.environment == 'development' }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      rabbitmq:
+        image: rabbitmq:3-management-alpine
+        env:
+          RABBITMQ_DEFAULT_USER: guest
+          RABBITMQ_DEFAULT_PASS: guest
+        options: >-
+          --health-cmd "rabbitmq-diagnostics ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5672:5672
+          - 15672:15672
 
     steps:
       - name: Checkout code
@@ -21,26 +173,41 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.21'
+          go-version: ${{ env.GO_VERSION }}
           cache: true
 
-      - name: Run API Gateway tests
+      - name: Run integration tests
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: test
+          DB_PASSWORD: test
+          DB_NAME: test_db
+          DB_SSLMODE: disable
+          RABBITMQ_URI: amqp://guest:guest@localhost:5672/
         run: |
-          echo "🧪 Testing API Gateway..."
-          cd services/api-gateway
-          go test ./... -v || echo "API Gateway tests failed"
-          cd ../..
-
-      - name: Run Auth Service tests
-        run: |
-          echo "🧪 Testing Auth Service..."
-          cd services/auth-service
-          go test ./... -v || echo "Auth Service tests failed"
-          cd ../..
-
-      - name: Run shared packages tests
-        run: |
-          echo "🧪 Testing shared packages..."
-          cd pkg
-          go test ./... -v || echo "Shared packages tests failed"
-          cd ..
+          echo "🔗 Running integration tests..."
+          
+          # Wait for services to be ready
+          echo "⏳ Waiting for PostgreSQL..."
+          until pg_isready -h localhost -U test; do
+            sleep 1
+          done
+          
+          echo "⏳ Waiting for RabbitMQ..."
+          until curl -f http://localhost:15672; do
+            sleep 1
+          done
+          
+          echo "✅ Services are ready"
+          
+          # Run integration tests if they exist
+          for dir in ./services/*; do
+            if [ -f "$dir/integration_test.go" ] || [ -d "$dir/integration" ]; then
+              echo "🧪 Running integration tests in $dir"
+              cd "$dir" && go test -tags=integration ./... -v
+              cd ../..
+            else
+              echo "⚠️ No integration tests found in $dir"
+            fi
+          done

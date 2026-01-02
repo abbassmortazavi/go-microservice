@@ -28,7 +28,7 @@ jobs:
     secrets: inherit
     with:
       environment: 'development'
-      skip-integration: ${{ github.event_name == 'push' }}
+      # حذف skip-integration چون در run-tests.yml تعریف نشده
 
   # مرحله ۲: ساخت images
   build:
@@ -72,7 +72,7 @@ jobs:
           
           # Add test results
           echo "### Test Results" >> report.md
-          echo "- Unit Tests: ${{ needs.tests.result }}" >> report.md
+          echo "- Status: ${{ needs.tests.result }}" >> report.md
           
           # Add build results
           echo "### Build Results" >> report.md
