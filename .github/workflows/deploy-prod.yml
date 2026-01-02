@@ -20,22 +20,27 @@ permissions:
   id-token: write
 
 jobs:
-  # مرحله ۱: تأییدیه
+  # مرحله ۱: تأییدیه (برای دیپلوی دستی)
   approval:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     environment: production
+    outputs:
+      approved: ${{ steps.check.outputs.approved }}
 
     steps:
       - name: Check confirmation
+        id: check
         run: |
           if [ "${{ github.event.inputs.confirm }}" != "confirm" ]; then
             echo "❌ Deployment cancelled. You must type 'confirm' to deploy to production."
+            echo "approved=false" >> $GITHUB_OUTPUT
             exit 1
           fi
           echo "✅ Confirmation received. Starting production deployment..."
+          echo "approved=true" >> $GITHUB_OUTPUT
 
-  # مرحله ۲: تست‌ها
+  # مرحله ۲: تست‌ها (برای push و دیپلوی دستی)
   tests:
     uses: ./.github/workflows/run-tests.yml
     secrets: inherit
@@ -45,7 +50,10 @@ jobs:
   # مرحله ۳: ساخت images
   build:
     uses: ./.github/workflows/run-build.yml
-    needs: [approval, tests]
+    needs: tests
+    if: |
+      (github.event_name == 'push' && needs.tests.result == 'success') ||
+      (github.event_name == 'workflow_dispatch' && needs.approval.result == 'success' && needs.tests.result == 'success')
     secrets: inherit
     with:
       environment: 'production'
@@ -54,6 +62,7 @@ jobs:
   deploy:
     uses: ./.github/workflows/deploy.yml
     needs: build
+    if: needs.build.result == 'success'
     secrets: inherit
     with:
       environment: 'production'
