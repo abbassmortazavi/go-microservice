@@ -55,7 +55,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: infra/development/docker/api-gateway/api-gateway.Dockerfile
+          file: infra/production/docker/api-gateway.Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
