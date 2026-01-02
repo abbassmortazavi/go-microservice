@@ -50,11 +50,13 @@ docker_build(
     dockerfile='./infra/development/docker/api-gateway/api-gateway.Dockerfile',
     only=[
         './services/api-gateway',
-        './build/api-gateway'
+        './build/api-gateway',
+        './env'
     ],
     live_update=[
         sync('./services/api-gateway', '/app'),
-        sync('./build/api-gateway', '/app/build/api-gateway')
+        sync('./build/api-gateway', '/app/build/api-gateway'),
+        sync('./env', '/app/.env')
     ]
 )
 
@@ -87,11 +89,13 @@ docker_build(
     dockerfile='./services/auth-service/docker/auth-service.Dockerfile',
     only=[
         './services/auth-service',
-        './build/auth-service'
+        './build/auth-service',
+        './env'
     ],
     live_update=[
         sync('./services/auth-service', '/app'),
-        sync('./build/auth-service', '/app/build/auth-service')
+        sync('./build/auth-service', '/app/build/auth-service'),
+        sync('./env', '/app/.env')
     ]
 )
 

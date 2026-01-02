@@ -48,6 +48,7 @@ func handelLogin(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	res, err := authService.Client.Login(ctx, req.ToProto())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
