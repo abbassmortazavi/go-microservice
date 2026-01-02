@@ -13,9 +13,7 @@ on:
         type: string
   push:
     branches: ["main"]
-    tags: ["v*"]
 
-# 🔥 تنظیم permissions در این سطح
 permissions:
   contents: write
   packages: write
@@ -41,12 +39,16 @@ jobs:
   tests:
     uses: ./.github/workflows/run-tests.yml
     secrets: inherit
+    with:
+      environment: 'production'
 
   # مرحله ۳: ساخت images
   build:
     uses: ./.github/workflows/run-build.yml
     needs: [approval, tests]
     secrets: inherit
+    with:
+      environment: 'production'
 
   # مرحله ۴: دیپلوی
   deploy:
@@ -55,3 +57,4 @@ jobs:
     secrets: inherit
     with:
       environment: 'production'
+      cluster: 'production-cluster'

@@ -1,35 +1,57 @@
-name:  Deploy
+name: Deploy to Kubernetes
 
+# ✅ اضافه کردن workflow_call برای reusable بودن
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       environment:
-        description: 'Environment'
         required: true
-        default: 'development'
-        type: choice
-        options:
-          - development
-          - production
+        type: string
+        default: "production"
+      cluster:
+        required: false
+        type: string
+        default: "default"
+
+# ❌ حذف triggers دیگر اگر دارید
+# on:
+#   workflow_dispatch:
+#   push:
 
 jobs:
   deploy:
+    name: Deploy to ${{ inputs.environment }}
     runs-on: ubuntu-latest
+
+    # ✅ استفاده از environment variable اگر تنظیم شده
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ vars.DEPLOYMENT_URL || '' }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+
       - name: Display deployment info
         run: |
-          echo "📦 Deployment Information"
-          echo "Environment: ${{ github.event.inputs.environment }}"
-          echo "Commit: ${{ github.sha }}"
-          echo "Branch: ${{ github.ref }}"
+          echo "🚀 Starting deployment..."
+          echo "Environment: ${{ inputs.environment }}"
+          echo "Cluster: ${{ inputs.cluster }}"
+          echo "Commit SHA: ${{ github.sha }}"
+
+      - name: Mock deployment (برای تست)
+        run: |
+          echo "🧪 Mock deployment for ${{ inputs.environment }}"
           
-          if [ "${{ github.event.inputs.environment }}" = "production" ]; then
-            echo "⚠️ Production deployment requires KUBECONFIG secret"
-            echo "Please set it in GitHub Secrets"
+          if [ "${{ inputs.environment }}" = "development" ]; then
+            echo "📦 Would deploy to development cluster"
+            echo "🔧 Using: infra/development/k8s/"
           else
-            echo "✅ Development test completed"
+            echo "👑 Would deploy to production cluster"
+            echo "🔧 Using: infra/production/k8s/base/"
           fi
+          
+          echo "✅ Mock deployment completed successfully"

@@ -19,21 +19,56 @@ jobs:
   tests:
     uses: ./.github/workflows/run-tests.yml
     secrets: inherit
-    with:  # ✅ اضافه کردن with
-      environment: 'development'  # ✅ ارسال environment
+    with:
+      environment: 'development'
 
   # مرحله ۲: ساخت images
   build:
     uses: ./.github/workflows/run-build.yml
     needs: tests
     secrets: inherit
-    with:  # ✅ اضافه کردن with
-      environment: 'development'  # ✅ ارسال environment
+    with:
+      environment: 'development'
 
-  # مرحله ۳: دیپلوی
+  # مرحله ۳: دیپلوی - ✅ حالا deploy.yml قابل فراخوانی است
   deploy:
     uses: ./.github/workflows/deploy.yml
     needs: build
     secrets: inherit
-    with:  # ✅ اضافه کردن with
-      environment: 'development'  # ✅ ارسال environment
+    with:
+      environment: 'development'
+      cluster: 'development-cluster'
+
+  # مرحله ۴: گزارش
+  report:
+    name: Generate Deployment Report
+    needs: [tests, build, deploy]
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate report
+        run: |
+          echo "📊 Deployment Report" > report.md
+          echo "======================" >> report.md
+          echo "" >> report.md
+          echo "**Environment**: Development" >> report.md
+          echo "**Branch**: ${{ github.ref_name }}" >> report.md
+          echo "**Commit**: ${{ github.sha }}" >> report.md
+          echo "**Timestamp**: $(date -u)" >> report.md
+          echo "" >> report.md
+          echo "### Results" >> report.md
+          echo "- Tests: ${{ needs.tests.result }}" >> report.md
+          echo "- Build: ${{ needs.build.result }}" >> report.md
+          echo "- Deploy: ${{ needs.deploy.result }}" >> report.md
+          
+          cat report.md
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-report
+          path: report.md
