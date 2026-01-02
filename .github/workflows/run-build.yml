@@ -1,32 +1,37 @@
-name: Build And Push to Docker Hub
+name: Build And Push Docker Images
+
 on:
-  workflow_dispatch:
   workflow_call:
     inputs:
       environment:
-        required: false
+        required: true
         type: string
         default: 'production'
+
 env:
   DOCKER_HUB_ORG: abbass69
-  COMMON_SHA: ${{ github.sha }}
-permissions:
-  contents: write
+  GITHUB_SHA_SHORT: ${{ github.sha }}
+  REGISTRY: docker.io
+
 jobs:
+  # Job برای build API Gateway
   build-api-gateway:
     name: Build API Gateway
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
 
     outputs:
-      image_name: ${{ steps.set-output.outputs.image_name }}
-      image_tag: ${{ steps.set-output.outputs.image_tag }}
+      image_name: ${{ env.DOCKER_HUB_ORG }}/api-gateway
+      image_tag: ${{ env.GITHUB_SHA_SHORT }}
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -34,51 +39,37 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Build and push API Gateway
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: infra/production/docker/api-gateway.Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_HUB_ORG }}/api-gateway:latest
+            ${{ env.DOCKER_HUB_ORG }}/api-gateway:${{ env.GITHUB_SHA_SHORT }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
 
-      - name: Set outputs
-        id: set-output
-        run: |
-          REPO="${{ env.DOCKER_HUB_ORG }}/api-gateway"
-          TAG="api-gateway-${{ env.COMMON_SHA }}"
-          
-          echo "image_name=$REPO" >> $GITHUB_OUTPUT
-          echo "image_tag=$TAG" >> $GITHUB_OUTPUT
-          
-          echo "API Gateway: $REPO:$TAG"
-
-      - name: Build and push
-        run: |
-          REPO="${{ steps.set-output.outputs.image_name }}"
-          TAG="${{ steps.set-output.outputs.image_tag }}"
-          
-          echo "Building $REPO:$TAG and $REPO:latest"
-          
-          # ساخت ایمیج با دو تگ
-          docker build -t $REPO:$TAG -t $REPO:latest \
-            -f infra/development/docker/api-gateway/api-gateway.Dockerfile .
-          
-          echo "Pushing $REPO:$TAG"
-          docker push $REPO:$TAG
-          
-          echo "Pushing $REPO:latest"
-          docker push $REPO:latest
-
+  # Job برای build Auth Service
   build-auth-service:
     name: Build Auth Service
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
 
     outputs:
-      image_name: ${{ steps.set-output.outputs.image_name }}
-      image_tag: ${{ steps.set-output.outputs.image_tag }}
+      image_name: ${{ env.DOCKER_HUB_ORG }}/auth-service
+      image_tag: ${{ env.GITHUB_SHA_SHORT }}
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -86,116 +77,88 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Build and push Auth Service
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: infra/production/docker/auth-service.Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_HUB_ORG }}/auth-service:latest
+            ${{ env.DOCKER_HUB_ORG }}/auth-service:${{ env.GITHUB_SHA_SHORT }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
 
-      - name: Set outputs
-        id: set-output
-        run: |
-          REPO="${{ env.DOCKER_HUB_ORG }}/auth-service"
-          TAG="auth-service-${{ env.COMMON_SHA }}"
-          
-          echo "image_name=$REPO" >> $GITHUB_OUTPUT
-          echo "image_tag=$TAG" >> $GITHUB_OUTPUT
-          
-          echo "Auth Service: $REPO:$TAG"
-
-      - name: Build and push
-        run: |
-          REPO="${{ steps.set-output.outputs.image_name }}"
-          TAG="${{ steps.set-output.outputs.image_tag }}"
-          
-          echo "Building $REPO:$TAG and $REPO:latest"
-          
-          # ساخت ایمیج با دو تگ
-          docker build -t $REPO:$TAG -t $REPO:latest \
-            -f services/auth-service/docker/auth-service.Dockerfile .
-          
-          echo "Pushing $REPO:$TAG"
-          docker push $REPO:$TAG
-          
-          echo "Pushing $REPO:latest"
-          docker push $REPO:latest
-
+  # Job برای update kustomize (اختیاری)
   update-kustomize:
-    name: Update Kustomize
+    name: Update Kustomize Images
     needs: [build-api-gateway, build-auth-service]
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
 
     steps:
-      - name: Checkout on develop branch
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
-          ref: develop
+          ref: ${{ github.ref_name }}
 
-      - name: Update kustomization.yml
+      - name: Install kustomize
         run: |
-          KUSTOMIZATION_FILE="infra/development/k8s/kustomization.yml"
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          sudo mv kustomize /usr/local/bin/
 
-          # اطلاعات api-gateway
-          API_GATEWAY_NAME="${{ needs.build-api-gateway.outputs.image_name }}"
-          API_GATEWAY_TAG="${{ needs.build-api-gateway.outputs.image_tag }}"
+      - name: Update kustomization for development
+        if: inputs.environment == 'development'
+        run: |
+          echo "🔄 Updating development kustomization..."
           
-          # اطلاعات auth-service
-          AUTH_SERVICE_NAME="${{ needs.build-auth-service.outputs.image_name }}"
-          AUTH_SERVICE_TAG="${{ needs.build-auth-service.outputs.image_tag }}"
+          cd infra/development/k8s
           
-          echo "Updating kustomization:"
-          echo "  api-gateway: $API_GATEWAY_NAME:$API_GATEWAY_TAG"
-          echo "  auth-service: $AUTH_SERVICE_NAME:$AUTH_SERVICE_TAG"
+          # Update API Gateway image
+          kustomize edit set image api-gateway=${{ needs.build-api-gateway.outputs.image_name }}:${{ needs.build-api-gateway.outputs.image_tag }}
           
-          # ایجاد یا آپدیت فایل
-          cat > "$KUSTOMIZATION_FILE" << EOF
-          apiVersion: kustomize.config.k8s.io/v1beta1
-          kind: Kustomization
+          # Update Auth Service image
+          kustomize edit set image auth-service=${{ needs.build-auth-service.outputs.image_name }}:${{ needs.build-auth-service.outputs.image_tag }}
           
-          namespace: production
-          
-          resources:
-            - api-gateway/api-gateway-deployment.yaml
-            - app-config.yaml
-            - api-gateway/api-gateway-service.yaml
-            - auth-service/auth-service.yaml
-            - auth-service/auth-service-deployment.yaml
-            - postgres-service/postgres-deployment.yaml
-            - postgres-service/postgres-service.yaml
-            - rabbitmq-service/rabbitmq-deployment.yaml
-            - rabbitmq-service/rabbitmq-service.yaml
-          
-          images:
-            - name: api-gateway  # باید با container name در deployment هماهنگ باشد
-              newName: $API_GATEWAY_NAME
-              newTag: $API_GATEWAY_TAG
-          
-            - name: auth-service  # باید با container name در deployment هماهنگ باشد
-              newName: $AUTH_SERVICE_NAME
-              newTag: $AUTH_SERVICE_TAG
-          EOF
-          
-          echo "Updated kustomization.yml:"
-          cat "$KUSTOMIZATION_FILE"
+          echo "✅ Development kustomization updated"
 
-      - name: Commit and push changes
+      - name: Update kustomization for production
+        if: inputs.environment == 'production'
+        run: |
+          echo "🔄 Updating production kustomization..."
+          
+          cd infra/production/k8s
+          
+          # Update API Gateway image
+          kustomize edit set image api-gateway=${{ needs.build-api-gateway.outputs.image_name }}:${{ needs.build-api-gateway.outputs.image_tag }}
+          
+          # Update Auth Service image
+          kustomize edit set image auth-service=${{ needs.build-auth-service.outputs.image_name }}:${{ needs.build-auth-service.outputs.image_tag }}
+          
+          echo "✅ Production kustomization updated"
+
+      - name: Commit changes
+        if: inputs.environment == 'development'
         env:
-          GIT_USERNAME: "github-actions[bot]"
+          GIT_USER: "github-actions[bot]"
           GIT_EMAIL: "github-actions[bot]@users.noreply.github.com"
         run: |
           if git diff --quiet; then
-            echo "No changes detected"
+            echo "📝 No changes to commit"
             exit 0
           fi
           
-          git config user.name "$GIT_USERNAME"
+          git config user.name "$GIT_USER"
           git config user.email "$GIT_EMAIL"
           
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           
-          git add infra/development/k8s/kustomization.yml
-          git commit -m "ci: update image tags [skip ci]"
+          git add infra/
+          git commit -m "ci: update image tags for ${{ inputs.environment }} [skip ci]"
           
-          git pull origin develop --rebase
-          git push origin develop
+          git pull origin ${{ github.ref_name }} --rebase
+          git push origin ${{ github.ref_name }}
           
-          echo "✅ Successfully updated kustomization.yml"
+          echo "✅ Changes committed and pushed"

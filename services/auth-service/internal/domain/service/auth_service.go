@@ -55,7 +55,6 @@ func (a *AuthService) Register(ctx context.Context, email, password, name string
 	return a.publisher.Publish(ctx, "user_registered", event)
 }
 func (a *AuthService) Login(ctx context.Context, email, password string) (*response.LoginResponse, error) {
-	log.Println("this is service")
 	user, err := a.userRepo.FindByEmail(ctx, email)
 	if err != nil {
 		return nil, err

@@ -4,21 +4,19 @@ kind: Kustomization
 namespace: production
 
 resources:
-  - api-gateway/api-gateway-deployment.yaml
-  - app-config.yaml
-  - api-gateway/api-gateway-service.yaml
-  - auth-service/auth-service.yaml
-  - auth-service/auth-service-deployment.yaml
-  - postgres-service/postgres-deployment.yaml
-  - postgres-service/postgres-service.yaml
-  - rabbitmq-service/rabbitmq-deployment.yaml
-  - rabbitmq-service/rabbitmq-service.yaml
+- api-gateway/api-gateway-deployment.yaml
+- app-config.yaml
+- api-gateway/api-gateway-service.yaml
+- auth-service/auth-service.yaml
+- auth-service/auth-service-deployment.yaml
+- postgres-service/postgres-deployment.yaml
+- postgres-service/postgres-service.yaml
+- rabbitmq-service/rabbitmq-deployment.yaml
+- rabbitmq-service/rabbitmq-service.yaml
+
 
 images:
-  - name: api-gateway  # باید با container name در deployment هماهنگ باشد
-    newName: 
-    newTag: api-gateway-159f09954a430fb1026053a96270cd656026cbec
-
-  - name: auth-service  # باید با container name در deployment هماهنگ باشد
-    newName: 
-    newTag: auth-service-159f09954a430fb1026053a96270cd656026cbec
+- name: api-gateway
+  newTag: 760292d03374bf55448955673f18a176432d30e6
+- name: auth-service
+  newTag: 760292d03374bf55448955673f18a176432d30e6

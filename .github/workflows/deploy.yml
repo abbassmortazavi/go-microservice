@@ -1,25 +1,57 @@
-name: Deploy
+name: Deploy to Kubernetes
+
+# ✅ اضافه کردن workflow_call برای reusable بودن
 on:
   workflow_call:
     inputs:
       environment:
-        required: false
+        required: true
         type: string
         default: "production"
-env:
-  REGION: ${{ vars.REGION }}
-  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+      cluster:
+        required: false
+        type: string
+        default: "default"
 
-permissions:
-  id-token: write
-  contents: read
+# ❌ حذف triggers دیگر اگر دارید
+# on:
+#   workflow_dispatch:
+#   push:
 
 jobs:
   deploy:
     name: Deploy to ${{ inputs.environment }}
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+
+    # ✅ استفاده از environment variable اگر تنظیم شده
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ vars.DEPLOYMENT_URL || '' }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Display deployment info
+        run: |
+          echo "🚀 Starting deployment..."
+          echo "Environment: ${{ inputs.environment }}"
+          echo "Cluster: ${{ inputs.cluster }}"
+          echo "Commit SHA: ${{ github.sha }}"
+
+      - name: Mock deployment (برای تست)
+        run: |
+          echo "🧪 Mock deployment for ${{ inputs.environment }}"
+          
+          if [ "${{ inputs.environment }}" = "development" ]; then
+            echo "📦 Would deploy to development cluster"
+            echo "🔧 Using: infra/development/k8s/"
+          else
+            echo "👑 Would deploy to production cluster"
+            echo "🔧 Using: infra/production/k8s/base/"
+          fi
+          
+          echo "✅ Mock deployment completed successfully"

@@ -28,10 +28,11 @@ func (u *UserRepository) Create(ctx context.Context, user *entity.User) error {
 	return nil
 }
 func (u *UserRepository) FindByEmail(ctx context.Context, email string) (*entity.User, error) {
-	query := `SELECT * FROM users WHERE email = $1`
+	query := `SELECT id, name, email, role, password, created_at 
+              FROM users WHERE email = $1`
 	row := u.db.QueryRowContext(ctx, query, email)
 	var user entity.User
-	err := row.Scan(&user.ID, &user.Email, &user.Password, &user.Role, &user.CreatedAt)
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Role, &user.Password, &user.CreatedAt)
 	if err != nil {
 		return nil, errors.New("user not found")
 	}

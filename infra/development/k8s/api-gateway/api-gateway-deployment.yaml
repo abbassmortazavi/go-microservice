@@ -2,10 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api-gateway
-  namespace: production
+  namespace: microservice-dev
 spec:
   replicas: 1
-  revisionHistoryLimit: 1
   selector:
     matchLabels:
       app: api-gateway
@@ -16,37 +15,14 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: abbass69/api-gateway:latest
-#          image: microservice/api-gateway
-          imagePullPolicy: Always
+          image: microservice/api-gateway:dev
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8081
-          # 👇 CHANGE TO TCP PROBES (No /health endpoint needed) 👇
-          readinessProbe:
-            tcpSocket:
-              port: 8081
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            timeoutSeconds: 2
-            failureThreshold: 3
-          livenessProbe:
-            tcpSocket:
-              port: 8081
-            initialDelaySeconds: 15
-            periodSeconds: 20
-            timeoutSeconds: 2
-            failureThreshold: 3
-          # 👆 TCP PROBES ADDED 👆
-          resources:
-            requests:
-              memory: "128Mi"
-              cpu: "125m"
-            limits:
-              memory: "128Mi"
-              cpu: "125m"
           env:
             - name: GATEWAY_HTTP_ADDR
-              valueFrom:
-                configMapKeyRef:
-                  key: GATEWAY_HTTP_ADDR
-                  name: app-config
+              value: ":8081"
+            - name: ENVIRONMENT
+              value: "development"
+            - name: AUTH_SERVICE_URL
+              value: "auth-service:9092"
