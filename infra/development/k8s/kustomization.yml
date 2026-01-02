@@ -17,6 +17,6 @@ resources:
 
 images:
 - name: api-gateway
-  newTag: 95543e4c514d216fb1da135e3b24442257cd8f03
+  newTag: 28c5d437e13ede82b6acc94abf8156727d38a615
 - name: auth-service
-  newTag: 95543e4c514d216fb1da135e3b24442257cd8f03
+  newTag: 28c5d437e13ede82b6acc94abf8156727d38a615
