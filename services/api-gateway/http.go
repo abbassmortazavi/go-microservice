@@ -1,12 +1,14 @@
 package main
 
 import (
+	authpb "abbassmortazavi/go-microservice/pkg/proto/auth"
 	"abbassmortazavi/go-microservice/pkg/utils"
 	"abbassmortazavi/go-microservice/services/api-gateway/auth/requests"
 	"abbassmortazavi/go-microservice/services/api-gateway/grpc_clients"
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func handelRegister(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +37,6 @@ func handelRegister(w http.ResponseWriter, r *http.Request) {
 }
 
 func handelLogin(w http.ResponseWriter, r *http.Request) {
-	log.Println("mmmmmmmmmmmmmmmmmmmmm")
 	var req requests.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -59,4 +60,34 @@ func handelLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println("login success")
+}
+
+func handelGetUser(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+	ctx := r.Context()
+	authService, err := grpc_clients.NewAuthServiceClient()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	// Convert string ID to int64
+	userID, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid user ID format", http.StatusBadRequest)
+		return
+	}
+
+	req := &authpb.GetUserRequest{
+		Id: userID,
+	}
+	res, err := authService.Client.GetUser(ctx, req)
+	if err != nil {
+		utils.InternalError(w, err)
+		return
+	}
+	err = utils.WriteJson(w, http.StatusOK, res)
+	if err != nil {
+		return
+	}
+
 }

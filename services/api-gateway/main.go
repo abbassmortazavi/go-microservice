@@ -2,6 +2,7 @@ package main
 
 import (
 	"abbassmortazavi/go-microservice/pkg/env"
+	"abbassmortazavi/go-microservice/services/auth-service/pkg/middlewares"
 	"context"
 	"log"
 	"net/http"
@@ -21,9 +22,11 @@ func main() {
 	mux.HandleFunc("POST /test-url", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("everything work perfectly!!!!!")
 	})
+	authMiddleware := middlewares.GetMiddleware()
+	mux.Handle("POST /register", authMiddleware.AuthMiddleware(http.HandlerFunc(handelRegister)))
+	mux.Handle("POST /login", authMiddleware.AuthMiddleware(http.HandlerFunc(handelLogin)))
 
-	mux.HandleFunc("POST /register", handelRegister)
-	mux.HandleFunc("POST /login", handelLogin)
+	mux.HandleFunc("GET /user/:id", handelGetUser)
 
 	server := &http.Server{
 		Addr:    httpAddr,

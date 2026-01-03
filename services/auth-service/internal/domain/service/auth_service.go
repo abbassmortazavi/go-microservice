@@ -16,11 +16,11 @@ import (
 type AuthService struct {
 	userRepo     repository_interface.UserRepositoryInterface
 	hasher       security.PasswordHasher
-	TokenService TokenService
+	TokenService TokenServiceInterface
 	publisher    *messaging.Publisher
 }
 
-func NewAuthService(repo repository_interface.UserRepositoryInterface, hasher security.PasswordHasher, tokenService TokenService, publisher *messaging.Publisher) *AuthService {
+func NewAuthService(repo repository_interface.UserRepositoryInterface, hasher security.PasswordHasher, tokenService TokenServiceInterface, publisher *messaging.Publisher) *AuthService {
 	return &AuthService{
 		userRepo:     repo,
 		hasher:       hasher,
@@ -79,4 +79,18 @@ func (a *AuthService) Login(ctx context.Context, email, password string) (*respo
 		Tokens: tokens,
 		User:   userEntity,
 	}, nil
+}
+func (a *AuthService) GetUser(ctx context.Context, id int) (*entity.User, error) {
+	user, err := a.userRepo.FindByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	/*userEntity := entity.User{
+		ID:        user.ID,
+		Name:      user.Name,
+		Email:     user.Email,
+		Role:      user.Role,
+		CreatedAt: user.CreatedAt,
+	}*/
+	return user, nil
 }

@@ -61,3 +61,19 @@ func (h *AuthHandler) ValidateToken(ctx context.Context, req *authpb.ValidateTok
 		UserId: claims.Subject,
 	}, nil
 }
+
+func (h *AuthHandler) GetUser(ctx context.Context, req *authpb.GetUserRequest) (*authpb.GetUserResponse, error) {
+	res, err := h.authService.GetUser(ctx, int(req.Id))
+	if err != nil {
+		return nil, err
+	}
+	return &authpb.GetUserResponse{
+		User: &authpb.User{
+			Id:        res.ID,
+			Name:      res.Name,
+			Email:     res.Email,
+			Role:      res.Role,
+			CreatedAt: res.CreatedAt.Unix(),
+		},
+	}, nil
+}
