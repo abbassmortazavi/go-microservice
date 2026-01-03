@@ -5,13 +5,13 @@ import (
 	"abbassmortazavi/go-microservice/pkg/database"
 	"abbassmortazavi/go-microservice/pkg/env"
 	authpb "abbassmortazavi/go-microservice/pkg/proto/auth"
-	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/service"
+	repository2 "abbassmortazavi/go-microservice/services/auth-service/db/repository"
 	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/config"
-	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/db/repository"
 	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/messaging"
 	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/security"
 	"abbassmortazavi/go-microservice/services/auth-service/internal/interface/grpc"
 	"abbassmortazavi/go-microservice/services/auth-service/pkg/middlewares"
+	service2 "abbassmortazavi/go-microservice/services/auth-service/service"
 	"context"
 	"log"
 	"net"
@@ -42,12 +42,12 @@ func main() {
 	}
 	database.Connect()
 
-	userRepo := repository.NewUserRepository(database.DB)
-	tokenRepo := repository.NewTokenRepository(database.DB)
+	userRepo := repository2.NewUserRepository(database.DB)
+	tokenRepo := repository2.NewTokenRepository(database.DB)
 
 	hasher := security.NewBcryptHasher()
 	//tokenService := service.NewJWTSecret([]byte(gcfg.JWT_SECRET))
-	tokenService := service.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo)
+	tokenService := service2.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo)
 	middlewares.Init(tokenService)
 
 	// ---- RabbitMQ ----
@@ -69,7 +69,7 @@ func main() {
 	}
 	publisher := messaging.NewPublisher(ch, cfg.UserExchange)
 
-	authService := service.NewAuthService(userRepo, hasher, tokenService, publisher)
+	authService := service2.NewAuthService(userRepo, hasher, tokenService, publisher)
 
 	authHandler := grpc.NewAuthHandler(authService)
 

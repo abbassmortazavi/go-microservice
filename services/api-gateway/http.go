@@ -63,7 +63,12 @@ func handelLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func handelGetUser(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Query().Get("id")
+	id := r.PathValue("id") // This gets the value from {id}
+	log.Println("get user id:", id)
+	if id == "" {
+		http.Error(w, "User ID is required", http.StatusBadRequest)
+		return
+	}
 	ctx := r.Context()
 	authService, err := grpc_clients.NewAuthServiceClient()
 	if err != nil {

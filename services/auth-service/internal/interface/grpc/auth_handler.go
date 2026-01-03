@@ -2,7 +2,7 @@ package grpc
 
 import (
 	authpb "abbassmortazavi/go-microservice/pkg/proto/auth"
-	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/service"
+	"abbassmortazavi/go-microservice/services/auth-service/service"
 	"context"
 	"log"
 )
@@ -63,7 +63,7 @@ func (h *AuthHandler) ValidateToken(ctx context.Context, req *authpb.ValidateTok
 }
 
 func (h *AuthHandler) GetUser(ctx context.Context, req *authpb.GetUserRequest) (*authpb.GetUserResponse, error) {
-	res, err := h.authService.GetUser(ctx, int(req.Id))
+	res, err := h.authService.GetUser(ctx, req.GetId())
 	if err != nil {
 		return nil, err
 	}

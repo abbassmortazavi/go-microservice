@@ -80,7 +80,7 @@ func (a *AuthService) Login(ctx context.Context, email, password string) (*respo
 		User:   userEntity,
 	}, nil
 }
-func (a *AuthService) GetUser(ctx context.Context, id int) (*entity.User, error) {
+func (a *AuthService) GetUser(ctx context.Context, id int64) (*entity.User, error) {
 	user, err := a.userRepo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err

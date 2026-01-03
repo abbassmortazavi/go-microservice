@@ -1,8 +1,13 @@
 package main
 
 import (
+	global "abbassmortazavi/go-microservice/pkg/config"
+	"abbassmortazavi/go-microservice/pkg/database"
 	"abbassmortazavi/go-microservice/pkg/env"
+	"abbassmortazavi/go-microservice/services/auth-service/db/repository"
 	"abbassmortazavi/go-microservice/services/auth-service/pkg/middlewares"
+	"abbassmortazavi/go-microservice/services/auth-service/service"
+
 	"context"
 	"log"
 	"net/http"
@@ -18,15 +23,34 @@ var (
 
 func main() {
 	log.Println("Starting API Gateway")
+	gcfg := global.Load()
+	// Create gRPC connection to auth service
+	/*authConn, err := grpc.NewClient("auth-service:9092",
+		grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Failed to connect to auth service: %v", err)
+	}
+	defer authConn.Close()
+
+	authClient := authpb.NewAuthServiceClient(authConn)
+
+	authMiddleware := middlewares.CreateGRPCMiddleware(authClient)*/
+	database.Connect()
+
+	tokenRepo := repository.NewTokenRepository(database.DB)
+	tokenService := service.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo)
+	middlewares.Init(tokenService)
+	authMiddleware := middlewares.GetMiddleware()
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /test-url", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("everything work perfectly!!!!!")
 	})
-	authMiddleware := middlewares.GetMiddleware()
-	mux.Handle("POST /register", authMiddleware.AuthMiddleware(http.HandlerFunc(handelRegister)))
-	mux.Handle("POST /login", authMiddleware.AuthMiddleware(http.HandlerFunc(handelLogin)))
 
-	mux.HandleFunc("GET /user/:id", handelGetUser)
+	mux.Handle("POST /register", http.HandlerFunc(handelRegister))
+	mux.Handle("POST /login", http.HandlerFunc(handelLogin))
+
+	mux.Handle("GET /user/{id}", authMiddleware.AuthMiddleware(http.HandlerFunc(handelGetUser)))
 
 	server := &http.Server{
 		Addr:    httpAddr,
