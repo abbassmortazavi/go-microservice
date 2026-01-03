@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  namespace: microservice-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: microservice/api-gateway:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+          env:
+            - name: GATEWAY_HTTP_ADDR
+              value: ":8081"
+            - name: ENVIRONMENT
+              value: "development"
+            - name: AUTH_SERVICE_URL
+              value: "auth-service:9092"
