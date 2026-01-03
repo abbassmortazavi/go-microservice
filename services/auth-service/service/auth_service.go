@@ -2,11 +2,11 @@ package service
 
 import (
 	eventpb "abbassmortazavi/go-microservice/pkg/proto/events"
-	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/entity"
-	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/repository_interface"
-	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/messaging"
-	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/security"
+	"abbassmortazavi/go-microservice/services/auth-service/entity"
+	"abbassmortazavi/go-microservice/services/auth-service/interfaces/repository_interface"
+	"abbassmortazavi/go-microservice/services/auth-service/messaging"
 	"abbassmortazavi/go-microservice/services/auth-service/pkg/response"
+	"abbassmortazavi/go-microservice/services/auth-service/security"
 	"context"
 	"errors"
 	"log"

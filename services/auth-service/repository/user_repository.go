@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/entity"
-	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/repository_interface"
+	"abbassmortazavi/go-microservice/services/auth-service/entity"
+	"abbassmortazavi/go-microservice/services/auth-service/interfaces/repository_interface"
 	"context"
 	"database/sql"
 	"errors"

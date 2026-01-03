@@ -2,7 +2,7 @@ package response
 
 import (
 	authpb "abbassmortazavi/go-microservice/pkg/proto/auth"
-	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/entity"
+	"abbassmortazavi/go-microservice/services/auth-service/entity"
 )
 
 type TokenResponse struct {
