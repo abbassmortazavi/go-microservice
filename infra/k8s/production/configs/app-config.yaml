@@ -9,7 +9,7 @@
     ENVIRONMENT: "production"
     APP_DEBUG: "false"
     LOG_LEVEL: "info"
-
+    
     # API Gateway
     GATEWAY_HTTP_ADDR: ":8081"
     GATEWAY_READ_TIMEOUT: "30s"
