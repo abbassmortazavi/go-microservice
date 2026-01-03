@@ -8,8 +8,8 @@ metadata:
     app.kubernetes.io/component: gateway
     app.kubernetes.io/version: "1.0.0"
 spec:
-  replicas: 2
-  revisionHistoryLimit: 3
+  replicas: 1
+  revisionHistoryLimit: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: api-gateway
