@@ -51,7 +51,7 @@ jobs:
             echo "🔧 Using: infra/development/k8s/"
           else
             echo "👑 Would deploy to production cluster"
-            echo "🔧 Using: infra/production/k8s/base/"
+            echo "🔧 Using: infra/k8s/production/"
           fi
           
           echo "✅ Mock deployment completed successfully"
