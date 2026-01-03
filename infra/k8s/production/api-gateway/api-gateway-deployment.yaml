@@ -56,27 +56,31 @@ spec:
             - secretRef:
                 name: app-secrets
 
-          # Probes
+          # Probes اصلاح شده - از TCP استفاده می‌کند
           startupProbe:
-            httpGet:
-              path: /health
+            tcpSocket:
               port: 8081
             failureThreshold: 30
             periodSeconds: 5
+            initialDelaySeconds: 30  # اضافه شد
 
           readinessProbe:
-            httpGet:
-              path: /health/ready
+            tcpSocket:
               port: 8081
             initialDelaySeconds: 5
             periodSeconds: 5
+            timeoutSeconds: 2        # اضافه شد
+            successThreshold: 1      # اضافه شد
+            failureThreshold: 3      # اضافه شد
 
           livenessProbe:
-            httpGet:
-              path: /health/live
+            tcpSocket:
               port: 8081
             initialDelaySeconds: 10
             periodSeconds: 10
+            timeoutSeconds: 2        # اضافه شد
+            successThreshold: 1      # اضافه شد
+            failureThreshold: 3      # اضافه شد
 
           # Volume mounts for logs, etc.
           volumeMounts:
