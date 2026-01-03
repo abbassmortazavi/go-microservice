@@ -9,8 +9,8 @@ k8s_namespace('microservice-dev')
 allow_k8s_contexts(['docker-desktop', 'minikube', 'docker-for-desktop'])
 
 ### k8s Config ###
-k8s_yaml('./infra/development/k8s/app-config.yaml')
-k8s_yaml('./infra/development/k8s/secrets.yaml')
+k8s_yaml('./infra/development/k8s/configs/app-config.yaml')
+k8s_yaml('./infra/development/k8s/configs/secrets.yaml')
 ### End k8s Config ###
 
 ### RabbitMQ ###
@@ -23,6 +23,7 @@ k8s_resource('rabbitmq',
 ### End RabbitMQ ###
 
 ### PostgresDB ###
+k8s_yaml('./infra/development/k8s/postgres-service/postgres-pvc.yaml')
 k8s_yaml('./infra/development/k8s/postgres-service/postgres-deployment.yaml')
 k8s_yaml('./infra/development/k8s/postgres-service/postgres-service.yaml')
 k8s_resource('postgres',

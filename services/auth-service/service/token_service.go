@@ -1,8 +1,8 @@
 package service
 
 import (
-	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/entity"
-	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/repository_interface"
+	"abbassmortazavi/go-microservice/services/auth-service/entity"
+	"abbassmortazavi/go-microservice/services/auth-service/interfaces/repository_interface"
 	"abbassmortazavi/go-microservice/services/auth-service/pkg/response"
 	"context"
 	"errors"
@@ -12,7 +12,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type TokenService interface {
+type TokenServiceInterface interface {
 	GenerateToken(userID int, name string) (response.TokenResponse, error)
 	RefreshAccessToken(refreshToken string) (response.TokenResponse, error)
 	ValidateToken(token string) (*Claims, error)
@@ -135,6 +135,7 @@ func (j *JWT) RefreshAccessToken(refreshToken string) (response.TokenResponse, e
 }
 
 func (j *JWT) ValidateToken(token string) (*Claims, error) {
+	log.Println("ValidateToken", token)
 	claims := &Claims{}
 	tkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		return j.SigningKey, nil
@@ -149,6 +150,7 @@ func (j *JWT) ValidateToken(token string) (*Claims, error) {
 
 	//check in database
 	res, err := j.TokenRepository.FindByToken(context.Background(), token)
+	log.Println("response=======>", res)
 	if err != nil {
 		return nil, err
 	}

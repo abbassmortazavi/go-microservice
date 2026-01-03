@@ -5,12 +5,13 @@ import (
 	"abbassmortazavi/go-microservice/pkg/database"
 	"abbassmortazavi/go-microservice/pkg/env"
 	authpb "abbassmortazavi/go-microservice/pkg/proto/auth"
-	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/service"
-	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/config"
-	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/db/repository"
-	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/messaging"
-	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/security"
-	"abbassmortazavi/go-microservice/services/auth-service/internal/interface/grpc"
+	"abbassmortazavi/go-microservice/services/auth-service/config"
+	"abbassmortazavi/go-microservice/services/auth-service/grpc"
+	messaging2 "abbassmortazavi/go-microservice/services/auth-service/messaging"
+	"abbassmortazavi/go-microservice/services/auth-service/pkg/middlewares"
+	"abbassmortazavi/go-microservice/services/auth-service/repository"
+	"abbassmortazavi/go-microservice/services/auth-service/security"
+	service2 "abbassmortazavi/go-microservice/services/auth-service/service"
 	"context"
 	"log"
 	"net"
@@ -46,10 +47,11 @@ func main() {
 
 	hasher := security.NewBcryptHasher()
 	//tokenService := service.NewJWTSecret([]byte(gcfg.JWT_SECRET))
-	tokenService := service.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo)
+	tokenService := service2.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo)
+	middlewares.Init(tokenService)
 
 	// ---- RabbitMQ ----
-	conn, ch := messaging.NewRabbitMQ(rabbitmqURL)
+	conn, ch := messaging2.NewRabbitMQ(rabbitmqURL)
 	defer conn.Close()
 	defer ch.Close()
 
@@ -65,9 +67,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	publisher := messaging.NewPublisher(ch, cfg.UserExchange)
+	publisher := messaging2.NewPublisher(ch, cfg.UserExchange)
 
-	authService := service.NewAuthService(userRepo, hasher, tokenService, publisher)
+	authService := service2.NewAuthService(userRepo, hasher, tokenService, publisher)
 
 	authHandler := grpc.NewAuthHandler(authService)
 

@@ -2,11 +2,11 @@
   kind: ConfigMap
   metadata:
     name: app-config
-    namespace: production
+    namespace: microservice-dev
     labels:
       app.kubernetes.io/name: app-config
   data:
-    ENVIRONMENT: "production"
+    ENVIRONMENT: "development"
     APP_DEBUG: "false"
     LOG_LEVEL: "info"
 

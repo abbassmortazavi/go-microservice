@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/entity"
-	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/repository_interface"
+	"abbassmortazavi/go-microservice/services/auth-service/entity"
+	"abbassmortazavi/go-microservice/services/auth-service/interfaces/repository_interface"
 	"context"
 	"database/sql"
 	"errors"
@@ -97,7 +97,7 @@ func (r *TokenRepository) Create(ctx context.Context, token *entity.Token) error
 }
 func (r *TokenRepository) FindByToken(ctx context.Context, token string) (*entity.Token, error) {
 	tokenModel := &entity.Token{}
-	query := `SELECT * FROM tokens WHERE token = $1`
+	query := `SELECT * FROM tokens WHERE hash_token = $1`
 	err := r.db.QueryRowContext(ctx, query, token).Scan(
 		&tokenModel.ID,
 		&tokenModel.UserID,

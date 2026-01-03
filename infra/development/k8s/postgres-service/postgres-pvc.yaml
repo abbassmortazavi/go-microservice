@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: microservice-dev
+spec:
+  accessModes:
+    - ReadWriteOnce  # فقط یک pod می‌تواند همزمان write کند
+  resources:
+    requests:
+      storage: 1Gi  # 1 گیگابایت فضای ذخیره‌سازی
+  storageClassName: standard  # یا "hostpath" در minikube

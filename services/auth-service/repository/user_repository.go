@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/entity"
-	"abbassmortazavi/go-microservice/services/auth-service/internal/domain/repository_interface"
+	"abbassmortazavi/go-microservice/services/auth-service/entity"
+	"abbassmortazavi/go-microservice/services/auth-service/interfaces/repository_interface"
 	"context"
 	"database/sql"
 	"errors"
@@ -33,6 +33,22 @@ func (u *UserRepository) FindByEmail(ctx context.Context, email string) (*entity
 	row := u.db.QueryRowContext(ctx, query, email)
 	var user entity.User
 	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Role, &user.Password, &user.CreatedAt)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+	return &user, nil
+}
+func (u *UserRepository) FindByID(ctx context.Context, id int64) (*entity.User, error) {
+	log.Println("finding user by id in repo", id)
+	query := `SELECT id, name, email, created_at, updated_at FROM users WHERE id = $1`
+	var user entity.User
+	err := u.db.QueryRowContext(ctx, query, id).Scan(
+		&user.ID,
+		&user.Name,
+		&user.Email,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
 	if err != nil {
 		return nil, errors.New("user not found")
 	}
