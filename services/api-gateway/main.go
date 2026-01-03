@@ -4,8 +4,8 @@ import (
 	global "abbassmortazavi/go-microservice/pkg/config"
 	"abbassmortazavi/go-microservice/pkg/database"
 	"abbassmortazavi/go-microservice/pkg/env"
-	"abbassmortazavi/go-microservice/services/auth-service/db/repository"
 	"abbassmortazavi/go-microservice/services/auth-service/pkg/middlewares"
+	"abbassmortazavi/go-microservice/services/auth-service/repository"
 	"abbassmortazavi/go-microservice/services/auth-service/service"
 
 	"context"
@@ -24,17 +24,6 @@ var (
 func main() {
 	log.Println("Starting API Gateway")
 	gcfg := global.Load()
-	// Create gRPC connection to auth service
-	/*authConn, err := grpc.NewClient("auth-service:9092",
-		grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalf("Failed to connect to auth service: %v", err)
-	}
-	defer authConn.Close()
-
-	authClient := authpb.NewAuthServiceClient(authConn)
-
-	authMiddleware := middlewares.CreateGRPCMiddleware(authClient)*/
 	database.Connect()
 
 	tokenRepo := repository.NewTokenRepository(database.DB)

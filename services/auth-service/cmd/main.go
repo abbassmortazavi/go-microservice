@@ -5,12 +5,12 @@ import (
 	"abbassmortazavi/go-microservice/pkg/database"
 	"abbassmortazavi/go-microservice/pkg/env"
 	authpb "abbassmortazavi/go-microservice/pkg/proto/auth"
-	repository2 "abbassmortazavi/go-microservice/services/auth-service/db/repository"
 	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/config"
 	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/messaging"
 	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/security"
 	"abbassmortazavi/go-microservice/services/auth-service/internal/interface/grpc"
 	"abbassmortazavi/go-microservice/services/auth-service/pkg/middlewares"
+	"abbassmortazavi/go-microservice/services/auth-service/repository"
 	service2 "abbassmortazavi/go-microservice/services/auth-service/service"
 	"context"
 	"log"
@@ -42,8 +42,8 @@ func main() {
 	}
 	database.Connect()
 
-	userRepo := repository2.NewUserRepository(database.DB)
-	tokenRepo := repository2.NewTokenRepository(database.DB)
+	userRepo := repository.NewUserRepository(database.DB)
+	tokenRepo := repository.NewTokenRepository(database.DB)
 
 	hasher := security.NewBcryptHasher()
 	//tokenService := service.NewJWTSecret([]byte(gcfg.JWT_SECRET))
