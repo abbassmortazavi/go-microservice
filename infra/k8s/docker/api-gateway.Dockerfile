@@ -11,9 +11,8 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # Copy source code
-COPY services/api-gateway ./services/api-gateway
-COPY pkg ./pkg
-COPY proto ./proto
+
+COPY . .
 
 # Build the application
 WORKDIR /app/services/api-gateway
