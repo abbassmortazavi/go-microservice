@@ -1,3 +1,4 @@
+# microservice-production.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -10,18 +11,15 @@ metadata:
     app.kubernetes.io/instance: production
 spec:
   project: default
-
   source:
     repoURL: https://github.com/abbassmortazavi/go-microservice.git
     targetRevision: HEAD
-    path: infra/production/k8s/base
+    path: k8s/base  # تغییر مسیر به این
     directory:
-      recurse: true
-
+      recurse: false  # اگر از Kustomize استفاده می‌کنید، بهتر است false باشد
   destination:
     server: https://kubernetes.default.svc
     namespace: production
-
   syncPolicy:
     automated:
       prune: true
@@ -31,7 +29,6 @@ spec:
       - CreateNamespace=true
       - PrunePropagationPolicy=foreground
       - PruneLast=true
-
   ignoreDifferences:
     - group: apps
       kind: Deployment
@@ -41,7 +38,6 @@ spec:
       kind: CronJob
       jsonPointers:
         - /spec/suspend
-
   info:
     - name: description
       value: Microservice Production Deployment
