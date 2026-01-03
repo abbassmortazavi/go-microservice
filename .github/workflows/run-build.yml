@@ -43,7 +43,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: infra/production/docker/api-gateway.Dockerfile
+          file: infra/k8s/docker/api-gateway.Dockerfile
           push: true
           tags: |
             ${{ env.DOCKER_HUB_ORG }}/api-gateway:latest
@@ -81,7 +81,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: infra/production/docker/auth-service.Dockerfile
+          file: infra/k8s/docker/auth-service.Dockerfile
           push: true
           tags: |
             ${{ env.DOCKER_HUB_ORG }}/auth-service:latest

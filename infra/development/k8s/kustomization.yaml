@@ -1,0 +1,48 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: Development
+
+  # ConfigMaps - Secrets
+
+  # Databases
+
+  # Message Queue
+
+  # Services
+
+resources:
+- configs/app-config.yaml
+- configs/secrets.yaml
+- postgres-service/postgres-deployment.yaml
+- postgres-service/postgres-service.yaml
+- rabbitmq-service/rabbitmq-deployment.yaml
+- rabbitmq-service/rabbitmq-service.yaml
+- api-gateway/api-gateway-deployment.yaml
+- api-gateway/api-gateway-service.yaml
+- auth-service/auth-service-deployment.yaml
+- auth-service/auth-service.yaml
+
+
+
+# Image transformers
+
+
+
+images:
+- name: api-gateway
+  newTag: 20567aeeedd07723566e334617a7235b046d2b5d
+- name: auth-service
+  newTag: 20567aeeedd07723566e334617a7235b046d2b5d
+- name: postgres
+  newName: postgres
+  newTag: 15-alpine
+- name: rabbitmq
+  newName: rabbitmq
+  newTag: 3-management-alpine
+
+# Common labels
+commonLabels:
+  app.kubernetes.io/environment: development
+  app.kubernetes.io/managed-by: argocd
+  app.kubernetes.io/part-of: microservice

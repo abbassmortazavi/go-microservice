@@ -10,7 +10,7 @@ spec:
   project: default
 
   source:
-    repoURL: https://github.com/abbassmortazavi/microservice.git
+    repoURL: https://github.com/abbassmortazavi/go-microservice.git
     targetRevision: develop
     path: infra/development/k8s
     directory:
