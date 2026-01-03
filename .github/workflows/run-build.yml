@@ -129,7 +129,7 @@ jobs:
         run: |
           echo "🔄 Updating production kustomization..."
           
-          cd infra/production/k8s
+          cd infra/k8s/production
           
           # Update API Gateway image
           kustomize edit set image api-gateway=${{ needs.build-api-gateway.outputs.image_name }}:${{ needs.build-api-gateway.outputs.image_tag }}
