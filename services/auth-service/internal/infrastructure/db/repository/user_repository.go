@@ -38,3 +38,13 @@ func (u *UserRepository) FindByEmail(ctx context.Context, email string) (*entity
 	}
 	return &user, nil
 }
+func (u *UserRepository) FindByID(ctx context.Context, id int) (*entity.User, error) {
+	query := `select * from users where id = $1`
+	row := u.db.QueryRowContext(ctx, query, id)
+	var user entity.User
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Role)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+	return &user, nil
+}

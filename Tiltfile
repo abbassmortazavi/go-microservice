@@ -23,6 +23,7 @@ k8s_resource('rabbitmq',
 ### End RabbitMQ ###
 
 ### PostgresDB ###
+k8s_yaml('./infra/development/k8s/postgres-service/postgres-pvc.yaml')
 k8s_yaml('./infra/development/k8s/postgres-service/postgres-deployment.yaml')
 k8s_yaml('./infra/development/k8s/postgres-service/postgres-service.yaml')
 k8s_resource('postgres',
