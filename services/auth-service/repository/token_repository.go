@@ -19,9 +19,33 @@ func NewTokenRepository(db *sql.DB) repository_interface.TokenRepositoryInterfac
 }
 
 func (r *TokenRepository) FindByUserId(ctx context.Context, userId int) (*entity.Token, error) {
-	token := &entity.Token{}
-	query := `SELECT * FROM tokens WHERE user_id = $1`
+	token := &entity.Token{
+		User: entity.User{},
+	}
+
+	query := `
+	SELECT
+		t.id,
+		t.user_id,
+		t.token_type,
+		t.hash_token,
+		t.expired_at,
+		t.is_revoked,
+		t.created_at,
+		t.updated_at,
+
+		u.id,
+		u.name,
+		u.email,
+		u.created_at,
+		u.updated_at
+	FROM tokens t
+	JOIN users u ON u.id = t.user_id
+	WHERE t.user_id = $1
+	LIMIT 1
+	`
 	err := r.db.QueryRowContext(ctx, query, userId).Scan(
+		// token
 		&token.ID,
 		&token.UserID,
 		&token.TokenType,
@@ -30,13 +54,22 @@ func (r *TokenRepository) FindByUserId(ctx context.Context, userId int) (*entity
 		&token.IsRevoked,
 		&token.CreatedAt,
 		&token.UpdatedAt,
+
+		// user
+		&token.User.ID,
+		&token.User.Name,
+		&token.User.Email,
+		&token.User.CreatedAt,
+		&token.User.UpdatedAt,
 	)
+
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
 		}
 		return nil, err
 	}
+
 	return token, nil
 }
 func (r *TokenRepository) Delete(ctx context.Context, id int) error {

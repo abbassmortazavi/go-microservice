@@ -39,7 +39,7 @@ func main() {
 	mux.Handle("POST /register", http.HandlerFunc(handelRegister))
 	mux.Handle("POST /login", http.HandlerFunc(handelLogin))
 
-	mux.Handle("GET /user/{id}", authMiddleware.AuthMiddleware(http.HandlerFunc(handelGetUser)))
+	mux.Handle("GET /user/me", authMiddleware.AuthMiddleware(http.HandlerFunc(handelGetUser)))
 
 	server := &http.Server{
 		Addr:    httpAddr,

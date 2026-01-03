@@ -82,6 +82,7 @@ func (a *AuthService) Login(ctx context.Context, email, password string) (*respo
 }
 func (a *AuthService) GetUser(ctx context.Context, id int64) (*entity.User, error) {
 	user, err := a.userRepo.FindByID(ctx, id)
+
 	if err != nil {
 		return nil, err
 	}

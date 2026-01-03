@@ -1,14 +1,13 @@
 package main
 
 import (
-	authpb "abbassmortazavi/go-microservice/pkg/proto/auth"
 	"abbassmortazavi/go-microservice/pkg/utils"
 	"abbassmortazavi/go-microservice/services/api-gateway/auth/requests"
 	"abbassmortazavi/go-microservice/services/api-gateway/grpc_clients"
+	"abbassmortazavi/go-microservice/services/auth-service/pkg/middlewares"
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 )
 
 func handelRegister(w http.ResponseWriter, r *http.Request) {
@@ -63,7 +62,19 @@ func handelLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func handelGetUser(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id") // This gets the value from {id}
+
+	user, err := middlewares.User(r.Context())
+	if err != nil {
+		log.Println(111111111111111)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = utils.WriteJson(w, http.StatusOK, user)
+	if err != nil {
+		return
+	}
+
+	/*id := r.PathValue("id")
 	log.Println("get user id:", id)
 	if id == "" {
 		http.Error(w, "User ID is required", http.StatusBadRequest)
@@ -86,6 +97,7 @@ func handelGetUser(w http.ResponseWriter, r *http.Request) {
 		Id: userID,
 	}
 	res, err := authService.Client.GetUser(ctx, req)
+
 	if err != nil {
 		utils.InternalError(w, err)
 		return
@@ -93,6 +105,6 @@ func handelGetUser(w http.ResponseWriter, r *http.Request) {
 	err = utils.WriteJson(w, http.StatusOK, res)
 	if err != nil {
 		return
-	}
+	}*/
 
 }

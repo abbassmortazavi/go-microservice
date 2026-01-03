@@ -16,6 +16,7 @@ type TokenServiceInterface interface {
 	GenerateToken(userID int, name string) (response.TokenResponse, error)
 	RefreshAccessToken(refreshToken string) (response.TokenResponse, error)
 	ValidateToken(token string) (*Claims, error)
+	FindByUserId(ctx context.Context, userId int) (*entity.Token, error)
 }
 
 var JwtAuthenticator *JWT
@@ -29,9 +30,9 @@ func NewJwtAuthenticator(j string, repo repository_interface.TokenRepositoryInte
 }
 
 type Claims struct {
-	UserID    int    `json:"user_id"`
-	Name      string `json:"name"`
-	TokenType string `json:"token_type"`
+	User      entity.User `json:"user"`
+	Name      string      `json:"name"`
+	TokenType string      `json:"token_type"`
 	jwt.RegisteredClaims
 }
 
@@ -43,8 +44,14 @@ type JWT struct {
 func (j *JWT) GenerateToken(userID int, name string) (response.TokenResponse, error) {
 	accessExpiry := time.Now().Add(time.Minute * 5)
 	refreshExpiry := time.Now().Add(time.Minute * 10)
+	ctx := context.Background()
+	user, err := j.FindByUserId(ctx, userID)
+	if err != nil {
+		return response.TokenResponse{}, err
+	}
+
 	claims := Claims{
-		UserID:    userID,
+		User:      user.User,
 		Name:      name,
 		TokenType: "access",
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -55,7 +62,7 @@ func (j *JWT) GenerateToken(userID int, name string) (response.TokenResponse, er
 	}
 
 	refreshExpiryClaims := &Claims{
-		UserID:    userID,
+		User:      user.User,
 		Name:      name,
 		TokenType: "refresh",
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -76,7 +83,6 @@ func (j *JWT) GenerateToken(userID int, name string) (response.TokenResponse, er
 		return response.TokenResponse{}, err
 	}
 
-	ctx := context.Background()
 	res, err := j.TokenRepository.FindByUserId(ctx, userID)
 	if err != nil {
 		log.Println(err)
@@ -131,11 +137,10 @@ func (j *JWT) RefreshAccessToken(refreshToken string) (response.TokenResponse, e
 	if claims.TokenType != "refresh" {
 		return response.TokenResponse{}, errors.New("invalid token")
 	}
-	return j.GenerateToken(claims.UserID, claims.Name)
+	return j.GenerateToken(int(claims.User.ID), claims.Name)
 }
 
 func (j *JWT) ValidateToken(token string) (*Claims, error) {
-	log.Println("ValidateToken", token)
 	claims := &Claims{}
 	tkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		return j.SigningKey, nil
@@ -150,7 +155,6 @@ func (j *JWT) ValidateToken(token string) (*Claims, error) {
 
 	//check in database
 	res, err := j.TokenRepository.FindByToken(context.Background(), token)
-	log.Println("response=======>", res)
 	if err != nil {
 		return nil, err
 	}
@@ -159,4 +163,12 @@ func (j *JWT) ValidateToken(token string) (*Claims, error) {
 	}
 
 	return claims, nil
+}
+
+func (j *JWT) FindByUserId(ctx context.Context, userId int) (*entity.Token, error) {
+	res, err := j.TokenRepository.FindByUserId(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }

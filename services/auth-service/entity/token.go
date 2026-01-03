@@ -11,4 +11,5 @@ type Token struct {
 	IsRevoked bool      `json:"is_revoked"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+	User      User      `json:"user"`
 }
