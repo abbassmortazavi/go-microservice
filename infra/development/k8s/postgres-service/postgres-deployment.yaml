@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
-  namespace: microservice-dev  # اضافه کردن namespace
+  namespace: microservice-dev
 spec:
   replicas: 1
   selector:
@@ -25,22 +25,31 @@ spec:
               value: root
             - name: POSTGRES_DB
               value: microservice_db
+          # اصلاح probeها - اضافه کردن پارامتر -d برای اشاره به دیتابیس موجود
           readinessProbe:
             exec:
               command:
                 - pg_isready
                 - -U
                 - root
-            initialDelaySeconds: 10  # افزایش به 10 ثانیه
+                - -d
+                - postgres  # استفاده از دیتابیس پیش‌فرض postgres
+            initialDelaySeconds: 10
             periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 3
           livenessProbe:
             exec:
               command:
                 - pg_isready
                 - -U
                 - root
+                - -d
+                - postgres  # استفاده از دیتابیس پیش‌فرض postgres
             initialDelaySeconds: 30
             periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/postgresql/data

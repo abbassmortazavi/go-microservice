@@ -20,6 +20,7 @@ func Connect() {
 		cfg.Password,
 		cfg.Name)
 
+	log.Printf("Connecting to database %s", dsn)
 	db, err := sql.Open("postgres", dsn)
 
 	if err != nil {
