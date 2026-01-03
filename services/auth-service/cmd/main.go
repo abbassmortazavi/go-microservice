@@ -11,6 +11,7 @@ import (
 	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/messaging"
 	"abbassmortazavi/go-microservice/services/auth-service/internal/infrastructure/security"
 	"abbassmortazavi/go-microservice/services/auth-service/internal/interface/grpc"
+	"abbassmortazavi/go-microservice/services/auth-service/pkg/middlewares"
 	"context"
 	"log"
 	"net"
@@ -47,6 +48,7 @@ func main() {
 	hasher := security.NewBcryptHasher()
 	//tokenService := service.NewJWTSecret([]byte(gcfg.JWT_SECRET))
 	tokenService := service.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo)
+	middlewares.Init(tokenService)
 
 	// ---- RabbitMQ ----
 	conn, ch := messaging.NewRabbitMQ(rabbitmqURL)

@@ -12,7 +12,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type TokenService interface {
+type TokenServiceInterface interface {
 	GenerateToken(userID int, name string) (response.TokenResponse, error)
 	RefreshAccessToken(refreshToken string) (response.TokenResponse, error)
 	ValidateToken(token string) (*Claims, error)
