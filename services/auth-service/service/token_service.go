@@ -12,13 +12,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type TokenServiceInterface interface {
-	GenerateToken(userID int, name string) (response.TokenResponse, error)
-	RefreshAccessToken(refreshToken string) (response.TokenResponse, error)
-	ValidateToken(token string) (*Claims, error)
-	FindByUserId(ctx context.Context, userId int) (*entity.Token, error)
-}
-
 var JwtAuthenticator *JWT
 
 func NewJwtAuthenticator(j string, repo repository_interface.TokenRepositoryInterface) *JWT {
