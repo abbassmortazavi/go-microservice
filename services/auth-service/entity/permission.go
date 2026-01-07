@@ -11,7 +11,7 @@ type Permission struct {
 
 func NewPermission(name string) (*Permission, error) {
 	if name == "" {
-		return nil, errors.New("name or description is empty")
+		return nil, errors.New("name is empty")
 	}
 	return &Permission{
 		ID:   1,
