@@ -45,13 +45,13 @@ func (r *RBACService) CreatePermission(ctx context.Context, name string) (*entit
 	return &res, nil
 }
 
-func (r *RBACService) CreateRole(ctx context.Context, name string) error {
+func (r *RBACService) CreateRole(ctx context.Context, name string) (*entity.Role, error) {
 	res, err := r.roleRepo.FindByName(ctx, name)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if res.Name != "" {
-		return errors.New("role already exists")
+		return nil, errors.New("role already exists")
 	}
 	role := entity.Role{
 		Name: name,
@@ -79,7 +79,7 @@ func (r *RBACService) AssignRoleToUser(ctx context.Context, roleID, userID int) 
 	return r.rbacRepo.AssignRoleToUser(ctx, userID, roleID)
 }
 
-func (r *RBACService) CheckUserPermission(ctx context.Context, permission string, userID int) (bool, error) {
+func (r *RBACService) CheckUserPermission(ctx context.Context, permission string, userID int64) (bool, error) {
 	permissions, err := r.rbacRepo.GetPermissionsByUserID(ctx, userID)
 	if err != nil {
 		return false, nil

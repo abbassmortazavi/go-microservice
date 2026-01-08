@@ -15,13 +15,14 @@ func NewRoleRepository(db *sql.DB) *RoleRepository {
 		db: db,
 	}
 }
-func (r *RoleRepository) Save(ctx context.Context, role entity.Role) error {
+func (r *RoleRepository) Save(ctx context.Context, role entity.Role) (*entity.Role, error) {
 	query := `INSERT INTO roles (name) VALUES ($1) RETURNING role_id`
-	row := r.db.QueryRowContext(ctx, query, role.Name)
-	if err := row.Scan(&role.ID); err != nil {
-		return err
+	var savedRole entity.Role
+	err := r.db.QueryRowContext(ctx, query, role.Name).Scan(&savedRole.ID, &savedRole.Name)
+	if err != nil {
+		return nil, err
 	}
-	return nil
+	return &savedRole, nil
 }
 func (r *RoleRepository) FindById(ctx context.Context, roleId int) (*entity.Role, error) {
 	query := `SELECT * FROM roles WHERE role_id=$1`

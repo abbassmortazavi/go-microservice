@@ -33,7 +33,7 @@ func (r *RBACRepository) AssignPermissionToRole(ctx context.Context, permissionI
 	}
 	return nil
 }
-func (r *RBACRepository) GetPermissionsByUserID(ctx context.Context, userID int) ([]string, error) {
+func (r *RBACRepository) GetPermissionsByUserID(ctx context.Context, userID int64) ([]string, error) {
 	query := `SELECT DISTINCT p.name From permissions p 
         join role_permissions rp on rp.permission_id = p.id
         join user_roles ur on ur.role_id = rp.role_id

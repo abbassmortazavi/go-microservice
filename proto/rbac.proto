@@ -1,22 +1,59 @@
 syntax = "proto3";
 
 package rbac;
+import "google/protobuf/empty.proto";
 
 option go_package = "rbac;rbacpb";
 
 
 service RBACService {
   rpc CreatePermission(CreatePermissionRequest) returns (CreatePermissionResponse);
+  rpc CreateRole(CreateRoleRequest) returns (CreateRoleResponse);
+  rpc AssignPermissionToRole(AssignPermissionToRoleRequest) returns (google.protobuf.Empty);
+  rpc AssignRoleToUser(AssignRoleToUserRequest) returns (google.protobuf.Empty);
+  rpc CheckUserPermission(CheckUserPermissionRequest) returns (CheckUserPermissionResponse);
 }
 
 message CreatePermissionRequest{
   string name = 1;
 }
 
+message CreateRoleRequest{
+  string name = 1;
+}
+
+message AssignPermissionToRoleRequest{
+  int64 roleID = 1;
+  int64 permissionID = 2;
+}
+message AssignRoleToUserRequest{
+  int64 roleID = 1;
+  int64 userID = 2;
+}
+
+message CheckUserPermissionRequest{
+  string permission = 1;
+  int64 userID = 2;
+}
+
 message CreatePermissionResponse {
   Permission permission = 1;
 }
+
+message CreateRoleResponse {
+  Permission permission = 1;
+}
+message CheckUserPermissionResponse {
+  bool hasPermission = 1;
+}
+
+
 message Permission {
+  int64 id = 1;
+  string name = 2;
+}
+
+message Role {
   int64 id = 1;
   string name = 2;
 }
