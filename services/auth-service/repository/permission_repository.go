@@ -15,13 +15,14 @@ func NewPermissionRepository(db *sql.DB) *PermissionRepository {
 		db: db,
 	}
 }
-func (p *PermissionRepository) Save(ctx context.Context, permission entity.Permission) error {
+func (p *PermissionRepository) Save(ctx context.Context, permission entity.Permission) (*entity.Permission, error) {
 	query := `insert into permissions ( name) values ($1) returning id, name`
-	_, err := p.db.ExecContext(ctx, query, permission.Name)
+	var savedPermission entity.Permission
+	err := p.db.QueryRowContext(ctx, query, permission.Name).Scan(&savedPermission.ID, &savedPermission.Name)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return &savedPermission, nil
 }
 func (p *PermissionRepository) FindByID(ctx context.Context, permissionId int) (entity.Permission, error) {
 	query := `select * from permissions where id = $1`

@@ -22,18 +22,27 @@ func NewRBACService(userRepo repository.UserRepository, roleRepo repository.Role
 		rbacRepo:       rbacRepo,
 	}
 }
-func (r *RBACService) CreatePermission(ctx context.Context, name string) error {
+func (r *RBACService) CreatePermission(ctx context.Context, name string) (*entity.Permission, error) {
 	res, err := r.permissionRepo.FindByName(ctx, name)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if res.Name != "" {
-		return errors.New("permission already exists")
+		return nil, errors.New(res.Name + " already exists")
 	}
 	permission := entity.Permission{
 		Name: name,
 	}
-	return r.permissionRepo.Save(ctx, permission)
+	p, err := r.permissionRepo.Save(ctx, permission)
+	if err != nil {
+		return nil, err
+	}
+	res = entity.Permission{
+		Name: name,
+		ID:   p.ID,
+	}
+
+	return &res, nil
 }
 
 func (r *RBACService) CreateRole(ctx context.Context, name string) error {

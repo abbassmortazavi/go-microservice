@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package rbac;
+
+option go_package = "rbac;rbacpb";
+
+
+service RBACService {
+  rpc CreatePermission(CreatePermissionRequest) returns (CreatePermissionResponse);
+}
+
+message CreatePermissionRequest{
+  string name = 1;
+}
+
+message CreatePermissionResponse {
+  Permission permission = 1;
+}
+message Permission {
+  int64 id = 1;
+  string name = 2;
+}
