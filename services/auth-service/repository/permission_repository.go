@@ -61,3 +61,11 @@ func (p *PermissionRepository) Lists(ctx context.Context) ([]entity.Permission, 
 	}
 	return permissions, nil
 }
+func (p *PermissionRepository) Delete(ctx context.Context, permissionId int) error {
+	query := `delete from permissions where id = $1`
+	_, err := p.db.ExecContext(ctx, query, permissionId)
+	if err != nil {
+		return err
+	}
+	return nil
+}

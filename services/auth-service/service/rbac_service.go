@@ -35,3 +35,50 @@ func (r *RBACService) CreatePermission(ctx context.Context, name string) error {
 	}
 	return r.permissionRepo.Save(ctx, permission)
 }
+
+func (r *RBACService) CreateRole(ctx context.Context, name string) error {
+	res, err := r.roleRepo.FindByName(ctx, name)
+	if err != nil {
+		return err
+	}
+	if res.Name != "" {
+		return errors.New("role already exists")
+	}
+	role := entity.Role{
+		Name: name,
+	}
+	return r.roleRepo.Save(ctx, role)
+}
+func (r *RBACService) AssignPermissionToRole(ctx context.Context, permissionID, roleID int) error {
+	role, err := r.roleRepo.FindById(ctx, roleID)
+	if err != nil {
+		return err
+	}
+	permission, err := r.permissionRepo.FindByID(ctx, permissionID)
+	if err != nil {
+		return err
+	}
+	return r.rbacRepo.AssignPermissionToRole(ctx, role.ID, permission.ID)
+}
+
+func (r *RBACService) AssignRoleToUser(ctx context.Context, roleID, userID int) error {
+	_, err := r.roleRepo.FindById(ctx, roleID)
+	if err != nil {
+		return err
+	}
+	_, err = r.userRepo.FindByID(ctx, userID)
+	return r.rbacRepo.AssignRoleToUser(ctx, userID, roleID)
+}
+
+func (r *RBACService) CheckUserPermission(ctx context.Context, permission string, userID int) (bool, error) {
+	permissions, err := r.rbacRepo.GetPermissionsByUserID(ctx, userID)
+	if err != nil {
+		return false, nil
+	}
+	for _, p := range permissions {
+		if p == permission {
+			return true, nil
+		}
+	}
+	return false, nil
+}

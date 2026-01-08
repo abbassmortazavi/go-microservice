@@ -10,4 +10,5 @@ type PermissionRepositoryInterface interface {
 	FindByID(ctx context.Context, permissionId int) (entity.Permission, error)
 	FindByName(ctx context.Context, name string) (entity.Permission, error)
 	Lists(ctx context.Context) ([]entity.Permission, error)
+	Delete(ctx context.Context, id int) error
 }

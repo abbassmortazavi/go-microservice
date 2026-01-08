@@ -10,4 +10,5 @@ type RoleRepositoryInterface interface {
 	FindById(ctx context.Context, roleId int64) (*entity.Role, error)
 	FindByName(ctx context.Context, name string) (*entity.Role, error)
 	Lists(ctx context.Context) ([]*entity.Role, error)
+	Delete(ctx context.Context, roleId int64) error
 }
