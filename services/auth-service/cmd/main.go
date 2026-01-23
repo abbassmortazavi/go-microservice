@@ -47,7 +47,7 @@ func main() {
 
 	hasher := security.NewBcryptHasher()
 	//tokenService := service.NewJWTSecret([]byte(gcfg.JWT_SECRET))
-	tokenService := service2.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo)
+	tokenService := service2.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo, userRepo)
 	middlewares.Init(tokenService)
 
 	// ---- RabbitMQ ----

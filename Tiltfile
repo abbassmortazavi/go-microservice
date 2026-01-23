@@ -66,7 +66,7 @@ k8s_yaml('./infra/development/k8s/api-gateway/api-gateway-deployment.yaml')
 k8s_yaml('./infra/development/k8s/api-gateway/api-gateway-service.yaml')
 
 k8s_resource('api-gateway',
-             port_forwards=[8081],
+             port_forwards=[8085],
              labels=['services', 'gateway'],
              extra_pod_selectors=[{'app': 'api-gateway'}])
 ### End of API Gateway ###

@@ -39,12 +39,13 @@ func (u *UserRepository) FindByEmail(ctx context.Context, email string) (*entity
 	return &user, nil
 }
 func (u *UserRepository) FindByID(ctx context.Context, id int) (*entity.User, error) {
-	query := `SELECT id, name, email, created_at, updated_at FROM users WHERE id = $1`
+	query := `SELECT id, name, email, role, created_at, updated_at FROM users WHERE id = $1`
 	var user entity.User
 	err := u.db.QueryRowContext(ctx, query, id).Scan(
 		&user.ID,
 		&user.Name,
 		&user.Email,
+		&user.Role,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)

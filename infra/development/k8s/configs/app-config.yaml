@@ -11,7 +11,7 @@
     LOG_LEVEL: "info"
 
     # API Gateway
-    GATEWAY_HTTP_ADDR: ":8081"
+    GATEWAY_HTTP_ADDR: ":8085"
     GATEWAY_READ_TIMEOUT: "30s"
     GATEWAY_WRITE_TIMEOUT: "30s"
 

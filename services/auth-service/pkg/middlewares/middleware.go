@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"abbassmortazavi/go-microservice/services/auth-service/interfaces/service_interface"
 	"abbassmortazavi/go-microservice/services/auth-service/service"
 	"context"
 	"log"
@@ -10,10 +9,10 @@ import (
 )
 
 type Middleware struct {
-	authenticator service_interface.TokenServiceInterface
+	authenticator service.TokenServiceInterface
 }
 
-func NewAuthMiddleware(authenticator service_interface.TokenServiceInterface) *Middleware {
+func NewAuthMiddleware(authenticator service.TokenServiceInterface) *Middleware {
 	return &Middleware{
 		authenticator: authenticator,
 	}

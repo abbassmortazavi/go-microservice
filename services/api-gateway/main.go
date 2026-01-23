@@ -18,7 +18,7 @@ import (
 )
 
 var (
-	httpAddr = env.GetString("GATEWAY_HTTP_ADDR", ":8081")
+	httpAddr = env.GetString("GATEWAY_HTTP_ADDR", ":8085")
 )
 
 func main() {
@@ -27,7 +27,8 @@ func main() {
 	database.Connect()
 
 	tokenRepo := repository.NewTokenRepository(database.DB)
-	tokenService := service.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo)
+	userRepo := repository.NewUserRepository(database.DB)
+	tokenService := service.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo, userRepo)
 	middlewares.Init(tokenService)
 	authMiddleware := middlewares.GetMiddleware()
 
@@ -40,6 +41,7 @@ func main() {
 	mux.Handle("POST /login", http.HandlerFunc(handelLogin))
 
 	mux.Handle("GET /user/me", authMiddleware.AuthMiddleware(http.HandlerFunc(handelGetUser)))
+	mux.Handle("POST /create-permission", authMiddleware.AuthMiddleware(http.HandlerFunc(handelCreatePermission)))
 
 	server := &http.Server{
 		Addr:    httpAddr,

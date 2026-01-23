@@ -13,6 +13,12 @@ import (
 	"strconv"
 )
 
+type TokenServiceInterface interface {
+	GenerateToken(userID int, name string) (response.TokenResponse, error)
+	RefreshAccessToken(refreshToken string) (response.TokenResponse, error)
+	ValidateToken(token string) (*Claims, error)
+}
+
 type AuthService struct {
 	userRepo     repository_interface.UserRepositoryInterface
 	hasher       security.PasswordHasher
@@ -64,6 +70,7 @@ func (a *AuthService) Login(ctx context.Context, email, password string) (*respo
 	}
 	tokens, err := a.TokenService.GenerateToken(int(user.ID), user.Name)
 	if err != nil {
+		log.Println(222222222222)
 		return nil, err
 	}
 
@@ -81,7 +88,7 @@ func (a *AuthService) Login(ctx context.Context, email, password string) (*respo
 	}, nil
 }
 func (a *AuthService) GetUser(ctx context.Context, id int64) (*entity.User, error) {
-	user, err := a.userRepo.FindByID(ctx, id)
+	user, err := a.userRepo.FindByID(ctx, int(id))
 
 	if err != nil {
 		return nil, err

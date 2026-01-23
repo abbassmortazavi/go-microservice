@@ -7,6 +7,6 @@ WORKDIR /app
 COPY build/api-gateway .
 
 
-EXPOSE 8081
+EXPOSE 8085
 
 CMD ["./api-gateway"]

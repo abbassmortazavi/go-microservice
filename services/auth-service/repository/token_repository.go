@@ -6,6 +6,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"log"
 )
 
 type TokenRepository struct {
@@ -37,12 +38,12 @@ func (r *TokenRepository) FindByUserId(ctx context.Context, userId int) (*entity
 		u.id,
 		u.name,
 		u.email,
-		u.role
+		u.role,
 		u.created_at,
 		u.updated_at
-	FROM tokens t
-	JOIN users u ON u.id = t.user_id
-	WHERE t.user_id = $1
+	FROM users u
+	JOIN tokens t ON t.user_id = u.id
+	WHERE u.id = $1
 	LIMIT 1
 	`
 	err := r.db.QueryRowContext(ctx, query, userId).Scan(
@@ -71,7 +72,7 @@ func (r *TokenRepository) FindByUserId(ctx context.Context, userId int) (*entity
 		}
 		return nil, err
 	}
-
+	log.Println("data ===>", token)
 	return token, nil
 }
 func (r *TokenRepository) Delete(ctx context.Context, id int) error {
