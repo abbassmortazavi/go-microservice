@@ -2,19 +2,19 @@ package service
 
 import (
 	"abbassmortazavi/go-microservice/services/auth-service/entity"
-	"abbassmortazavi/go-microservice/services/auth-service/repository"
+	"abbassmortazavi/go-microservice/services/auth-service/interfaces/repository_interface"
 	"context"
 	"errors"
 )
 
 type RBACService struct {
-	userRepo       repository.UserRepository
-	roleRepo       repository.RoleRepository
-	permissionRepo repository.PermissionRepository
-	rbacRepo       repository.RBACRepository
+	userRepo       repository_interface.UserRepositoryInterface
+	roleRepo       repository_interface.RoleRepositoryInterface
+	permissionRepo repository_interface.PermissionRepositoryInterface
+	rbacRepo       repository_interface.RBACRepositoryInterface
 }
 
-func NewRBACService(userRepo repository.UserRepository, roleRepo repository.RoleRepository, permissionRepo repository.PermissionRepository, rbacRepo repository.RBACRepository) *RBACService {
+func NewRBACService(userRepo repository_interface.UserRepositoryInterface, roleRepo repository_interface.RoleRepositoryInterface, permissionRepo repository_interface.PermissionRepositoryInterface, rbacRepo repository_interface.RBACRepositoryInterface) *RBACService {
 	return &RBACService{
 		userRepo:       userRepo,
 		roleRepo:       roleRepo,
@@ -56,10 +56,15 @@ func (r *RBACService) CreateRole(ctx context.Context, name string) (*entity.Role
 	role := entity.Role{
 		Name: name,
 	}
-	return r.roleRepo.Save(ctx, role)
+	data, err := r.roleRepo.Save(ctx, &role)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 func (r *RBACService) AssignPermissionToRole(ctx context.Context, permissionID, roleID int) error {
-	role, err := r.roleRepo.FindById(ctx, roleID)
+	role, err := r.roleRepo.FindById(ctx, int64(roleID))
 	if err != nil {
 		return err
 	}
@@ -67,16 +72,16 @@ func (r *RBACService) AssignPermissionToRole(ctx context.Context, permissionID, 
 	if err != nil {
 		return err
 	}
-	return r.rbacRepo.AssignPermissionToRole(ctx, role.ID, permission.ID)
+	return r.rbacRepo.AssignPermissionToRole(ctx, int64(role.ID), int64(permission.ID))
 }
 
 func (r *RBACService) AssignRoleToUser(ctx context.Context, roleID, userID int) error {
-	_, err := r.roleRepo.FindById(ctx, roleID)
+	_, err := r.roleRepo.FindById(ctx, int64(roleID))
 	if err != nil {
 		return err
 	}
 	_, err = r.userRepo.FindByID(ctx, userID)
-	return r.rbacRepo.AssignRoleToUser(ctx, userID, roleID)
+	return r.rbacRepo.AssignRoleToUser(ctx, int64(userID), int64(roleID))
 }
 
 func (r *RBACService) CheckUserPermission(ctx context.Context, permission string, userID int64) (bool, error) {

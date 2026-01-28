@@ -16,7 +16,7 @@ func NewRoleRepository(db *sql.DB) *RoleRepository {
 	}
 }
 func (r *RoleRepository) Save(ctx context.Context, role entity.Role) (*entity.Role, error) {
-	query := `INSERT INTO roles (name) VALUES ($1) RETURNING role_id`
+	query := `INSERT INTO roles (name) VALUES ($1) returning id, name`
 	var savedRole entity.Role
 	err := r.db.QueryRowContext(ctx, query, role.Name).Scan(&savedRole.ID, &savedRole.Name)
 	if err != nil {
@@ -24,7 +24,7 @@ func (r *RoleRepository) Save(ctx context.Context, role entity.Role) (*entity.Ro
 	}
 	return &savedRole, nil
 }
-func (r *RoleRepository) FindById(ctx context.Context, roleId int) (*entity.Role, error) {
+func (r *RoleRepository) FindById(ctx context.Context, roleId int64) (*entity.Role, error) {
 	query := `SELECT * FROM roles WHERE role_id=$1`
 	row := r.db.QueryRowContext(ctx, query, roleId)
 	var role entity.Role
@@ -62,7 +62,7 @@ func (r *RoleRepository) Lists(ctx context.Context) ([]entity.Role, error) {
 	}
 	return roles, nil
 }
-func (r *RoleRepository) Delete(ctx context.Context, roleId int) error {
+func (r *RoleRepository) Delete(ctx context.Context, roleId int64) error {
 	query := `DELETE FROM roles WHERE role_id=$1`
 	_, err := r.db.ExecContext(ctx, query, roleId)
 	if err != nil {
