@@ -108,3 +108,6 @@ func handelGetUser(w http.ResponseWriter, r *http.Request) {
 	}*/
 
 }
+func handelCreatePermission(w http.ResponseWriter, r *http.Request) {
+	log.Println("create permission")
+}

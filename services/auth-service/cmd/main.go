@@ -5,6 +5,7 @@ import (
 	"abbassmortazavi/go-microservice/pkg/database"
 	"abbassmortazavi/go-microservice/pkg/env"
 	authpb "abbassmortazavi/go-microservice/pkg/proto/auth"
+	rbacpb "abbassmortazavi/go-microservice/pkg/proto/rbac"
 	"abbassmortazavi/go-microservice/services/auth-service/config"
 	"abbassmortazavi/go-microservice/services/auth-service/grpc"
 	messaging2 "abbassmortazavi/go-microservice/services/auth-service/messaging"
@@ -47,7 +48,7 @@ func main() {
 
 	hasher := security.NewBcryptHasher()
 	//tokenService := service.NewJWTSecret([]byte(gcfg.JWT_SECRET))
-	tokenService := service2.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo)
+	tokenService := service2.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo, userRepo)
 	middlewares.Init(tokenService)
 
 	// ---- RabbitMQ ----
@@ -69,12 +70,19 @@ func main() {
 	}
 	publisher := messaging2.NewPublisher(ch, cfg.UserExchange)
 
+	roleRepo := repository.NewRoleRepository(database.DB)
+	permissionRepo := repository.NewPermissionRepository(database.DB)
+	rbacRepo := repository.NewRBACRepository(database.DB)
+
 	authService := service2.NewAuthService(userRepo, hasher, tokenService, publisher)
+	rbacService := service2.NewRBACService(userRepo, roleRepo, permissionRepo, rbacRepo)
 
 	authHandler := grpc.NewAuthHandler(authService)
+	rbacHandler := grpc.NewRabcHandler(rbacService)
 
 	server := grpc2.NewServer()
 	authpb.RegisterAuthServiceServer(server, authHandler)
+	rbacpb.RegisterRBACServiceServer(server, rbacHandler)
 
 	// Run server in a goroutine
 	serverErr := make(chan error, 1)
