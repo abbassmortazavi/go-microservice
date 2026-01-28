@@ -30,18 +30,12 @@ func main() {
 	userRepo := repository.NewUserRepository(database.DB)
 	tokenService := service.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo, userRepo)
 	middlewares.Init(tokenService)
-	authMiddleware := middlewares.GetMiddleware()
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("POST /test-url", func(w http.ResponseWriter, r *http.Request) {
-		log.Println("everything work perfectly!!!!!")
-	})
 
-	mux.Handle("POST /register", http.HandlerFunc(handelRegister))
-	mux.Handle("POST /login", http.HandlerFunc(handelLogin))
-
-	mux.Handle("GET /user/me", authMiddleware.AuthMiddleware(http.HandlerFunc(handelGetUser)))
-	mux.Handle("POST /create-permission", authMiddleware.AuthMiddleware(http.HandlerFunc(handelCreatePermission)))
+	publicGroup(mux)
+	permissionGroup(mux)
+	userGroup(mux)
 
 	server := &http.Server{
 		Addr:    httpAddr,

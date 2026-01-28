@@ -111,3 +111,6 @@ func handelGetUser(w http.ResponseWriter, r *http.Request) {
 func handelCreatePermission(w http.ResponseWriter, r *http.Request) {
 	log.Println("create permission")
 }
+func handelDeletePermission(w http.ResponseWriter, r *http.Request) {
+	log.Println("delete permission")
+}
