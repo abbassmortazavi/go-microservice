@@ -15,7 +15,7 @@ func NewRBACRepository(db *sql.DB) *RBACRepository {
 	}
 }
 
-func (r *RBACRepository) AssignRoleToUser(ctx context.Context, userId, roleId int) error {
+func (r *RBACRepository) AssignRoleToUser(ctx context.Context, userId, roleId int64) error {
 	query := `INSERT INTO user_roles (role_id, user_id) VALUES ($1, $2) RETURNING *;`
 	row := r.db.QueryRow(query, roleId, userId)
 	err := row.Scan(&roleId, &userId)
@@ -24,7 +24,7 @@ func (r *RBACRepository) AssignRoleToUser(ctx context.Context, userId, roleId in
 	}
 	return nil
 }
-func (r *RBACRepository) AssignPermissionToRole(ctx context.Context, permissionID, roleId int) error {
+func (r *RBACRepository) AssignPermissionToRole(ctx context.Context, permissionID, roleId int64) error {
 	query := `insert into role_permissions (role_id, permission_id) VALUES ($1, $2) RETURNING *;`
 	row := r.db.QueryRow(query, roleId, permissionID)
 	err := row.Scan(&roleId, &permissionID)

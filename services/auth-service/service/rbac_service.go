@@ -56,19 +56,19 @@ func (r *RBACService) CreateRole(ctx context.Context, name string) (*entity.Role
 	role := entity.Role{
 		Name: name,
 	}
-	data, err := r.roleRepo.Save(ctx, &role)
+	data, err := r.roleRepo.Save(ctx, role)
 	if err != nil {
 		return nil, err
 	}
 
 	return data, nil
 }
-func (r *RBACService) AssignPermissionToRole(ctx context.Context, permissionID, roleID int) error {
-	role, err := r.roleRepo.FindById(ctx, int64(roleID))
+func (r *RBACService) AssignPermissionToRole(ctx context.Context, permissionID, roleID int64) error {
+	role, err := r.roleRepo.FindById(ctx, roleID)
 	if err != nil {
 		return err
 	}
-	permission, err := r.permissionRepo.FindByID(ctx, permissionID)
+	permission, err := r.permissionRepo.FindByID(ctx, int(permissionID))
 	if err != nil {
 		return err
 	}
