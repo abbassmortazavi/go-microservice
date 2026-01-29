@@ -62,3 +62,4 @@ build/
 
 # Secrets
 secrets.yaml
+infra/local/docker/postgres-data/
