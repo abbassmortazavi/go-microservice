@@ -4,6 +4,7 @@ import (
 	global "abbassmortazavi/go-microservice/pkg/config"
 	"abbassmortazavi/go-microservice/pkg/database"
 	"abbassmortazavi/go-microservice/pkg/env"
+	"abbassmortazavi/go-microservice/services/api-gateway/routes"
 	"abbassmortazavi/go-microservice/services/auth-service/pkg/middlewares"
 	"abbassmortazavi/go-microservice/services/auth-service/repository"
 	"abbassmortazavi/go-microservice/services/auth-service/service"
@@ -15,6 +16,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 var (
@@ -31,15 +34,12 @@ func main() {
 	tokenService := service.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo, userRepo)
 	middlewares.Init(tokenService)
 
-	mux := http.NewServeMux()
-
-	publicGroup(mux)
-	permissionGroup(mux)
-	userGroup(mux)
+	router := mux.NewRouter()
+	routes.SetupRoutes(router)
 
 	server := &http.Server{
 		Addr:    httpAddr,
-		Handler: mux,
+		Handler: router,
 	}
 	serverErrors := make(chan error, 1)
 	go func() {
