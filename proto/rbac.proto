@@ -12,6 +12,36 @@ service RBACService {
   rpc AssignPermissionToRole(AssignPermissionToRoleRequest) returns (google.protobuf.Empty);
   rpc AssignRoleToUser(AssignRoleToUserRequest) returns (google.protobuf.Empty);
   rpc CheckUserPermission(CheckUserPermissionRequest) returns (CheckUserPermissionResponse);
+  rpc DeletePermission(DeletePermissionRequest) returns (google.protobuf.Empty);
+  rpc DeleteRole(DeleteRoleRequest) returns (google.protobuf.Empty);
+  rpc UpdateRole(UpdateRoleRequest) returns (UpdateRoleResponse);
+  rpc UpdatePermission(UpdatePermissionRequest) returns (UpdatePermissionResponse);
+}
+
+message DeletePermissionRequest {
+  int64 id = 1;
+}
+
+message DeleteRoleRequest {
+  int64 id = 1;
+}
+
+message UpdatePermissionRequest {
+  int64 id = 1;
+  string name= 2;
+}
+
+message UpdateRoleRequest {
+  int64 id = 1;
+  string name= 2;
+}
+
+message UpdateRoleResponse {
+  Role role = 1;
+}
+
+message UpdatePermissionResponse {
+  Permission permission = 1;
 }
 
 message CreatePermissionRequest{
