@@ -7,8 +7,8 @@ import (
 
 type PermissionRepositoryInterface interface {
 	Save(ctx context.Context, permission entity.Permission) (*entity.Permission, error)
-	FindByID(ctx context.Context, permissionId int) (entity.Permission, error)
+	FindByID(ctx context.Context, permissionId int64) (entity.Permission, error)
 	FindByName(ctx context.Context, name string) (entity.Permission, error)
 	Lists(ctx context.Context) ([]entity.Permission, error)
-	Delete(ctx context.Context, id int) error
+	Delete(ctx context.Context, id int64) error
 }

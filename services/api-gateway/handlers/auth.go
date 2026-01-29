@@ -62,10 +62,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
-
 	user, err := middlewares.User(r.Context())
 	if err != nil {
-		log.Println(111111111111111)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

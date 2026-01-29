@@ -24,7 +24,6 @@ func NewRBACService(userRepo repository_interface.UserRepositoryInterface, roleR
 	}
 }
 func (r *RBACService) CreatePermission(ctx context.Context, name string) (*entity.Permission, error) {
-	log.Println("CreatePermission service in rbc handler", name)
 	res, _ := r.permissionRepo.FindByName(ctx, name)
 
 	if res.Name != "" {
@@ -69,7 +68,7 @@ func (r *RBACService) AssignPermissionToRole(ctx context.Context, permissionID, 
 	if err != nil {
 		return err
 	}
-	permission, err := r.permissionRepo.FindByID(ctx, int(permissionID))
+	permission, err := r.permissionRepo.FindByID(ctx, permissionID)
 	if err != nil {
 		return err
 	}
@@ -96,4 +95,13 @@ func (r *RBACService) CheckUserPermission(ctx context.Context, permission string
 		}
 	}
 	return false, nil
+}
+
+func (r *RBACService) DeletePermission(ctx context.Context, permissionID int64) error {
+	log.Println("data before send", permissionID)
+	err := r.permissionRepo.Delete(ctx, permissionID)
+	if err != nil {
+		return err
+	}
+	return nil
 }

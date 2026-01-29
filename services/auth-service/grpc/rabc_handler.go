@@ -4,6 +4,9 @@ import (
 	rbacpb "abbassmortazavi/go-microservice/pkg/proto/rbac"
 	"abbassmortazavi/go-microservice/services/auth-service/service"
 	"context"
+	"log"
+
+	"github.com/golang/protobuf/ptypes/empty"
 )
 
 type RabcHandler struct {
@@ -29,4 +32,12 @@ func (rb *RabcHandler) CreatePermission(ctx context.Context, req *rbacpb.CreateP
 	return &rbacpb.CreatePermissionResponse{
 		Permission: permission,
 	}, nil
+}
+func (rb *RabcHandler) DeletePermission(ctx context.Context, req *rbacpb.DeletePermissionRequest) (*empty.Empty, error) {
+	log.Println("delete permission handler", req.Id)
+	err := rb.rbacService.DeletePermission(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &empty.Empty{}, nil
 }
