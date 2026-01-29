@@ -37,7 +37,7 @@ type JWT struct {
 }
 
 func (j *JWT) GenerateToken(userID int, name string) (response.TokenResponse, error) {
-	accessExpiry := time.Now().Add(time.Minute * 5)
+	accessExpiry := time.Now().Add(time.Minute * 60)
 	refreshExpiry := time.Now().Add(time.Minute * 10)
 	ctx := context.Background()
 	user, err := j.FindByUserId(ctx, userID)

@@ -4,6 +4,7 @@ import (
 	"abbassmortazavi/go-microservice/services/auth-service/entity"
 	"context"
 	"database/sql"
+	"log"
 )
 
 type PermissionRepository struct {
@@ -16,6 +17,7 @@ func NewPermissionRepository(db *sql.DB) *PermissionRepository {
 	}
 }
 func (p *PermissionRepository) Save(ctx context.Context, permission entity.Permission) (*entity.Permission, error) {
+	log.Println(" repository===>", permission)
 	query := `insert into permissions ( name) values ($1) returning id, name`
 	var savedPermission entity.Permission
 	err := p.db.QueryRowContext(ctx, query, permission.Name).Scan(&savedPermission.ID, &savedPermission.Name)
