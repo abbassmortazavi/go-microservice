@@ -5,7 +5,6 @@ import (
 	"abbassmortazavi/go-microservice/services/auth-service/interfaces/repository_interface"
 	"context"
 	"errors"
-	"log"
 )
 
 type RBACService struct {
@@ -25,14 +24,12 @@ func NewRBACService(userRepo repository_interface.UserRepositoryInterface, roleR
 }
 func (r *RBACService) CreatePermission(ctx context.Context, name string) (*entity.Permission, error) {
 	res, _ := r.permissionRepo.FindByName(ctx, name)
-
 	if res.Name != "" {
 		return nil, errors.New(res.Name + " already exists")
 	}
 	permission := entity.Permission{
 		Name: name,
 	}
-	log.Println("data before send", permission)
 	p, err := r.permissionRepo.Create(ctx, permission)
 	if err != nil {
 		return nil, err

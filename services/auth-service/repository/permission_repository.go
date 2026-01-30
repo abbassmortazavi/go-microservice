@@ -70,3 +70,8 @@ func (p *PermissionRepository) Delete(ctx context.Context, permissionId int64) e
 	}
 	return nil
 }
+
+func (p *PermissionRepository) Update(ctx context.Context, id int64, name string) (entity.Permission, error) {
+	//TODO implement me
+	panic("implement me")
+}

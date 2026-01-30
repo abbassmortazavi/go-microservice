@@ -1,13 +1,15 @@
 package permission
 
-import rbacpb "abbassmortazavi/go-microservice/pkg/proto/rbac"
+import (
+	permissionpb "abbassmortazavi/go-microservice/pkg/proto/permission"
+)
 
 type CreatePermissionReq struct {
 	Name string `json:"name"`
 }
 
-func (p *CreatePermissionReq) ToProto() *rbacpb.CreatePermissionRequest {
-	return &rbacpb.CreatePermissionRequest{
+func (p *CreatePermissionReq) ToProto() *permissionpb.CreatePermissionRequest {
+	return &permissionpb.CreatePermissionRequest{
 		Name: p.Name,
 	}
 }

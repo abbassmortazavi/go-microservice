@@ -1,0 +1,52 @@
+package grpc
+
+import (
+	permissionpb "abbassmortazavi/go-microservice/pkg/proto/permission"
+	"abbassmortazavi/go-microservice/services/auth-service/service"
+	"context"
+	"log"
+
+	"github.com/golang/protobuf/ptypes/empty"
+)
+
+type PermissionHandler struct {
+	permissionpb.UnimplementedPermissionServiceServer
+	permissionService *service.PermissionService
+}
+
+func NewPermissionHandler(p *service.PermissionService) *PermissionHandler {
+	return &PermissionHandler{
+		permissionService: p,
+	}
+}
+
+func (p *PermissionHandler) Create(ctx context.Context, req *permissionpb.CreatePermissionRequest) (*permissionpb.CreatePermissionResponse, error) {
+	res, err := p.permissionService.Create(ctx, req.Name)
+	if err != nil {
+		return nil, err
+	}
+	permission := &permissionpb.Permission{
+		Id:   int64(res.ID),
+		Name: res.Name,
+	}
+	return &permissionpb.CreatePermissionResponse{
+		Permission: permission,
+	}, nil
+}
+func (p *PermissionHandler) Delete(ctx context.Context, req *permissionpb.DeletePermissionRequest) (*empty.Empty, error) {
+	log.Println("delete permission handler", req.Id)
+	err := p.permissionService.Delete(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &empty.Empty{}, nil
+}
+func (p *PermissionHandler) Update(ctx context.Context, request *permissionpb.UpdatePermissionRequest) (*permissionpb.UpdatePermissionResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (p *PermissionHandler) Lists(ctx context.Context, request *permissionpb.ListPermissionsRequest) (*permissionpb.ListPermissionResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}

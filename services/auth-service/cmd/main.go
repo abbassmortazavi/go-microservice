@@ -5,6 +5,7 @@ import (
 	"abbassmortazavi/go-microservice/pkg/database"
 	"abbassmortazavi/go-microservice/pkg/env"
 	authpb "abbassmortazavi/go-microservice/pkg/proto/auth"
+	permissionpb "abbassmortazavi/go-microservice/pkg/proto/permission"
 	rbacpb "abbassmortazavi/go-microservice/pkg/proto/rbac"
 	"abbassmortazavi/go-microservice/services/auth-service/config"
 	"abbassmortazavi/go-microservice/services/auth-service/grpc"
@@ -76,13 +77,16 @@ func main() {
 
 	authService := service2.NewAuthService(userRepo, hasher, tokenService, publisher)
 	rbacService := service2.NewRBACService(userRepo, roleRepo, permissionRepo, rbacRepo)
+	permissionService := service2.NewPermissionService(permissionRepo)
 
 	authHandler := grpc.NewAuthHandler(authService)
 	rbacHandler := grpc.NewRabcHandler(rbacService)
+	permissionHandler := grpc.NewPermissionHandler(permissionService)
 
 	server := grpc2.NewServer()
 	authpb.RegisterAuthServiceServer(server, authHandler)
 	rbacpb.RegisterRBACServiceServer(server, rbacHandler)
+	permissionpb.RegisterPermissionServiceServer(server, permissionHandler)
 
 	// Run server in a goroutine
 	serverErr := make(chan error, 1)

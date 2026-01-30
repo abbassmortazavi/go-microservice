@@ -1,13 +1,15 @@
 package permission
 
-import rbacpb "abbassmortazavi/go-microservice/pkg/proto/rbac"
+import (
+	permissionpb "abbassmortazavi/go-microservice/pkg/proto/permission"
+)
 
 type DeletePermissionReq struct {
 	Id int64 `json:"id" form:"id" query:"id"`
 }
 
-func (d *DeletePermissionReq) ToProto() *rbacpb.DeletePermissionRequest {
-	return &rbacpb.DeletePermissionRequest{
+func (d *DeletePermissionReq) ToProto() *permissionpb.DeletePermissionRequest {
+	return &permissionpb.DeletePermissionRequest{
 		Id: d.Id,
 	}
 }
