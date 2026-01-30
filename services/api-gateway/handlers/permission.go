@@ -21,7 +21,7 @@ func CreatePermission(w http.ResponseWriter, r *http.Request) {
 		utils.InternalError(w, err)
 		return
 	}
-	res, err := authService.Rbac.CreatePermission(ctx, req.ToProto())
+	res, err := authService.Permission.Create(ctx, req.ToProto())
 	if err != nil {
 		utils.InternalError(w, err)
 		return
@@ -48,10 +48,13 @@ func DeletePermission(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	req.Id = idConvert
-	_, err = authService.Rbac.DeletePermission(ctx, req.ToProto())
+	_, err = authService.Permission.Delete(ctx, req.ToProto())
 	if err != nil {
 		utils.InternalError(w, err)
 		return
 	}
 	utils.Success(w, http.StatusOK, "", "Permission has been deleted Successfully!")
+}
+func ListPermissions(w http.ResponseWriter, r *http.Request) {
+
 }

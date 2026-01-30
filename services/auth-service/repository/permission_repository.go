@@ -15,7 +15,7 @@ func NewPermissionRepository(db *sql.DB) *PermissionRepository {
 		db: db,
 	}
 }
-func (p *PermissionRepository) Save(ctx context.Context, permission entity.Permission) (*entity.Permission, error) {
+func (p *PermissionRepository) Create(ctx context.Context, permission entity.Permission) (*entity.Permission, error) {
 	query := `insert into permissions ( name) values ($1) returning id, name`
 	var savedPermission entity.Permission
 	err := p.db.QueryRowContext(ctx, query, permission.Name).Scan(&savedPermission.ID, &savedPermission.Name)

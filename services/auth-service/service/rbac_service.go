@@ -33,7 +33,7 @@ func (r *RBACService) CreatePermission(ctx context.Context, name string) (*entit
 		Name: name,
 	}
 	log.Println("data before send", permission)
-	p, err := r.permissionRepo.Save(ctx, permission)
+	p, err := r.permissionRepo.Create(ctx, permission)
 	if err != nil {
 		return nil, err
 	}

@@ -1,0 +1,56 @@
+syntax = "proto3";
+package permission;
+import "google/protobuf/empty.proto";
+
+option go_package = "permission;permissionpb";
+
+service PermissionService {
+  rpc Create(CreatePermissionRequest) returns (CreatePermissionResponse);
+  rpc Delete(DeletePermissionRequest) returns (google.protobuf.Empty);
+  rpc Update(UpdatePermissionRequest) returns (UpdatePermissionResponse);
+  rpc Lists (ListPermissionsRequest) returns (ListPermissionResponse);
+}
+
+message DeletePermissionRequest {
+  int64 id = 1;
+}
+message UpdatePermissionRequest {
+  int64 id = 1;
+  string name = 2;
+}
+message CreatePermissionRequest{
+  string name = 1;
+}
+
+message ListPermissionsRequest {
+  int64 page = 1;
+  int64 per_page = 2;
+  string search = 3;
+  string sort_by = 4;
+  string sort_order = 5;
+}
+message ListPermissionResponse {
+  repeated Permission permissions = 1;
+  Meta meta = 2;
+}
+
+message Meta {
+  int64 current_page = 1;
+  int64 per_page = 2;
+  int64 total_pages = 3;
+  int64 TotalItems = 4;
+  bool has_next = 5;
+  bool has_previous = 6;
+}
+
+message Permission {
+  int64 id = 1;
+  string name = 2;
+}
+
+message UpdatePermissionResponse {
+  Permission permission = 1;
+}
+message CreatePermissionResponse {
+  Permission permission = 1;
+}
