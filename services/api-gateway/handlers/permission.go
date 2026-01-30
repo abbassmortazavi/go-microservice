@@ -4,7 +4,6 @@ import (
 	"abbassmortazavi/go-microservice/pkg/utils"
 	"abbassmortazavi/go-microservice/services/api-gateway/grpc_clients"
 	"abbassmortazavi/go-microservice/services/api-gateway/requests/permission"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -51,7 +50,6 @@ func DeletePermission(w http.ResponseWriter, r *http.Request) {
 	req.Id = idConvert
 	_, err = authService.Rbac.DeletePermission(ctx, req.ToProto())
 	if err != nil {
-		log.Println("111111111111111111111111111111111111")
 		utils.InternalError(w, err)
 		return
 	}

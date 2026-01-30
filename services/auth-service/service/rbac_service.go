@@ -98,8 +98,11 @@ func (r *RBACService) CheckUserPermission(ctx context.Context, permission string
 }
 
 func (r *RBACService) DeletePermission(ctx context.Context, permissionID int64) error {
-	log.Println("data before send", permissionID)
-	err := r.permissionRepo.Delete(ctx, permissionID)
+	_, err := r.permissionRepo.FindByID(ctx, permissionID)
+	if err != nil {
+		return errors.New("permission not exists")
+	}
+	err = r.permissionRepo.Delete(ctx, permissionID)
 	if err != nil {
 		return err
 	}

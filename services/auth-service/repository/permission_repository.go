@@ -25,7 +25,7 @@ func (p *PermissionRepository) Save(ctx context.Context, permission entity.Permi
 	return &savedPermission, nil
 }
 func (p *PermissionRepository) FindByID(ctx context.Context, permissionId int64) (entity.Permission, error) {
-	query := `select * from permissions where id = $1`
+	query := `select id,name from permissions where id = $1`
 	row := p.db.QueryRowContext(ctx, query, permissionId)
 	var permission entity.Permission
 	err := row.Scan(&permission.ID, &permission.Name)
