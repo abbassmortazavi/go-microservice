@@ -31,9 +31,9 @@ resources:
 
 images:
 - name: api-gateway
-  newTag: 9ffcf0cfd8e00477819827b0ab55eacd185387cc
+  newTag: 3d5ca533580be387e4dee438998b26eef4cfb378
 - name: auth-service
-  newTag: 9ffcf0cfd8e00477819827b0ab55eacd185387cc
+  newTag: 3d5ca533580be387e4dee438998b26eef4cfb378
 - name: postgres
   newName: postgres
   newTag: 15-alpine
