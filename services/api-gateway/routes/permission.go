@@ -12,8 +12,8 @@ func PermissionRoutes(mux *mux.Router) {
 	protected := mux.PathPrefix("/api/v1/permissions").Subrouter()
 	protected.Use(authMiddleware.AuthMiddleware)
 
-	protected.HandleFunc("POST /", handlers.CreatePermission)
-	protected.HandleFunc("DELETE /{id}", handlers.DeletePermission)
-	/*permGroup.Handle("GET /", handlers.ListPermissions)
-	permGroup.Handle("GET /{id}", handlers.GetPermission)*/
+	protected.HandleFunc("/create", handlers.CreatePermission).Methods("POST")
+	protected.HandleFunc("/{id}", handlers.DeletePermission).Methods("DELETE")
+	protected.HandleFunc("/lists", handlers.ListPermissions).Methods("GET")
+	protected.HandleFunc("/{id}", handlers.GetPermission).Methods("GET")
 }

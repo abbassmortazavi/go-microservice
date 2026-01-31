@@ -37,7 +37,7 @@ type JWT struct {
 }
 
 func (j *JWT) GenerateToken(userID int, name string) (response.TokenResponse, error) {
-	accessExpiry := time.Now().Add(time.Minute * 5)
+	accessExpiry := time.Now().Add(time.Minute * 60)
 	refreshExpiry := time.Now().Add(time.Minute * 10)
 	ctx := context.Background()
 	user, err := j.FindByUserId(ctx, userID)
@@ -50,7 +50,6 @@ func (j *JWT) GenerateToken(userID int, name string) (response.TokenResponse, er
 	if err != nil {
 		return response.TokenResponse{}, err
 	}
-	log.Println("user data ===> ", user)
 	claims := Claims{
 		User:      userInfo,
 		Name:      name,
@@ -76,27 +75,22 @@ func (j *JWT) GenerateToken(userID int, name string) (response.TokenResponse, er
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	accessTokenString, err := accessToken.SignedString(j.SigningKey)
 	if err != nil {
-		log.Println(0)
 		return response.TokenResponse{}, err
 	}
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshExpiryClaims)
 	refreshTokenString, err := refreshToken.SignedString(j.SigningKey)
 	if err != nil {
-		log.Println(1)
 		return response.TokenResponse{}, err
 	}
 
 	res, err := j.TokenRepository.FindByUserId(ctx, userID)
 	if err != nil {
-		log.Println(2)
 		return response.TokenResponse{}, err
 	}
 	if res != nil {
 		//delete all current user tokens
 		err := j.TokenRepository.RevokeAllUserTokens(ctx, userID)
 		if err != nil {
-			log.Println(3)
-			log.Println(err)
 			return response.TokenResponse{}, err
 		}
 	}
@@ -123,8 +117,6 @@ func (j *JWT) GenerateToken(userID int, name string) (response.TokenResponse, er
 	}
 	err = j.TokenRepository.Create(ctx, &reqRefreshToken)
 	if err != nil {
-		log.Println(5)
-		log.Println(err)
 		return response.TokenResponse{}, err
 	}
 
@@ -152,7 +144,6 @@ func (j *JWT) ValidateToken(token string) (*Claims, error) {
 		return j.SigningKey, nil
 	})
 	if err != nil {
-		log.Println(err.Error())
 		return nil, err
 	}
 	if !tkn.Valid {
@@ -173,7 +164,6 @@ func (j *JWT) ValidateToken(token string) (*Claims, error) {
 
 func (j *JWT) FindByUserId(ctx context.Context, userId int) (*entity.User, error) {
 	user, err := j.UserRepository.FindByID(ctx, userId)
-	log.Println("useeeeeer", user)
 	if err != nil {
 		return nil, err
 	}

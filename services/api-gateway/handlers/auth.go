@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"abbassmortazavi/go-microservice/pkg/utils"
-	"abbassmortazavi/go-microservice/services/api-gateway/auth/requests"
 	"abbassmortazavi/go-microservice/services/api-gateway/grpc_clients"
+	"abbassmortazavi/go-microservice/services/api-gateway/requests/auth"
 	"abbassmortazavi/go-microservice/services/auth-service/pkg/middlewares"
 	"encoding/json"
 	"log"
@@ -11,7 +11,7 @@ import (
 )
 
 func Register(w http.ResponseWriter, r *http.Request) {
-	var req requests.RegisterReq
+	var req auth.RegisterReq
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -36,7 +36,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
-	var req requests.LoginRequest
+	var req auth.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -62,10 +62,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
-
 	user, err := middlewares.User(r.Context())
 	if err != nil {
-		log.Println(111111111111111)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

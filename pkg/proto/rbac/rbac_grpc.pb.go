@@ -19,11 +19,12 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RBACServiceClient interface {
-	CreatePermission(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*CreatePermissionResponse, error)
 	CreateRole(ctx context.Context, in *CreateRoleRequest, opts ...grpc.CallOption) (*CreateRoleResponse, error)
 	AssignPermissionToRole(ctx context.Context, in *AssignPermissionToRoleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	AssignRoleToUser(ctx context.Context, in *AssignRoleToUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	CheckUserPermission(ctx context.Context, in *CheckUserPermissionRequest, opts ...grpc.CallOption) (*CheckUserPermissionResponse, error)
+	DeleteRole(ctx context.Context, in *DeleteRoleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpdateRole(ctx context.Context, in *UpdateRoleRequest, opts ...grpc.CallOption) (*UpdateRoleResponse, error)
 }
 
 type rBACServiceClient struct {
@@ -32,15 +33,6 @@ type rBACServiceClient struct {
 
 func NewRBACServiceClient(cc grpc.ClientConnInterface) RBACServiceClient {
 	return &rBACServiceClient{cc}
-}
-
-func (c *rBACServiceClient) CreatePermission(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*CreatePermissionResponse, error) {
-	out := new(CreatePermissionResponse)
-	err := c.cc.Invoke(ctx, "/rbac.RBACService/CreatePermission", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *rBACServiceClient) CreateRole(ctx context.Context, in *CreateRoleRequest, opts ...grpc.CallOption) (*CreateRoleResponse, error) {
@@ -79,15 +71,34 @@ func (c *rBACServiceClient) CheckUserPermission(ctx context.Context, in *CheckUs
 	return out, nil
 }
 
+func (c *rBACServiceClient) DeleteRole(ctx context.Context, in *DeleteRoleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/rbac.RBACService/DeleteRole", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rBACServiceClient) UpdateRole(ctx context.Context, in *UpdateRoleRequest, opts ...grpc.CallOption) (*UpdateRoleResponse, error) {
+	out := new(UpdateRoleResponse)
+	err := c.cc.Invoke(ctx, "/rbac.RBACService/UpdateRole", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RBACServiceServer is the server API for RBACService service.
 // All implementations must embed UnimplementedRBACServiceServer
 // for forward compatibility
 type RBACServiceServer interface {
-	CreatePermission(context.Context, *CreatePermissionRequest) (*CreatePermissionResponse, error)
 	CreateRole(context.Context, *CreateRoleRequest) (*CreateRoleResponse, error)
 	AssignPermissionToRole(context.Context, *AssignPermissionToRoleRequest) (*emptypb.Empty, error)
 	AssignRoleToUser(context.Context, *AssignRoleToUserRequest) (*emptypb.Empty, error)
 	CheckUserPermission(context.Context, *CheckUserPermissionRequest) (*CheckUserPermissionResponse, error)
+	DeleteRole(context.Context, *DeleteRoleRequest) (*emptypb.Empty, error)
+	UpdateRole(context.Context, *UpdateRoleRequest) (*UpdateRoleResponse, error)
 	mustEmbedUnimplementedRBACServiceServer()
 }
 
@@ -95,9 +106,6 @@ type RBACServiceServer interface {
 type UnimplementedRBACServiceServer struct {
 }
 
-func (UnimplementedRBACServiceServer) CreatePermission(context.Context, *CreatePermissionRequest) (*CreatePermissionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreatePermission not implemented")
-}
 func (UnimplementedRBACServiceServer) CreateRole(context.Context, *CreateRoleRequest) (*CreateRoleResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateRole not implemented")
 }
@@ -110,6 +118,12 @@ func (UnimplementedRBACServiceServer) AssignRoleToUser(context.Context, *AssignR
 func (UnimplementedRBACServiceServer) CheckUserPermission(context.Context, *CheckUserPermissionRequest) (*CheckUserPermissionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckUserPermission not implemented")
 }
+func (UnimplementedRBACServiceServer) DeleteRole(context.Context, *DeleteRoleRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteRole not implemented")
+}
+func (UnimplementedRBACServiceServer) UpdateRole(context.Context, *UpdateRoleRequest) (*UpdateRoleResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateRole not implemented")
+}
 func (UnimplementedRBACServiceServer) mustEmbedUnimplementedRBACServiceServer() {}
 
 // UnsafeRBACServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -121,24 +135,6 @@ type UnsafeRBACServiceServer interface {
 
 func RegisterRBACServiceServer(s grpc.ServiceRegistrar, srv RBACServiceServer) {
 	s.RegisterService(&RBACService_ServiceDesc, srv)
-}
-
-func _RBACService_CreatePermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreatePermissionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RBACServiceServer).CreatePermission(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/rbac.RBACService/CreatePermission",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RBACServiceServer).CreatePermission(ctx, req.(*CreatePermissionRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _RBACService_CreateRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -213,6 +209,42 @@ func _RBACService_CheckUserPermission_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RBACService_DeleteRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRoleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RBACServiceServer).DeleteRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/rbac.RBACService/DeleteRole",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RBACServiceServer).DeleteRole(ctx, req.(*DeleteRoleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RBACService_UpdateRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateRoleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RBACServiceServer).UpdateRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/rbac.RBACService/UpdateRole",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RBACServiceServer).UpdateRole(ctx, req.(*UpdateRoleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RBACService_ServiceDesc is the grpc.ServiceDesc for RBACService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -220,10 +252,6 @@ var RBACService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "rbac.RBACService",
 	HandlerType: (*RBACServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "CreatePermission",
-			Handler:    _RBACService_CreatePermission_Handler,
-		},
 		{
 			MethodName: "CreateRole",
 			Handler:    _RBACService_CreateRole_Handler,
@@ -239,6 +267,14 @@ var RBACService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CheckUserPermission",
 			Handler:    _RBACService_CheckUserPermission_Handler,
+		},
+		{
+			MethodName: "DeleteRole",
+			Handler:    _RBACService_DeleteRole_Handler,
+		},
+		{
+			MethodName: "UpdateRole",
+			Handler:    _RBACService_UpdateRole_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

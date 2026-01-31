@@ -9,6 +9,15 @@ type Permission struct {
 	Name string `json:"name"`
 }
 
+type PaginationMeta struct {
+	Page        int64 `json:"page"`
+	PerPage     int64 `json:"perPage"`
+	Total       int64 `json:"total"`
+	TotalItems  int64 `json:"total_items"`
+	HasNextPage bool  `json:"has_next_page"`
+	HasPrevPage bool  `json:"has_prev_page"`
+}
+
 func NewPermission(name string) (*Permission, error) {
 	if name == "" {
 		return nil, errors.New("name is empty")

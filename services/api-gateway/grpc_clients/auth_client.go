@@ -2,6 +2,8 @@ package grpc_clients
 
 import (
 	authpb "abbassmortazavi/go-microservice/pkg/proto/auth"
+	permissionpb "abbassmortazavi/go-microservice/pkg/proto/permission"
+	rbacpb "abbassmortazavi/go-microservice/pkg/proto/rbac"
 	"os"
 
 	"google.golang.org/grpc"
@@ -9,8 +11,10 @@ import (
 )
 
 type AuthServiceClient struct {
-	Client authpb.AuthServiceClient
-	Conn   *grpc.ClientConn
+	Client     authpb.AuthServiceClient
+	Conn       *grpc.ClientConn
+	Rbac       rbacpb.RBACServiceClient
+	Permission permissionpb.PermissionServiceClient
 }
 
 func NewAuthServiceClient() (*AuthServiceClient, error) {
@@ -23,9 +27,13 @@ func NewAuthServiceClient() (*AuthServiceClient, error) {
 		return nil, err
 	}
 	client := authpb.NewAuthServiceClient(conn)
+	rbac := rbacpb.NewRBACServiceClient(conn)
+	permission := permissionpb.NewPermissionServiceClient(conn)
 	return &AuthServiceClient{
-		Client: client,
-		Conn:   conn,
+		Client:     client,
+		Conn:       conn,
+		Rbac:       rbac,
+		Permission: permission,
 	}, nil
 }
 func (c *AuthServiceClient) Close() error {

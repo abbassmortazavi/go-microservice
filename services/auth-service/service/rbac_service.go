@@ -23,17 +23,14 @@ func NewRBACService(userRepo repository_interface.UserRepositoryInterface, roleR
 	}
 }
 func (r *RBACService) CreatePermission(ctx context.Context, name string) (*entity.Permission, error) {
-	res, err := r.permissionRepo.FindByName(ctx, name)
-	if err != nil {
-		return nil, err
-	}
+	res, _ := r.permissionRepo.FindByName(ctx, name)
 	if res.Name != "" {
 		return nil, errors.New(res.Name + " already exists")
 	}
 	permission := entity.Permission{
 		Name: name,
 	}
-	p, err := r.permissionRepo.Save(ctx, permission)
+	p, err := r.permissionRepo.Create(ctx, permission)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +65,7 @@ func (r *RBACService) AssignPermissionToRole(ctx context.Context, permissionID, 
 	if err != nil {
 		return err
 	}
-	permission, err := r.permissionRepo.FindByID(ctx, int(permissionID))
+	permission, err := r.permissionRepo.FindByID(ctx, permissionID)
 	if err != nil {
 		return err
 	}
@@ -95,4 +92,16 @@ func (r *RBACService) CheckUserPermission(ctx context.Context, permission string
 		}
 	}
 	return false, nil
+}
+
+func (r *RBACService) DeletePermission(ctx context.Context, permissionID int64) error {
+	_, err := r.permissionRepo.FindByID(ctx, permissionID)
+	if err != nil {
+		return errors.New("permission not exists")
+	}
+	err = r.permissionRepo.Delete(ctx, permissionID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
