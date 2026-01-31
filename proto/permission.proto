@@ -27,7 +27,7 @@ message ListPermissionsRequest {
   int64 per_page = 2;
   string search = 3;
   string sort_by = 4;
-  string sort_order = 5;
+  string order_by = 5;
 }
 message ListPermissionResponse {
   repeated Permission permissions = 1;

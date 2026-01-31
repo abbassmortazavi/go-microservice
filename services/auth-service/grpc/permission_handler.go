@@ -46,7 +46,31 @@ func (p *PermissionHandler) Update(ctx context.Context, request *permissionpb.Up
 	panic("implement me")
 }
 
-func (p *PermissionHandler) Lists(ctx context.Context, request *permissionpb.ListPermissionsRequest) (*permissionpb.ListPermissionResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (p *PermissionHandler) Lists(ctx context.Context, req *permissionpb.ListPermissionsRequest) (*permissionpb.ListPermissionResponse, error) {
+	log.Println(2)
+	permissions, paginationData, err := p.permissionService.Lists(ctx, req.Page, req.PerPage, req.Search, req.OrderBy, req.SortBy)
+	if err != nil {
+		return nil, err
+	}
+
+	pbpermissions := make([]*permissionpb.Permission, len(permissions))
+	for i, permission := range permissions {
+		pbpermissions[i] = &permissionpb.Permission{
+			Id:   int64(permission.ID),
+			Name: permission.Name,
+		}
+	}
+
+	return &permissionpb.ListPermissionResponse{
+		Permissions: pbpermissions,
+		Meta: &permissionpb.Meta{
+			CurrentPage: paginationData.Page,
+			PerPage:     paginationData.PerPage,
+			TotalPages:  paginationData.Total,
+			TotalItems:  paginationData.TotalItems,
+			HasNext:     paginationData.HasNextPage,
+			HasPrevious: paginationData.HasPrevPage,
+		},
+	}, nil
+
 }

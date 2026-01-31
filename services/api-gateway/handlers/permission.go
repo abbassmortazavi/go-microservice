@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	permissionpb "abbassmortazavi/go-microservice/pkg/proto/permission"
 	"abbassmortazavi/go-microservice/pkg/utils"
 	"abbassmortazavi/go-microservice/services/api-gateway/grpc_clients"
 	"abbassmortazavi/go-microservice/services/api-gateway/requests/permission"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -57,4 +59,48 @@ func DeletePermission(w http.ResponseWriter, r *http.Request) {
 }
 func ListPermissions(w http.ResponseWriter, r *http.Request) {
 
+	log.Println(1)
+	query := r.URL.Query()
+	ctx := r.Context()
+	page, _ := strconv.Atoi(query.Get("page"))
+	if page < 1 {
+		page = 1
+	}
+	perPage, _ := strconv.ParseInt(query.Get("per_page"), 10, 64)
+	if perPage < 1 || perPage > 100 {
+		perPage = 20
+	}
+
+	search := query.Get("search")
+	sortBy := query.Get("sort_by")
+	orderBy := query.Get("order_by")
+
+	if sortBy == "" {
+		sortBy = "desc"
+	}
+	if orderBy == "" {
+		orderBy = "id"
+	}
+
+	// Create protobuf request
+	req := &permissionpb.ListPermissionsRequest{
+		Page:    int64(page),
+		PerPage: perPage,
+		Search:  search,
+		SortBy:  sortBy,
+		OrderBy: orderBy,
+	}
+
+	authService, err := grpc_clients.NewAuthServiceClient()
+	if err != nil {
+		utils.InternalError(w, err)
+		return
+	}
+	res, err := authService.Permission.Lists(ctx, req)
+	if err != nil {
+		utils.InternalError(w, err)
+		return
+	}
+
+	utils.Success(w, http.StatusOK, res, "Permission has been listed Successfully!")
 }

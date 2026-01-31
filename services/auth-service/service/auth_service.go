@@ -9,7 +9,6 @@ import (
 	"abbassmortazavi/go-microservice/services/auth-service/security"
 	"context"
 	"errors"
-	"log"
 	"strconv"
 )
 
@@ -35,7 +34,6 @@ func NewAuthService(repo repository_interface.UserRepositoryInterface, hasher se
 	}
 }
 func (a *AuthService) Register(ctx context.Context, email, password, name string) error {
-	log.Println("auth service")
 	hashed, err := a.hasher.Hash(password)
 	if err != nil {
 		return err
@@ -70,7 +68,6 @@ func (a *AuthService) Login(ctx context.Context, email, password string) (*respo
 	}
 	tokens, err := a.TokenService.GenerateToken(int(user.ID), user.Name)
 	if err != nil {
-		log.Println(222222222222)
 		return nil, err
 	}
 
