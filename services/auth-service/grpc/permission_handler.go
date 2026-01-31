@@ -48,7 +48,7 @@ func (p *PermissionHandler) Update(ctx context.Context, request *permissionpb.Up
 
 func (p *PermissionHandler) Lists(ctx context.Context, req *permissionpb.ListPermissionsRequest) (*permissionpb.ListPermissionResponse, error) {
 	log.Println(2)
-	permissions, paginationData, err := p.permissionService.Lists(ctx, req.Page, req.PerPage, req.Search, req.OrderBy, req.SortBy)
+	permissions, paginationData, err := p.permissionService.Lists(ctx, req.Page, req.PerPage, req.OrderBy, req.SortBy, req.Search)
 	if err != nil {
 		return nil, err
 	}

@@ -4,6 +4,8 @@ import (
 	"abbassmortazavi/go-microservice/services/auth-service/entity"
 	"context"
 	"database/sql"
+	"fmt"
+	"log"
 	"math"
 	"strings"
 )
@@ -67,8 +69,16 @@ func (p *PermissionRepository) Lists(ctx context.Context, page, perPage int64, o
 		searchTerm = "%" + search + "%"
 	}
 
-	query := `select * from permissions where ($1 = '' or name ilike $1) order by $2 $3 limit $4 offset $5`
-	rows, err := p.db.QueryContext(ctx, query, searchTerm, orderBy, sortBy, perPage, perPage, offset)
+	query := fmt.Sprintf(`
+    SELECT id, name 
+    FROM permissions 
+    WHERE ($1 = '' OR name ILIKE '%%' || $1 || '%%')
+    ORDER BY %s %s 
+    LIMIT $2 OFFSET $3
+`, orderBy, sortBy)
+
+	rows, err := p.db.QueryContext(ctx, query, searchTerm, perPage, offset)
+	log.Println("permission service lists rows:", rows)
 	if err != nil {
 		return nil, entity.PaginationMeta{}, err
 	}
@@ -103,7 +113,7 @@ func (p *PermissionRepository) Lists(ctx context.Context, page, perPage int64, o
 		HasNextPage: page < totalPages,
 		HasPrevPage: page > 1,
 	}
-
+	log.Println("permission repository", permissions)
 	return permissions, paginationMeta, nil
 }
 func (p *PermissionRepository) Delete(ctx context.Context, permissionId int64) error {
