@@ -5,7 +5,6 @@ import (
 	"abbassmortazavi/go-microservice/pkg/utils"
 	"abbassmortazavi/go-microservice/services/api-gateway/grpc_clients"
 	"abbassmortazavi/go-microservice/services/api-gateway/requests/permission"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -58,8 +57,6 @@ func DeletePermission(w http.ResponseWriter, r *http.Request) {
 	utils.Success(w, http.StatusOK, "", "Permission has been deleted Successfully!")
 }
 func ListPermissions(w http.ResponseWriter, r *http.Request) {
-
-	log.Println(1)
 	query := r.URL.Query()
 	ctx := r.Context()
 	page, _ := strconv.Atoi(query.Get("page"))

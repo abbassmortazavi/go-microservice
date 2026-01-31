@@ -5,7 +5,6 @@ import (
 	"abbassmortazavi/go-microservice/services/auth-service/interfaces/repository_interface"
 	"context"
 	"errors"
-	"log"
 )
 
 type PermissionService struct {
@@ -55,12 +54,9 @@ func (p *PermissionService) Update(ctx context.Context, permissionID int64, name
 }
 
 func (p *PermissionService) Lists(ctx context.Context, page, perPage int64, orderBy, sortBy, search string) ([]entity.Permission, *entity.PaginationMeta, error) {
-	log.Println("permission service 3")
 	permissions, paginationData, err := p.permissionRepo.Lists(ctx, page, perPage, orderBy, sortBy, search)
 	if err != nil {
 		return nil, &entity.PaginationMeta{}, err
 	}
-	log.Println("permission lists", permissions)
-	log.Println("pagination data", paginationData)
 	return permissions, &paginationData, nil
 }

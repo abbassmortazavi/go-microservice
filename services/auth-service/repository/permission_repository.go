@@ -5,7 +5,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
 	"math"
 	"strings"
 )
@@ -78,7 +77,6 @@ func (p *PermissionRepository) Lists(ctx context.Context, page, perPage int64, o
 `, orderBy, sortBy)
 
 	rows, err := p.db.QueryContext(ctx, query, searchTerm, perPage, offset)
-	log.Println("permission service lists rows:", rows)
 	if err != nil {
 		return nil, entity.PaginationMeta{}, err
 	}
@@ -113,7 +111,7 @@ func (p *PermissionRepository) Lists(ctx context.Context, page, perPage int64, o
 		HasNextPage: page < totalPages,
 		HasPrevPage: page > 1,
 	}
-	log.Println("permission repository", permissions)
+
 	return permissions, paginationMeta, nil
 }
 func (p *PermissionRepository) Delete(ctx context.Context, permissionId int64) error {
