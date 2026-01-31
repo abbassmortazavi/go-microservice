@@ -71,5 +71,19 @@ func (p *PermissionHandler) Lists(ctx context.Context, req *permissionpb.ListPer
 			HasPrevious: paginationData.HasPrevPage,
 		},
 	}, nil
+}
+
+func (p *PermissionHandler) Get(ctx context.Context, req *permissionpb.GetPermissionDetailRequest) (*permissionpb.GetPermissionDetailResponse, error) {
+	res, err := p.permissionService.Get(ctx, req.GetId())
+	if err != nil {
+		return nil, err
+	}
+	permission := &permissionpb.Permission{
+		Id:   int64(res.ID),
+		Name: res.Name,
+	}
+	return &permissionpb.GetPermissionDetailResponse{
+		Permission: permission,
+	}, nil
 
 }

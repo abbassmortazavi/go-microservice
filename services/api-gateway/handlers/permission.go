@@ -101,3 +101,26 @@ func ListPermissions(w http.ResponseWriter, r *http.Request) {
 
 	utils.Success(w, http.StatusOK, res, "Permission has been listed Successfully!")
 }
+
+func GetPermission(w http.ResponseWriter, r *http.Request) {
+	id, err := utils.GetPathParamInt(r, "id")
+	if err != nil {
+		utils.BadRequest(w, "invalid id", err)
+		return
+	}
+	authService, err := grpc_clients.NewAuthServiceClient()
+	if err != nil {
+		utils.InternalError(w, err)
+		return
+	}
+	ctx := r.Context()
+	req := permissionpb.GetPermissionDetailRequest{
+		Id: int64(id),
+	}
+	res, err := authService.Permission.Get(ctx, &req)
+	if err != nil {
+		utils.InternalError(w, err)
+		return
+	}
+	utils.Success(w, http.StatusOK, res, "Permission has been retrieved Successfully!")
+}

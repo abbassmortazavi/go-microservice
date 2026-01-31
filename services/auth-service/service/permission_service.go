@@ -60,3 +60,11 @@ func (p *PermissionService) Lists(ctx context.Context, page, perPage int64, orde
 	}
 	return permissions, &paginationData, nil
 }
+
+func (p *PermissionService) Get(ctx context.Context, permissionID int64) (*entity.Permission, error) {
+	permission, err := p.permissionRepo.FindByID(ctx, permissionID)
+	if err != nil {
+		return nil, errors.New("permission not exists")
+	}
+	return &permission, nil
+}

@@ -15,4 +15,5 @@ func PermissionRoutes(mux *mux.Router) {
 	protected.HandleFunc("/create", handlers.CreatePermission).Methods("POST")
 	protected.HandleFunc("/{id}", handlers.DeletePermission).Methods("DELETE")
 	protected.HandleFunc("/lists", handlers.ListPermissions).Methods("GET")
+	protected.HandleFunc("/{id}", handlers.GetPermission).Methods("GET")
 }

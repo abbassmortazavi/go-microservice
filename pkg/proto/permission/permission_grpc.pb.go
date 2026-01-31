@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PermissionServiceClient interface {
 	Create(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*CreatePermissionResponse, error)
+	Get(ctx context.Context, in *GetPermissionDetailRequest, opts ...grpc.CallOption) (*GetPermissionDetailResponse, error)
 	Delete(ctx context.Context, in *DeletePermissionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Update(ctx context.Context, in *UpdatePermissionRequest, opts ...grpc.CallOption) (*UpdatePermissionResponse, error)
 	Lists(ctx context.Context, in *ListPermissionsRequest, opts ...grpc.CallOption) (*ListPermissionResponse, error)
@@ -36,6 +37,15 @@ func NewPermissionServiceClient(cc grpc.ClientConnInterface) PermissionServiceCl
 func (c *permissionServiceClient) Create(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*CreatePermissionResponse, error) {
 	out := new(CreatePermissionResponse)
 	err := c.cc.Invoke(ctx, "/permission.PermissionService/Create", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *permissionServiceClient) Get(ctx context.Context, in *GetPermissionDetailRequest, opts ...grpc.CallOption) (*GetPermissionDetailResponse, error) {
+	out := new(GetPermissionDetailResponse)
+	err := c.cc.Invoke(ctx, "/permission.PermissionService/Get", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -74,6 +84,7 @@ func (c *permissionServiceClient) Lists(ctx context.Context, in *ListPermissions
 // for forward compatibility
 type PermissionServiceServer interface {
 	Create(context.Context, *CreatePermissionRequest) (*CreatePermissionResponse, error)
+	Get(context.Context, *GetPermissionDetailRequest) (*GetPermissionDetailResponse, error)
 	Delete(context.Context, *DeletePermissionRequest) (*emptypb.Empty, error)
 	Update(context.Context, *UpdatePermissionRequest) (*UpdatePermissionResponse, error)
 	Lists(context.Context, *ListPermissionsRequest) (*ListPermissionResponse, error)
@@ -86,6 +97,9 @@ type UnimplementedPermissionServiceServer struct {
 
 func (UnimplementedPermissionServiceServer) Create(context.Context, *CreatePermissionRequest) (*CreatePermissionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (UnimplementedPermissionServiceServer) Get(context.Context, *GetPermissionDetailRequest) (*GetPermissionDetailResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
 func (UnimplementedPermissionServiceServer) Delete(context.Context, *DeletePermissionRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
@@ -123,6 +137,24 @@ func _PermissionService_Create_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PermissionServiceServer).Create(ctx, req.(*CreatePermissionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PermissionService_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPermissionDetailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PermissionServiceServer).Get(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/permission.PermissionService/Get",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PermissionServiceServer).Get(ctx, req.(*GetPermissionDetailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -191,6 +223,10 @@ var PermissionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Create",
 			Handler:    _PermissionService_Create_Handler,
+		},
+		{
+			MethodName: "Get",
+			Handler:    _PermissionService_Get_Handler,
 		},
 		{
 			MethodName: "Delete",
