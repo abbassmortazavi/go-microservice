@@ -20,5 +20,5 @@ func SetupRoutes(router *mux.Router) {
 	// Register all service routes
 	PermissionRoutes(router)
 	UserRoutes(router)
-	//RoleRoutes(mux)
+	RoleRoutes(router)
 }
