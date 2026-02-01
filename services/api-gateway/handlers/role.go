@@ -10,25 +10,7 @@ import (
 )
 
 func Create(w http.ResponseWriter, r *http.Request) {
-	var req permission.CreatePermissionReq
-	if err := utils.ReadJson(w, r, &req); err != nil {
-		utils.BadRequest(w, "invalid request", err)
-		return
-	}
-	defer r.Body.Close()
-	ctx := r.Context()
-	authService, err := grpc_clients.NewAuthServiceClient()
-	if err != nil {
-		utils.InternalError(w, err)
-		return
-	}
-	res, err := authService.Permission.Create(ctx, req.ToProto())
-	if err != nil {
-		utils.InternalError(w, err)
-		return
-	}
 
-	utils.Created(w, res)
 }
 func Delete(w http.ResponseWriter, r *http.Request) {
 	id, err := utils.GetPathParamInt(r, "id")
