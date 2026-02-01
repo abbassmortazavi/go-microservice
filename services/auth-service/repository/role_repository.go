@@ -4,6 +4,9 @@ import (
 	"abbassmortazavi/go-microservice/services/auth-service/entity"
 	"context"
 	"database/sql"
+	"fmt"
+	"math"
+	"strings"
 )
 
 type RoleRepository struct {
@@ -42,25 +45,72 @@ func (r *RoleRepository) FindByName(ctx context.Context, name string) (*entity.R
 	}
 	return &role, nil
 }
-func (r *RoleRepository) Lists(ctx context.Context) ([]entity.Role, error) {
-	query := `SELECT * FROM roles`
-	rows, err := r.db.QueryContext(ctx, query)
+func (r *RoleRepository) Lists(ctx context.Context, page, perPage int64, orderBy, sortBy, search string) ([]entity.Role, entity.PaginationMeta, error) {
+	if page < 1 {
+		page = 1
+	}
+	if perPage < 1 {
+		perPage = 20
+	}
+	offset := (page - 1) * perPage
+	if orderBy == "" {
+		orderBy = "id"
+	}
+
+	sortBy = strings.ToLower(sortBy)
+	if sortBy != "asc" && sortBy != "desc" {
+		sortBy = "desc"
+	}
+	searchTerm := ""
+	if search != "" {
+		searchTerm = "%" + search + "%"
+	}
+
+	query := fmt.Sprintf(`
+    SELECT id, name 
+    FROM roles 
+    WHERE ($1 = '' OR name ILIKE '%%' || $1 || '%%')
+    ORDER BY %s %s 
+    LIMIT $2 OFFSET $3
+`, orderBy, sortBy)
+
+	rows, err := r.db.QueryContext(ctx, query, searchTerm, perPage, offset)
 	if err != nil {
-		return nil, err
+		return nil, entity.PaginationMeta{}, err
 	}
 	defer rows.Close()
 	var roles []entity.Role
 	for rows.Next() {
 		var role entity.Role
-		if err := rows.Scan(&role.ID, &role.Name); err != nil {
-			return nil, err
+		err := rows.Scan(&role.ID, &role.Name)
+		if err != nil {
+			return nil, entity.PaginationMeta{}, err
 		}
 		roles = append(roles, role)
 	}
-	if err := rows.Err(); err != nil {
-		return nil, err
+
+	// Get total count
+	var total int64
+	countQuery := `SELECT COUNT(*) FROM permissions`
+	err = r.db.QueryRowContext(ctx, countQuery).Scan(&total)
+	if err != nil {
+		return nil, entity.PaginationMeta{}, err
 	}
-	return roles, nil
+
+	totalPages := int64(math.Ceil(float64(total) / float64(perPage)))
+	if totalPages == 0 && total > 0 {
+		totalPages = 1
+	}
+
+	paginationMeta := entity.PaginationMeta{
+		Page:        page,
+		PerPage:     perPage,
+		Total:       total,
+		HasNextPage: page < totalPages,
+		HasPrevPage: page > 1,
+	}
+
+	return roles, paginationMeta, nil
 }
 func (r *RoleRepository) Delete(ctx context.Context, roleId int64) error {
 	query := `DELETE FROM roles WHERE role_id=$1`
