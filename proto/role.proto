@@ -1,0 +1,63 @@
+syntax = "proto3";
+package role;
+import "google/protobuf/empty.proto";
+
+option go_package = "role;rolepb";
+
+service RoleService {
+  rpc Create(CreateRoleRequest) returns (CreateRoleResponse);
+  rpc Get(GetRoleDetailRequest) returns (GetRoleDetailResponse);
+  rpc Delete(DeleteRoleRequest) returns (google.protobuf.Empty);
+  rpc Update(UpdateRoleRequest) returns (UpdateRoleResponse);
+  rpc Lists (ListRolesRequest) returns (ListRoleResponse);
+}
+message GetRoleDetailRequest {
+  int64 id = 1;
+}
+message DeleteRoleRequest {
+  int64 id = 1;
+}
+message UpdateRoleRequest {
+  int64 id = 1;
+  string name = 2;
+}
+message CreateRoleRequest{
+  string name = 1;
+}
+
+message ListRolesRequest {
+  int64 page = 1;
+  int64 per_page = 2;
+  string search = 3;
+  string sort_by = 4;
+  string order_by = 5;
+}
+message ListRoleResponse {
+  repeated Role roles = 1;
+  Meta meta = 2;
+}
+
+message GetRoleDetailResponse {
+  Role role = 1;
+}
+
+message Meta {
+  int64 current_page = 1;
+  int64 per_page = 2;
+  int64 total_pages = 3;
+  int64 TotalItems = 4;
+  bool has_next = 5;
+  bool has_previous = 6;
+}
+
+message Role {
+  int64 id = 1;
+  string name = 2;
+}
+
+message UpdateRoleResponse {
+  Role role = 1;
+}
+message CreateRoleResponse {
+  Role role = 1;
+}
