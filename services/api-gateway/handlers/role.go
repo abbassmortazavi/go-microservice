@@ -4,13 +4,30 @@ import (
 	permissionpb "abbassmortazavi/go-microservice/pkg/proto/permission"
 	"abbassmortazavi/go-microservice/pkg/utils"
 	"abbassmortazavi/go-microservice/services/api-gateway/grpc_clients"
-	"abbassmortazavi/go-microservice/services/api-gateway/requests/permission"
+	"abbassmortazavi/go-microservice/services/api-gateway/requests/role"
 	"net/http"
 	"strconv"
 )
 
 func Create(w http.ResponseWriter, r *http.Request) {
-
+	var req role.CreateRoleReq
+	if err := utils.ReadJson(w, r, &req); err != nil {
+		utils.BadRequest(w, "Validation request!!", err)
+		return
+	}
+	defer r.Body.Close()
+	ctx := r.Context()
+	authService, err := grpc_clients.NewAuthServiceClient()
+	if err != nil {
+		utils.InternalError(w, err)
+		return
+	}
+	res, err := authService.Role.Create(ctx, req.ToProto())
+	if err != nil {
+		utils.InternalError(w, err)
+		return
+	}
+	utils.Success(w, http.StatusOK, res, "Role Has been inserted Successfully!!")
 }
 func Delete(w http.ResponseWriter, r *http.Request) {
 	id, err := utils.GetPathParamInt(r, "id")
@@ -18,7 +35,7 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 		utils.BadRequest(w, "invalid id", err)
 		return
 	}
-	var req permission.DeletePermissionReq
+	var req role.DeleteRoleReq
 	ctx := r.Context()
 	authService, err := grpc_clients.NewAuthServiceClient()
 	if err != nil {
@@ -31,12 +48,12 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	req.Id = idConvert
-	_, err = authService.Permission.Delete(ctx, req.ToProto())
+	_, err = authService.Role.Delete(ctx, req.ToProto())
 	if err != nil {
 		utils.InternalError(w, err)
 		return
 	}
-	utils.Success(w, http.StatusOK, "", "Permission has been deleted Successfully!")
+	utils.Success(w, http.StatusOK, "", "Role has been deleted Successfully!")
 }
 func List(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
