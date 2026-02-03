@@ -9,7 +9,7 @@ import (
 
 func RoleRoutes(mux *mux.Router) {
 	authMiddleware := middlewares.GetMiddleware()
-	protected := mux.PathPrefix("/api/v1/permissions").Subrouter()
+	protected := mux.PathPrefix("/api/v1/roles").Subrouter()
 	protected.Use(authMiddleware.AuthMiddleware)
 
 	protected.HandleFunc("/create", handlers.Create).Methods("POST")

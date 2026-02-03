@@ -20,8 +20,10 @@ func NewRoleHandler(p *service.RoleService) *RoleHandler {
 	}
 }
 
-func (p *RoleHandler) Create(ctx context.Context, req *rolepb.CreateRoleRequest) (*rolepb.CreateRoleResponse, error) {
-	res, err := p.roleService.Create(ctx, req.Name)
+func (r *RoleHandler) Create(ctx context.Context, req *rolepb.CreateRoleRequest) (*rolepb.CreateRoleResponse, error) {
+	log.Println("Create role")
+	res, err := r.roleService.Create(ctx, req.Name)
+	log.Println("Create role: ", res)
 	if err != nil {
 		return nil, err
 	}
@@ -33,21 +35,21 @@ func (p *RoleHandler) Create(ctx context.Context, req *rolepb.CreateRoleRequest)
 		Role: role,
 	}, nil
 }
-func (p *RoleHandler) Delete(ctx context.Context, req *rolepb.DeleteRoleRequest) (*empty.Empty, error) {
+func (r *RoleHandler) Delete(ctx context.Context, req *rolepb.DeleteRoleRequest) (*empty.Empty, error) {
 	log.Println("delete role handler", req.Id)
-	err := p.roleService.Delete(ctx, req.Id)
+	err := r.roleService.Delete(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
 	return &empty.Empty{}, nil
 }
-func (p *RoleHandler) Update(ctx context.Context, request *rolepb.UpdateRoleRequest) (*rolepb.UpdateRoleResponse, error) {
+func (r *RoleHandler) Update(ctx context.Context, request *rolepb.UpdateRoleRequest) (*rolepb.UpdateRoleResponse, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (p *RoleHandler) Lists(ctx context.Context, req *rolepb.ListRolesRequest) (*rolepb.ListRoleResponse, error) {
-	roles, paginationData, err := p.roleService.Lists(ctx, req.Page, req.PerPage, req.OrderBy, req.SortBy, req.Search)
+func (r *RoleHandler) Lists(ctx context.Context, req *rolepb.ListRolesRequest) (*rolepb.ListRoleResponse, error) {
+	roles, paginationData, err := r.roleService.Lists(ctx, req.Page, req.PerPage, req.OrderBy, req.SortBy, req.Search)
 	if err != nil {
 		return nil, err
 	}
@@ -73,8 +75,8 @@ func (p *RoleHandler) Lists(ctx context.Context, req *rolepb.ListRolesRequest) (
 	}, nil
 }
 
-func (p *RoleHandler) Get(ctx context.Context, req *rolepb.GetRoleDetailRequest) (*rolepb.GetRoleDetailResponse, error) {
-	res, err := p.roleService.Get(ctx, req.GetId())
+func (r *RoleHandler) Get(ctx context.Context, req *rolepb.GetRoleDetailRequest) (*rolepb.GetRoleDetailResponse, error) {
+	res, err := r.roleService.Get(ctx, req.GetId())
 	if err != nil {
 		return nil, err
 	}
