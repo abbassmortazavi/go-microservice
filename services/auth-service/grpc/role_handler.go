@@ -4,7 +4,6 @@ import (
 	rolepb "abbassmortazavi/go-microservice/pkg/proto/role"
 	"abbassmortazavi/go-microservice/services/auth-service/service"
 	"context"
-	"log"
 
 	"github.com/golang/protobuf/ptypes/empty"
 )
@@ -21,9 +20,7 @@ func NewRoleHandler(p *service.RoleService) *RoleHandler {
 }
 
 func (r *RoleHandler) Create(ctx context.Context, req *rolepb.CreateRoleRequest) (*rolepb.CreateRoleResponse, error) {
-	log.Println("Create role")
 	res, err := r.roleService.Create(ctx, req.Name)
-	log.Println("Create role: ", res)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +33,6 @@ func (r *RoleHandler) Create(ctx context.Context, req *rolepb.CreateRoleRequest)
 	}, nil
 }
 func (r *RoleHandler) Delete(ctx context.Context, req *rolepb.DeleteRoleRequest) (*empty.Empty, error) {
-	log.Println("delete role handler", req.Id)
 	err := r.roleService.Delete(ctx, req.Id)
 	if err != nil {
 		return nil, err
