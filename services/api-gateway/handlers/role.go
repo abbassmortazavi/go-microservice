@@ -2,6 +2,7 @@ package handlers
 
 import (
 	permissionpb "abbassmortazavi/go-microservice/pkg/proto/permission"
+	rolepb "abbassmortazavi/go-microservice/pkg/proto/role"
 	"abbassmortazavi/go-microservice/pkg/utils"
 	"abbassmortazavi/go-microservice/services/api-gateway/grpc_clients"
 	"abbassmortazavi/go-microservice/services/api-gateway/requests/role"
@@ -79,7 +80,7 @@ func List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create protobuf request
-	req := &permissionpb.ListPermissionsRequest{
+	req := &rolepb.ListRolesRequest{
 		Page:    int64(page),
 		PerPage: perPage,
 		Search:  search,
@@ -92,7 +93,7 @@ func List(w http.ResponseWriter, r *http.Request) {
 		utils.InternalError(w, err)
 		return
 	}
-	res, err := authService.Permission.Lists(ctx, req)
+	res, err := authService.Role.Lists(ctx, req)
 	if err != nil {
 		utils.InternalError(w, err)
 		return
