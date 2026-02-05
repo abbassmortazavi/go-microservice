@@ -21,202 +21,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type DeleteRoleRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-}
-
-func (x *DeleteRoleRequest) Reset() {
-	*x = DeleteRoleRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_rbac_proto_msgTypes[0]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *DeleteRoleRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteRoleRequest) ProtoMessage() {}
-
-func (x *DeleteRoleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rbac_proto_msgTypes[0]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteRoleRequest.ProtoReflect.Descriptor instead.
-func (*DeleteRoleRequest) Descriptor() ([]byte, []int) {
-	return file_rbac_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *DeleteRoleRequest) GetId() int64 {
-	if x != nil {
-		return x.Id
-	}
-	return 0
-}
-
-type UpdateRoleRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Id   int64  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-}
-
-func (x *UpdateRoleRequest) Reset() {
-	*x = UpdateRoleRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_rbac_proto_msgTypes[1]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *UpdateRoleRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateRoleRequest) ProtoMessage() {}
-
-func (x *UpdateRoleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rbac_proto_msgTypes[1]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateRoleRequest.ProtoReflect.Descriptor instead.
-func (*UpdateRoleRequest) Descriptor() ([]byte, []int) {
-	return file_rbac_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *UpdateRoleRequest) GetId() int64 {
-	if x != nil {
-		return x.Id
-	}
-	return 0
-}
-
-func (x *UpdateRoleRequest) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-type UpdateRoleResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Role *Role `protobuf:"bytes,1,opt,name=role,proto3" json:"role,omitempty"`
-}
-
-func (x *UpdateRoleResponse) Reset() {
-	*x = UpdateRoleResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_rbac_proto_msgTypes[2]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *UpdateRoleResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateRoleResponse) ProtoMessage() {}
-
-func (x *UpdateRoleResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rbac_proto_msgTypes[2]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateRoleResponse.ProtoReflect.Descriptor instead.
-func (*UpdateRoleResponse) Descriptor() ([]byte, []int) {
-	return file_rbac_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *UpdateRoleResponse) GetRole() *Role {
-	if x != nil {
-		return x.Role
-	}
-	return nil
-}
-
-type CreateRoleRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-}
-
-func (x *CreateRoleRequest) Reset() {
-	*x = CreateRoleRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_rbac_proto_msgTypes[3]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *CreateRoleRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateRoleRequest) ProtoMessage() {}
-
-func (x *CreateRoleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rbac_proto_msgTypes[3]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateRoleRequest.ProtoReflect.Descriptor instead.
-func (*CreateRoleRequest) Descriptor() ([]byte, []int) {
-	return file_rbac_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *CreateRoleRequest) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
 type AssignPermissionToRoleRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -229,7 +33,7 @@ type AssignPermissionToRoleRequest struct {
 func (x *AssignPermissionToRoleRequest) Reset() {
 	*x = AssignPermissionToRoleRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rbac_proto_msgTypes[4]
+		mi := &file_rbac_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -242,7 +46,7 @@ func (x *AssignPermissionToRoleRequest) String() string {
 func (*AssignPermissionToRoleRequest) ProtoMessage() {}
 
 func (x *AssignPermissionToRoleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rbac_proto_msgTypes[4]
+	mi := &file_rbac_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -255,7 +59,7 @@ func (x *AssignPermissionToRoleRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssignPermissionToRoleRequest.ProtoReflect.Descriptor instead.
 func (*AssignPermissionToRoleRequest) Descriptor() ([]byte, []int) {
-	return file_rbac_proto_rawDescGZIP(), []int{4}
+	return file_rbac_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *AssignPermissionToRoleRequest) GetRoleID() int64 {
@@ -284,7 +88,7 @@ type AssignRoleToUserRequest struct {
 func (x *AssignRoleToUserRequest) Reset() {
 	*x = AssignRoleToUserRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rbac_proto_msgTypes[5]
+		mi := &file_rbac_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -297,7 +101,7 @@ func (x *AssignRoleToUserRequest) String() string {
 func (*AssignRoleToUserRequest) ProtoMessage() {}
 
 func (x *AssignRoleToUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rbac_proto_msgTypes[5]
+	mi := &file_rbac_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -310,7 +114,7 @@ func (x *AssignRoleToUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssignRoleToUserRequest.ProtoReflect.Descriptor instead.
 func (*AssignRoleToUserRequest) Descriptor() ([]byte, []int) {
-	return file_rbac_proto_rawDescGZIP(), []int{5}
+	return file_rbac_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *AssignRoleToUserRequest) GetRoleID() int64 {
@@ -339,7 +143,7 @@ type CheckUserPermissionRequest struct {
 func (x *CheckUserPermissionRequest) Reset() {
 	*x = CheckUserPermissionRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rbac_proto_msgTypes[6]
+		mi := &file_rbac_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -352,7 +156,7 @@ func (x *CheckUserPermissionRequest) String() string {
 func (*CheckUserPermissionRequest) ProtoMessage() {}
 
 func (x *CheckUserPermissionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rbac_proto_msgTypes[6]
+	mi := &file_rbac_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -365,7 +169,7 @@ func (x *CheckUserPermissionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckUserPermissionRequest.ProtoReflect.Descriptor instead.
 func (*CheckUserPermissionRequest) Descriptor() ([]byte, []int) {
-	return file_rbac_proto_rawDescGZIP(), []int{6}
+	return file_rbac_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CheckUserPermissionRequest) GetPermission() string {
@@ -382,53 +186,6 @@ func (x *CheckUserPermissionRequest) GetUserID() int64 {
 	return 0
 }
 
-type CreateRoleResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Role *Role `protobuf:"bytes,1,opt,name=role,proto3" json:"role,omitempty"`
-}
-
-func (x *CreateRoleResponse) Reset() {
-	*x = CreateRoleResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_rbac_proto_msgTypes[7]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *CreateRoleResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateRoleResponse) ProtoMessage() {}
-
-func (x *CreateRoleResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rbac_proto_msgTypes[7]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateRoleResponse.ProtoReflect.Descriptor instead.
-func (*CreateRoleResponse) Descriptor() ([]byte, []int) {
-	return file_rbac_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *CreateRoleResponse) GetRole() *Role {
-	if x != nil {
-		return x.Role
-	}
-	return nil
-}
-
 type CheckUserPermissionResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -440,7 +197,7 @@ type CheckUserPermissionResponse struct {
 func (x *CheckUserPermissionResponse) Reset() {
 	*x = CheckUserPermissionResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rbac_proto_msgTypes[8]
+		mi := &file_rbac_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -453,7 +210,7 @@ func (x *CheckUserPermissionResponse) String() string {
 func (*CheckUserPermissionResponse) ProtoMessage() {}
 
 func (x *CheckUserPermissionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rbac_proto_msgTypes[8]
+	mi := &file_rbac_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -466,7 +223,7 @@ func (x *CheckUserPermissionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckUserPermissionResponse.ProtoReflect.Descriptor instead.
 func (*CheckUserPermissionResponse) Descriptor() ([]byte, []int) {
-	return file_rbac_proto_rawDescGZIP(), []int{8}
+	return file_rbac_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *CheckUserPermissionResponse) GetHasPermission() bool {
@@ -476,111 +233,34 @@ func (x *CheckUserPermissionResponse) GetHasPermission() bool {
 	return false
 }
 
-type Role struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Id   int64  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-}
-
-func (x *Role) Reset() {
-	*x = Role{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_rbac_proto_msgTypes[9]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *Role) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Role) ProtoMessage() {}
-
-func (x *Role) ProtoReflect() protoreflect.Message {
-	mi := &file_rbac_proto_msgTypes[9]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Role.ProtoReflect.Descriptor instead.
-func (*Role) Descriptor() ([]byte, []int) {
-	return file_rbac_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *Role) GetId() int64 {
-	if x != nil {
-		return x.Id
-	}
-	return 0
-}
-
-func (x *Role) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
 var File_rbac_proto protoreflect.FileDescriptor
 
 var file_rbac_proto_rawDesc = []byte{
 	0x0a, 0x0a, 0x72, 0x62, 0x61, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x04, 0x72, 0x62,
 	0x61, 0x63, 0x1a, 0x1b, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f,
 	0x62, 0x75, 0x66, 0x2f, 0x65, 0x6d, 0x70, 0x74, 0x79, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22,
-	0x23, 0x0a, 0x11, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x6f, 0x6c, 0x65, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03,
-	0x52, 0x02, 0x69, 0x64, 0x22, 0x37, 0x0a, 0x11, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x6f,
-	0x6c, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d,
-	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x34, 0x0a,
-	0x12, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x6f, 0x6c, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x12, 0x1e, 0x0a, 0x04, 0x72, 0x6f, 0x6c, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x0b, 0x32, 0x0a, 0x2e, 0x72, 0x62, 0x61, 0x63, 0x2e, 0x52, 0x6f, 0x6c, 0x65, 0x52, 0x04, 0x72,
-	0x6f, 0x6c, 0x65, 0x22, 0x27, 0x0a, 0x11, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x52, 0x6f, 0x6c,
-	0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x5b, 0x0a, 0x1d,
-	0x41, 0x73, 0x73, 0x69, 0x67, 0x6e, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e,
-	0x54, 0x6f, 0x52, 0x6f, 0x6c, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a,
-	0x06, 0x72, 0x6f, 0x6c, 0x65, 0x49, 0x44, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x06, 0x72,
-	0x6f, 0x6c, 0x65, 0x49, 0x44, 0x12, 0x22, 0x0a, 0x0c, 0x70, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73,
-	0x69, 0x6f, 0x6e, 0x49, 0x44, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0c, 0x70, 0x65, 0x72,
-	0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x44, 0x22, 0x49, 0x0a, 0x17, 0x41, 0x73, 0x73,
-	0x69, 0x67, 0x6e, 0x52, 0x6f, 0x6c, 0x65, 0x54, 0x6f, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x72, 0x6f, 0x6c, 0x65, 0x49, 0x44, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x03, 0x52, 0x06, 0x72, 0x6f, 0x6c, 0x65, 0x49, 0x44, 0x12, 0x16, 0x0a, 0x06,
-	0x75, 0x73, 0x65, 0x72, 0x49, 0x44, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x06, 0x75, 0x73,
-	0x65, 0x72, 0x49, 0x44, 0x22, 0x54, 0x0a, 0x1a, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x55, 0x73, 0x65,
-	0x72, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x12, 0x1e, 0x0a, 0x0a, 0x70, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69,
-	0x6f, 0x6e, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x44, 0x18, 0x02, 0x20, 0x01,
-	0x28, 0x03, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x44, 0x22, 0x34, 0x0a, 0x12, 0x43, 0x72,
-	0x65, 0x61, 0x74, 0x65, 0x52, 0x6f, 0x6c, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x12, 0x1e, 0x0a, 0x04, 0x72, 0x6f, 0x6c, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0a,
-	0x2e, 0x72, 0x62, 0x61, 0x63, 0x2e, 0x52, 0x6f, 0x6c, 0x65, 0x52, 0x04, 0x72, 0x6f, 0x6c, 0x65,
-	0x22, 0x43, 0x0a, 0x1b, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x55, 0x73, 0x65, 0x72, 0x50, 0x65, 0x72,
-	0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
-	0x24, 0x0a, 0x0d, 0x68, 0x61, 0x73, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0d, 0x68, 0x61, 0x73, 0x50, 0x65, 0x72, 0x6d, 0x69,
-	0x73, 0x73, 0x69, 0x6f, 0x6e, 0x22, 0x2a, 0x0a, 0x04, 0x52, 0x6f, 0x6c, 0x65, 0x12, 0x0e, 0x0a,
-	0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a,
-	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d,
-	0x65, 0x32, 0xcc, 0x03, 0x0a, 0x0b, 0x52, 0x42, 0x41, 0x43, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63,
-	0x65, 0x12, 0x3f, 0x0a, 0x0a, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x52, 0x6f, 0x6c, 0x65, 0x12,
-	0x17, 0x2e, 0x72, 0x62, 0x61, 0x63, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x52, 0x6f, 0x6c,
-	0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x72, 0x62, 0x61, 0x63, 0x2e,
-	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x52, 0x6f, 0x6c, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x12, 0x55, 0x0a, 0x16, 0x41, 0x73, 0x73, 0x69, 0x67, 0x6e, 0x50, 0x65, 0x72, 0x6d,
+	0x5b, 0x0a, 0x1d, 0x41, 0x73, 0x73, 0x69, 0x67, 0x6e, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73,
+	0x69, 0x6f, 0x6e, 0x54, 0x6f, 0x52, 0x6f, 0x6c, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x16, 0x0a, 0x06, 0x72, 0x6f, 0x6c, 0x65, 0x49, 0x44, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03,
+	0x52, 0x06, 0x72, 0x6f, 0x6c, 0x65, 0x49, 0x44, 0x12, 0x22, 0x0a, 0x0c, 0x70, 0x65, 0x72, 0x6d,
+	0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x44, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0c,
+	0x70, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x44, 0x22, 0x49, 0x0a, 0x17,
+	0x41, 0x73, 0x73, 0x69, 0x67, 0x6e, 0x52, 0x6f, 0x6c, 0x65, 0x54, 0x6f, 0x55, 0x73, 0x65, 0x72,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x72, 0x6f, 0x6c, 0x65, 0x49,
+	0x44, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x06, 0x72, 0x6f, 0x6c, 0x65, 0x49, 0x44, 0x12,
+	0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x44, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52,
+	0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x44, 0x22, 0x54, 0x0a, 0x1a, 0x43, 0x68, 0x65, 0x63, 0x6b,
+	0x55, 0x73, 0x65, 0x72, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1e, 0x0a, 0x0a, 0x70, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73,
+	0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x65, 0x72, 0x6d, 0x69,
+	0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x44, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x44, 0x22, 0x43, 0x0a,
+	0x1b, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x55, 0x73, 0x65, 0x72, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73,
+	0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x24, 0x0a, 0x0d,
+	0x68, 0x61, 0x73, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x08, 0x52, 0x0d, 0x68, 0x61, 0x73, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69,
+	0x6f, 0x6e, 0x32, 0x8b, 0x02, 0x0a, 0x0b, 0x52, 0x42, 0x41, 0x43, 0x53, 0x65, 0x72, 0x76, 0x69,
+	0x63, 0x65, 0x12, 0x55, 0x0a, 0x16, 0x41, 0x73, 0x73, 0x69, 0x67, 0x6e, 0x50, 0x65, 0x72, 0x6d,
 	0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x54, 0x6f, 0x52, 0x6f, 0x6c, 0x65, 0x12, 0x23, 0x2e, 0x72,
 	0x62, 0x61, 0x63, 0x2e, 0x41, 0x73, 0x73, 0x69, 0x67, 0x6e, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73,
 	0x73, 0x69, 0x6f, 0x6e, 0x54, 0x6f, 0x52, 0x6f, 0x6c, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
@@ -596,14 +276,6 @@ var file_rbac_proto_rawDesc = []byte{
 	0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x21, 0x2e,
 	0x72, 0x62, 0x61, 0x63, 0x2e, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x55, 0x73, 0x65, 0x72, 0x50, 0x65,
 	0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x12, 0x3d, 0x0a, 0x0a, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x6f, 0x6c, 0x65, 0x12, 0x17,
-	0x2e, 0x72, 0x62, 0x61, 0x63, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x6f, 0x6c, 0x65,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x12,
-	0x3f, 0x0a, 0x0a, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x6f, 0x6c, 0x65, 0x12, 0x17, 0x2e,
-	0x72, 0x62, 0x61, 0x63, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x6f, 0x6c, 0x65, 0x52,
-	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x72, 0x62, 0x61, 0x63, 0x2e, 0x55, 0x70,
-	0x64, 0x61, 0x74, 0x65, 0x52, 0x6f, 0x6c, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
 	0x42, 0x0d, 0x5a, 0x0b, 0x72, 0x62, 0x61, 0x63, 0x3b, 0x72, 0x62, 0x61, 0x63, 0x70, 0x62, 0x62,
 	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
@@ -620,40 +292,26 @@ func file_rbac_proto_rawDescGZIP() []byte {
 	return file_rbac_proto_rawDescData
 }
 
-var file_rbac_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_rbac_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_rbac_proto_goTypes = []interface{}{
-	(*DeleteRoleRequest)(nil),             // 0: rbac.DeleteRoleRequest
-	(*UpdateRoleRequest)(nil),             // 1: rbac.UpdateRoleRequest
-	(*UpdateRoleResponse)(nil),            // 2: rbac.UpdateRoleResponse
-	(*CreateRoleRequest)(nil),             // 3: rbac.CreateRoleRequest
-	(*AssignPermissionToRoleRequest)(nil), // 4: rbac.AssignPermissionToRoleRequest
-	(*AssignRoleToUserRequest)(nil),       // 5: rbac.AssignRoleToUserRequest
-	(*CheckUserPermissionRequest)(nil),    // 6: rbac.CheckUserPermissionRequest
-	(*CreateRoleResponse)(nil),            // 7: rbac.CreateRoleResponse
-	(*CheckUserPermissionResponse)(nil),   // 8: rbac.CheckUserPermissionResponse
-	(*Role)(nil),                          // 9: rbac.Role
-	(*emptypb.Empty)(nil),                 // 10: google.protobuf.Empty
+	(*AssignPermissionToRoleRequest)(nil), // 0: rbac.AssignPermissionToRoleRequest
+	(*AssignRoleToUserRequest)(nil),       // 1: rbac.AssignRoleToUserRequest
+	(*CheckUserPermissionRequest)(nil),    // 2: rbac.CheckUserPermissionRequest
+	(*CheckUserPermissionResponse)(nil),   // 3: rbac.CheckUserPermissionResponse
+	(*emptypb.Empty)(nil),                 // 4: google.protobuf.Empty
 }
 var file_rbac_proto_depIdxs = []int32{
-	9,  // 0: rbac.UpdateRoleResponse.role:type_name -> rbac.Role
-	9,  // 1: rbac.CreateRoleResponse.role:type_name -> rbac.Role
-	3,  // 2: rbac.RBACService.CreateRole:input_type -> rbac.CreateRoleRequest
-	4,  // 3: rbac.RBACService.AssignPermissionToRole:input_type -> rbac.AssignPermissionToRoleRequest
-	5,  // 4: rbac.RBACService.AssignRoleToUser:input_type -> rbac.AssignRoleToUserRequest
-	6,  // 5: rbac.RBACService.CheckUserPermission:input_type -> rbac.CheckUserPermissionRequest
-	0,  // 6: rbac.RBACService.DeleteRole:input_type -> rbac.DeleteRoleRequest
-	1,  // 7: rbac.RBACService.UpdateRole:input_type -> rbac.UpdateRoleRequest
-	7,  // 8: rbac.RBACService.CreateRole:output_type -> rbac.CreateRoleResponse
-	10, // 9: rbac.RBACService.AssignPermissionToRole:output_type -> google.protobuf.Empty
-	10, // 10: rbac.RBACService.AssignRoleToUser:output_type -> google.protobuf.Empty
-	8,  // 11: rbac.RBACService.CheckUserPermission:output_type -> rbac.CheckUserPermissionResponse
-	10, // 12: rbac.RBACService.DeleteRole:output_type -> google.protobuf.Empty
-	2,  // 13: rbac.RBACService.UpdateRole:output_type -> rbac.UpdateRoleResponse
-	8,  // [8:14] is the sub-list for method output_type
-	2,  // [2:8] is the sub-list for method input_type
-	2,  // [2:2] is the sub-list for extension type_name
-	2,  // [2:2] is the sub-list for extension extendee
-	0,  // [0:2] is the sub-list for field type_name
+	0, // 0: rbac.RBACService.AssignPermissionToRole:input_type -> rbac.AssignPermissionToRoleRequest
+	1, // 1: rbac.RBACService.AssignRoleToUser:input_type -> rbac.AssignRoleToUserRequest
+	2, // 2: rbac.RBACService.CheckUserPermission:input_type -> rbac.CheckUserPermissionRequest
+	4, // 3: rbac.RBACService.AssignPermissionToRole:output_type -> google.protobuf.Empty
+	4, // 4: rbac.RBACService.AssignRoleToUser:output_type -> google.protobuf.Empty
+	3, // 5: rbac.RBACService.CheckUserPermission:output_type -> rbac.CheckUserPermissionResponse
+	3, // [3:6] is the sub-list for method output_type
+	0, // [0:3] is the sub-list for method input_type
+	0, // [0:0] is the sub-list for extension type_name
+	0, // [0:0] is the sub-list for extension extendee
+	0, // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_rbac_proto_init() }
@@ -663,54 +321,6 @@ func file_rbac_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_rbac_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteRoleRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_rbac_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateRoleRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_rbac_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateRoleResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_rbac_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateRoleRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_rbac_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AssignPermissionToRoleRequest); i {
 			case 0:
 				return &v.state
@@ -722,7 +332,7 @@ func file_rbac_proto_init() {
 				return nil
 			}
 		}
-		file_rbac_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_rbac_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AssignRoleToUserRequest); i {
 			case 0:
 				return &v.state
@@ -734,7 +344,7 @@ func file_rbac_proto_init() {
 				return nil
 			}
 		}
-		file_rbac_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_rbac_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CheckUserPermissionRequest); i {
 			case 0:
 				return &v.state
@@ -746,32 +356,8 @@ func file_rbac_proto_init() {
 				return nil
 			}
 		}
-		file_rbac_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateRoleResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_rbac_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_rbac_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CheckUserPermissionResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_rbac_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Role); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -789,7 +375,7 @@ func file_rbac_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_rbac_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
