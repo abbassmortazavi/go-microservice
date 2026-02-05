@@ -7,30 +7,9 @@ option go_package = "rbac;rbacpb";
 
 
 service RBACService {
-  rpc CreateRole(CreateRoleRequest) returns (CreateRoleResponse);
   rpc AssignPermissionToRole(AssignPermissionToRoleRequest) returns (google.protobuf.Empty);
   rpc AssignRoleToUser(AssignRoleToUserRequest) returns (google.protobuf.Empty);
   rpc CheckUserPermission(CheckUserPermissionRequest) returns (CheckUserPermissionResponse);
-  rpc DeleteRole(DeleteRoleRequest) returns (google.protobuf.Empty);
-  rpc UpdateRole(UpdateRoleRequest) returns (UpdateRoleResponse);
-}
-
-
-message DeleteRoleRequest {
-  int64 id = 1;
-}
-
-message UpdateRoleRequest {
-  int64 id = 1;
-  string name= 2;
-}
-
-message UpdateRoleResponse {
-  Role role = 1;
-}
-
-message CreateRoleRequest{
-  string name = 1;
 }
 
 message AssignPermissionToRoleRequest{
@@ -47,14 +26,8 @@ message CheckUserPermissionRequest{
   int64 userID = 2;
 }
 
-message CreateRoleResponse {
-  Role role = 1;
-}
+
 message CheckUserPermissionResponse {
   bool hasPermission = 1;
 }
 
-message Role {
-  int64 id = 1;
-  string name = 2;
-}
