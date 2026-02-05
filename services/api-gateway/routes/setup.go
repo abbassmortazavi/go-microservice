@@ -21,4 +21,5 @@ func SetupRoutes(router *mux.Router) {
 	PermissionRoutes(router)
 	UserRoutes(router)
 	RoleRoutes(router)
+	RBACRoutes(router)
 }

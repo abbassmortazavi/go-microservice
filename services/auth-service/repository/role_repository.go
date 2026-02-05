@@ -5,6 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"math"
 	"strings"
 )
@@ -34,6 +35,7 @@ func (r *RoleRepository) FindById(ctx context.Context, roleId int64) (*entity.Ro
 	if err := row.Scan(&role.ID, &role.Name); err != nil {
 		return nil, err
 	}
+	log.Println("repo ===>", role)
 	return &role, nil
 }
 func (r *RoleRepository) FindByName(ctx context.Context, name string) (*entity.Role, error) {

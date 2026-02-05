@@ -60,7 +60,7 @@ func (r *RBACService) CreateRole(ctx context.Context, name string) (*entity.Role
 
 	return data, nil
 }
-func (r *RBACService) AssignPermissionToRole(ctx context.Context, permissionID, roleID int64) error {
+func (r *RBACService) AssignPermissionToRole(ctx context.Context, roleID, permissionID int64) error {
 	role, err := r.roleRepo.FindById(ctx, roleID)
 	if err != nil {
 		return err

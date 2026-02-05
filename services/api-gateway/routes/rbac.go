@@ -13,7 +13,4 @@ func RBACRoutes(mux *mux.Router) {
 	protected.Use(authMiddleware.AuthMiddleware)
 
 	protected.HandleFunc("/assign-permission-to-role", handlers.AssignPermissionToRole).Methods("POST")
-	protected.HandleFunc("/{id}", handlers.Delete).Methods("DELETE")
-	protected.HandleFunc("/lists", handlers.List).Methods("GET")
-	protected.HandleFunc("/{id}", handlers.Get).Methods("GET")
 }
