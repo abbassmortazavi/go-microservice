@@ -63,8 +63,8 @@ func (r *RoleService) Lists(ctx context.Context, page, perPage int64, orderBy, s
 	return roles, &paginationData, nil
 }
 
-func (r *RoleService) Get(ctx context.Context, permissionID int64) (*entity.Role, error) {
-	role, err := r.roleRepo.FindById(ctx, permissionID)
+func (r *RoleService) Get(ctx context.Context, roleID int64) (*entity.Role, error) {
+	role, err := r.roleRepo.FindById(ctx, roleID)
 	if err != nil {
 		return nil, errors.New("role not exists")
 	}

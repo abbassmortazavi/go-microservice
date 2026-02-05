@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	permissionpb "abbassmortazavi/go-microservice/pkg/proto/permission"
 	rolepb "abbassmortazavi/go-microservice/pkg/proto/role"
 	"abbassmortazavi/go-microservice/pkg/utils"
 	"abbassmortazavi/go-microservice/services/api-gateway/grpc_clients"
@@ -114,13 +113,13 @@ func Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ctx := r.Context()
-	req := permissionpb.GetPermissionDetailRequest{
+	req := rolepb.GetRoleDetailRequest{
 		Id: int64(id),
 	}
-	res, err := authService.Permission.Get(ctx, &req)
+	res, err := authService.Role.Get(ctx, &req)
 	if err != nil {
 		utils.InternalError(w, err)
 		return
 	}
-	utils.Success(w, http.StatusOK, res, "Permission has been retrieved Successfully!")
+	utils.Success(w, http.StatusOK, res, "Role has been retrieved Successfully!")
 }

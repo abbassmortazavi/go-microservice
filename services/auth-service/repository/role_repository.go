@@ -28,7 +28,7 @@ func (r *RoleRepository) Save(ctx context.Context, role entity.Role) (*entity.Ro
 	return &savedRole, nil
 }
 func (r *RoleRepository) FindById(ctx context.Context, roleId int64) (*entity.Role, error) {
-	query := `SELECT * FROM roles WHERE role_id=$1`
+	query := `SELECT id,name FROM roles WHERE id=$1`
 	row := r.db.QueryRowContext(ctx, query, roleId)
 	var role entity.Role
 	if err := row.Scan(&role.ID, &role.Name); err != nil {
@@ -113,7 +113,7 @@ func (r *RoleRepository) Lists(ctx context.Context, page, perPage int64, orderBy
 	return roles, paginationMeta, nil
 }
 func (r *RoleRepository) Delete(ctx context.Context, roleId int64) error {
-	query := `DELETE FROM roles WHERE role_id=$1`
+	query := `DELETE FROM roles WHERE id=$1`
 	_, err := r.db.ExecContext(ctx, query, roleId)
 	if err != nil {
 		return err
