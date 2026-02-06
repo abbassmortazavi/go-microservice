@@ -4,7 +4,6 @@ import (
 	rolepb "abbassmortazavi/go-microservice/pkg/proto/role"
 	"abbassmortazavi/go-microservice/services/auth-service/service"
 	"context"
-	"log"
 
 	"github.com/golang/protobuf/ptypes/empty"
 )
@@ -77,7 +76,6 @@ func (r *RoleHandler) Get(ctx context.Context, req *rolepb.GetRoleDetailRequest)
 	if err != nil {
 		return nil, err
 	}
-
 	var permissions []*rolepb.Permission
 	for _, permission := range res.Permissions {
 		permissions = append(permissions, &rolepb.Permission{
@@ -85,7 +83,6 @@ func (r *RoleHandler) Get(ctx context.Context, req *rolepb.GetRoleDetailRequest)
 			Name: permission.Name,
 		})
 	}
-
 	result := rolepb.GetRoleDetailResponse{
 		Role: &rolepb.Role{
 			Id:          int64(res.ID),
@@ -93,7 +90,5 @@ func (r *RoleHandler) Get(ctx context.Context, req *rolepb.GetRoleDetailRequest)
 			Permissions: permissions,
 		},
 	}
-
-	log.Println("role detail", &result)
 	return &result, nil
 }
