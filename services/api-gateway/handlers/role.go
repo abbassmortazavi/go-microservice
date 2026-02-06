@@ -5,6 +5,8 @@ import (
 	"abbassmortazavi/go-microservice/pkg/utils"
 	"abbassmortazavi/go-microservice/services/api-gateway/grpc_clients"
 	"abbassmortazavi/go-microservice/services/api-gateway/requests/role"
+	"abbassmortazavi/go-microservice/services/auth-service/entity"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -121,5 +123,26 @@ func Get(w http.ResponseWriter, r *http.Request) {
 		utils.InternalError(w, err)
 		return
 	}
-	utils.Success(w, http.StatusOK, res, "Role has been retrieved Successfully!")
+
+	role := res.Role
+
+	permissions := make([]entity.PermissionDTO, 0)
+	for _, p := range role.Permissions {
+		permissions = append(permissions, entity.PermissionDTO{
+			Id:   p.Id,
+			Name: p.Name,
+		})
+	}
+
+	dto := entity.GetRoleResponseDTO{
+		Role: entity.RoleDTO{
+			Id:          role.Id,
+			Name:        role.Name,
+			Permissions: permissions,
+		},
+	}
+
+	log.Println("dto", dto)
+
+	utils.Success(w, http.StatusOK, dto, "Role has been retrieved Successfully!")
 }
