@@ -4,7 +4,9 @@ import (
 	"abbassmortazavi/go-microservice/services/auth-service/entity"
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
+	"log"
 	"math"
 	"strings"
 )
@@ -28,13 +30,73 @@ func (r *RoleRepository) Save(ctx context.Context, role entity.Role) (*entity.Ro
 	return &savedRole, nil
 }
 func (r *RoleRepository) FindById(ctx context.Context, roleId int64) (*entity.Role, error) {
-	query := `SELECT id,name FROM roles WHERE id=$1`
+	query := `
+	        SELECT
+	            r.id,
+	            r.name,
+	            COALESCE(
+	                JSON_AGG(
+	                    JSON_BUILD_OBJECT(
+	                        'id', p.id,
+	                        'name', p.name
+	                    )
+	                ) FILTER (WHERE p.id IS NOT NULL),
+	                '[]'::JSON
+	            ) as permissions
+	        FROM roles r
+	        LEFT JOIN role_permissions rp ON r.id = rp.role_id
+	        LEFT JOIN permissions p ON rp.permission_id = p.id
+	        WHERE r.id = $1
+	        GROUP BY r.id, r.name
+	    `
+
 	row := r.db.QueryRowContext(ctx, query, roleId)
 	var role entity.Role
-	if err := row.Scan(&role.ID, &role.Name); err != nil {
+	var permissionsJSON []byte
+
+	err := row.Scan(&role.ID, &role.Name, &permissionsJSON)
+	if err != nil {
 		return nil, err
 	}
+	role.Permissions = []entity.Permission{}
+
+	if len(permissionsJSON) > 0 && string(permissionsJSON) != "[]" {
+		if err := json.Unmarshal(permissionsJSON, &role.Permissions); err != nil {
+			log.Printf("Failed to unmarshal permissions: %v", err)
+		}
+	}
 	return &role, nil
+
+	/*roleQuery := `SELECT id, name FROM roles WHERE id = $1`
+		var role entity.Role
+		err := r.db.QueryRowContext(ctx, roleQuery, roleId).Scan(&role.ID, &role.Name)
+		if err != nil {
+			return nil, err
+		}
+
+		// Query 2: Get permissions separately
+		permQuery := `
+	        SELECT p.id, p.name
+	        FROM permissions p
+	        JOIN role_permissions rp ON p.id = rp.permission_id
+	        WHERE rp.role_id = $1
+	    `
+
+		rows, err := r.db.QueryContext(ctx, permQuery, roleId)
+		if err != nil {
+			return nil, err
+		}
+		defer rows.Close()
+
+		var permissions []entity.Permission
+		for rows.Next() {
+			var perm entity.Permission
+			_ = rows.Scan(&perm.ID, &perm.Name)
+			permissions = append(permissions, perm)
+		}
+
+		role.Permissions = permissions
+		return &role, nil*/
 }
 func (r *RoleRepository) FindByName(ctx context.Context, name string) (*entity.Role, error) {
 	query := `SELECT * FROM roles WHERE name=$1`

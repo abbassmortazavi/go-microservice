@@ -3,6 +3,7 @@ package handlers
 import (
 	rolepb "abbassmortazavi/go-microservice/pkg/proto/role"
 	"abbassmortazavi/go-microservice/pkg/utils"
+	role2 "abbassmortazavi/go-microservice/services/api-gateway/dto/role"
 	"abbassmortazavi/go-microservice/services/api-gateway/grpc_clients"
 	"abbassmortazavi/go-microservice/services/api-gateway/requests/role"
 	"net/http"
@@ -121,5 +122,24 @@ func Get(w http.ResponseWriter, r *http.Request) {
 		utils.InternalError(w, err)
 		return
 	}
-	utils.Success(w, http.StatusOK, res, "Role has been retrieved Successfully!")
+
+	roleRes := res.Role
+
+	permissions := make([]role2.PermissionDTO, 0)
+	for _, p := range roleRes.Permissions {
+		permissions = append(permissions, role2.PermissionDTO{
+			Id:   p.Id,
+			Name: p.Name,
+		})
+	}
+
+	dto := role2.GetRoleResponseDTO{
+		Role: role2.RoleDTO{
+			Id:          roleRes.Id,
+			Name:        roleRes.Name,
+			Permissions: permissions,
+		},
+	}
+
+	utils.Success(w, http.StatusOK, dto, "Role has been retrieved Successfully!")
 }

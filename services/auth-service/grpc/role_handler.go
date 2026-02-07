@@ -76,12 +76,19 @@ func (r *RoleHandler) Get(ctx context.Context, req *rolepb.GetRoleDetailRequest)
 	if err != nil {
 		return nil, err
 	}
-	role := &rolepb.Role{
-		Id:   int64(res.ID),
-		Name: res.Name,
+	var permissions []*rolepb.Permission
+	for _, permission := range res.Permissions {
+		permissions = append(permissions, &rolepb.Permission{
+			Id:   int64(permission.ID),
+			Name: permission.Name,
+		})
 	}
-	return &rolepb.GetRoleDetailResponse{
-		Role: role,
-	}, nil
-
+	result := rolepb.GetRoleDetailResponse{
+		Role: &rolepb.Role{
+			Id:          int64(res.ID),
+			Name:        res.Name,
+			Permissions: permissions,
+		},
+	}
+	return &result, nil
 }

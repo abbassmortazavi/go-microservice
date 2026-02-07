@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"log"
 )
 
 type RBACRepository struct {
@@ -24,10 +25,11 @@ func (r *RBACRepository) AssignRoleToUser(ctx context.Context, userId, roleId in
 	}
 	return nil
 }
-func (r *RBACRepository) AssignPermissionToRole(ctx context.Context, permissionID, roleId int64) error {
+func (r *RBACRepository) AssignPermissionToRole(ctx context.Context, roleID, permissionID int64) error {
+	log.Println(permissionID, roleID)
 	query := `insert into role_permissions (role_id, permission_id) VALUES ($1, $2) RETURNING *;`
-	row := r.db.QueryRow(query, roleId, permissionID)
-	err := row.Scan(&roleId, &permissionID)
+	row := r.db.QueryRow(query, roleID, permissionID)
+	err := row.Scan(&roleID, &permissionID)
 	if err != nil {
 		return err
 	}
