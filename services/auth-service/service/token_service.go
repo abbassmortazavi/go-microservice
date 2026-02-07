@@ -6,7 +6,6 @@ import (
 	"abbassmortazavi/go-microservice/services/auth-service/pkg/response"
 	"context"
 	"errors"
-	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -36,7 +35,7 @@ type JWT struct {
 	UserRepository  repository_interface.UserRepositoryInterface
 }
 
-func (j *JWT) GenerateToken(userID int, name string) (response.TokenResponse, error) {
+func (j *JWT) GenerateToken(userID int64, name string) (response.TokenResponse, error) {
 	accessExpiry := time.Now().Add(time.Minute * 60)
 	refreshExpiry := time.Now().Add(time.Minute * 10)
 	ctx := context.Background()
@@ -104,8 +103,6 @@ func (j *JWT) GenerateToken(userID int, name string) (response.TokenResponse, er
 	}
 	err = j.TokenRepository.Create(ctx, &reqAccessToken)
 	if err != nil {
-		log.Println(err)
-		log.Println(4)
 		return response.TokenResponse{}, err
 	}
 	reqRefreshToken := entity.Token{
@@ -135,7 +132,7 @@ func (j *JWT) RefreshAccessToken(refreshToken string) (response.TokenResponse, e
 	if claims.TokenType != "refresh" {
 		return response.TokenResponse{}, errors.New("invalid token")
 	}
-	return j.GenerateToken(int(claims.User.ID), claims.Name)
+	return j.GenerateToken(claims.User.ID, claims.Name)
 }
 
 func (j *JWT) ValidateToken(token string) (*Claims, error) {
@@ -162,7 +159,7 @@ func (j *JWT) ValidateToken(token string) (*Claims, error) {
 	return claims, nil
 }
 
-func (j *JWT) FindByUserId(ctx context.Context, userId int) (*entity.User, error) {
+func (j *JWT) FindByUserId(ctx context.Context, userId int64) (*entity.User, error) {
 	user, err := j.UserRepository.FindByID(ctx, userId)
 	if err != nil {
 		return nil, err

@@ -13,7 +13,7 @@ import (
 )
 
 type TokenServiceInterface interface {
-	GenerateToken(userID int, name string) (response.TokenResponse, error)
+	GenerateToken(userID int64, name string) (response.TokenResponse, error)
 	RefreshAccessToken(refreshToken string) (response.TokenResponse, error)
 	ValidateToken(token string) (*Claims, error)
 }
@@ -66,7 +66,7 @@ func (a *AuthService) Login(ctx context.Context, email, password string) (*respo
 	if err := a.hasher.Compare(user.Password, password); err == false {
 		return nil, errors.New("password is wrong")
 	}
-	tokens, err := a.TokenService.GenerateToken(int(user.ID), user.Name)
+	tokens, err := a.TokenService.GenerateToken(user.ID, user.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (a *AuthService) Login(ctx context.Context, email, password string) (*respo
 	}, nil
 }
 func (a *AuthService) GetUser(ctx context.Context, id int64) (*entity.User, error) {
-	user, err := a.userRepo.FindByID(ctx, int(id))
+	user, err := a.userRepo.FindByID(ctx, id)
 
 	if err != nil {
 		return nil, err

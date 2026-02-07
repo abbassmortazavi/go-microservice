@@ -25,3 +25,10 @@ func (r *RabcHandler) AssignPermissionToRole(ctx context.Context, req *rbacpb.As
 	}
 	return nil, nil
 }
+func (r *RabcHandler) AssignRoleToUser(ctx context.Context, req *rbacpb.AssignRoleToUserRequest) (*emptypb.Empty, error) {
+	err := r.rbacService.AssignRoleToUser(ctx, req.GetRoleID(), req.GetUserID())
+	if err != nil {
+		return nil, err
+	}
+	return nil, nil
+}

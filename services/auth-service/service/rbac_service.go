@@ -72,13 +72,16 @@ func (r *RBACService) AssignPermissionToRole(ctx context.Context, roleID, permis
 	return r.rbacRepo.AssignPermissionToRole(ctx, int64(role.ID), int64(permission.ID))
 }
 
-func (r *RBACService) AssignRoleToUser(ctx context.Context, roleID, userID int) error {
-	_, err := r.roleRepo.FindById(ctx, int64(roleID))
+func (r *RBACService) AssignRoleToUser(ctx context.Context, roleID, userID int64) error {
+	_, err := r.roleRepo.FindById(ctx, roleID)
 	if err != nil {
 		return err
 	}
 	_, err = r.userRepo.FindByID(ctx, userID)
-	return r.rbacRepo.AssignRoleToUser(ctx, int64(userID), int64(roleID))
+	if err != nil {
+		return err
+	}
+	return r.rbacRepo.AssignRoleToUser(ctx, userID, roleID)
 }
 
 func (r *RBACService) CheckUserPermission(ctx context.Context, permission string, userID int64) (bool, error) {

@@ -19,7 +19,7 @@ func NewTokenRepository(db *sql.DB) repository_interface.TokenRepositoryInterfac
 	}
 }
 
-func (r *TokenRepository) FindByUserId(ctx context.Context, userId int) (*entity.Token, error) {
+func (r *TokenRepository) FindByUserId(ctx context.Context, userId int64) (*entity.Token, error) {
 	token := &entity.Token{
 		User: entity.User{},
 	}
@@ -75,7 +75,7 @@ func (r *TokenRepository) FindByUserId(ctx context.Context, userId int) (*entity
 	log.Println("data ===>", token)
 	return token, nil
 }
-func (r *TokenRepository) Delete(ctx context.Context, id int) error {
+func (r *TokenRepository) Delete(ctx context.Context, id int64) error {
 	query := `DELETE FROM tokens WHERE id = $1`
 	_, err := r.db.ExecContext(ctx, query, id)
 	if err != nil {
@@ -83,7 +83,7 @@ func (r *TokenRepository) Delete(ctx context.Context, id int) error {
 	}
 	return nil
 }
-func (r *TokenRepository) RevokeAllUserTokens(ctx context.Context, userId int) error {
+func (r *TokenRepository) RevokeAllUserTokens(ctx context.Context, userId int64) error {
 	query := `DELETE FROM tokens WHERE user_id = $1`
 	_, err := r.db.ExecContext(ctx, query, userId)
 	if err != nil {
@@ -91,7 +91,7 @@ func (r *TokenRepository) RevokeAllUserTokens(ctx context.Context, userId int) e
 	}
 	return nil
 }
-func (r *TokenRepository) FindById(ctx context.Context, id int) (*entity.Token, error) {
+func (r *TokenRepository) FindById(ctx context.Context, id int64) (*entity.Token, error) {
 	token := &entity.Token{}
 	query := `SELECT * FROM tokens WHERE id = $1`
 	err := r.db.QueryRowContext(ctx, query, id).Scan(

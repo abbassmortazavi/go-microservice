@@ -60,4 +60,10 @@ message GetUserRequest {
 
 message GetUserResponse {
   User user = 1;
+  repeated Role roles = 2;
+}
+
+message Role {
+  int64 id = 1;
+  string name = 2;
 }
