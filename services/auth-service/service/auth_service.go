@@ -12,10 +12,10 @@ import (
 	"strconv"
 )
 
-type TokenServiceInterface interface {
-	GenerateToken(userID int64, name string) (response.TokenResponse, error)
-	RefreshAccessToken(refreshToken string) (response.TokenResponse, error)
-	ValidateToken(token string) (*Claims, error)
+type AuthServiceInterface interface {
+	Register(ctx context.Context, email, password, name string) error
+	Login(ctx context.Context, email, password string) (*response.LoginResponse, error)
+	GetUser(ctx context.Context, id int64) (*entity.User, error)
 }
 
 type AuthService struct {
@@ -42,7 +42,6 @@ func (a *AuthService) Register(ctx context.Context, email, password, name string
 		Email:    email,
 		Password: hashed,
 		Name:     name,
-		Role:     "user",
 	}
 	err = a.userRepo.Create(ctx, &user)
 	if err != nil {
@@ -53,7 +52,6 @@ func (a *AuthService) Register(ctx context.Context, email, password, name string
 	event := eventpb.UserRegistered{
 		UserId: strconv.FormatInt(user.ID, 10),
 		Email:  user.Email,
-		Role:   user.Role,
 	}
 
 	return a.publisher.Publish(ctx, "user_registered", event)
@@ -75,7 +73,6 @@ func (a *AuthService) Login(ctx context.Context, email, password string) (*respo
 		ID:        user.ID,
 		Name:      user.Name,
 		Email:     user.Email,
-		Role:      user.Role,
 		CreatedAt: user.CreatedAt,
 	}
 

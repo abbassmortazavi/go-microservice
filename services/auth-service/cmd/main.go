@@ -3,14 +3,12 @@ package main
 import (
 	global "abbassmortazavi/go-microservice/pkg/config"
 	"abbassmortazavi/go-microservice/pkg/database"
-	"abbassmortazavi/go-microservice/pkg/env"
+	"abbassmortazavi/go-microservice/pkg/message"
 	authpb "abbassmortazavi/go-microservice/pkg/proto/auth"
 	permissionpb "abbassmortazavi/go-microservice/pkg/proto/permission"
 	rbacpb "abbassmortazavi/go-microservice/pkg/proto/rbac"
 	rolepb "abbassmortazavi/go-microservice/pkg/proto/role"
-	"abbassmortazavi/go-microservice/services/auth-service/config"
 	"abbassmortazavi/go-microservice/services/auth-service/grpc"
-	messaging2 "abbassmortazavi/go-microservice/services/auth-service/messaging"
 	"abbassmortazavi/go-microservice/services/auth-service/pkg/middlewares"
 	"abbassmortazavi/go-microservice/services/auth-service/repository"
 	"abbassmortazavi/go-microservice/services/auth-service/security"
@@ -28,9 +26,11 @@ import (
 
 func main() {
 	log.Println("Starting service Auth Service...")
-	rabbitmqURL := env.GetString("RABBITMQ_URL", "amqp://guest:guest@rabbitmq:5672/")
 	gcfg := global.Load()
-	cfg := config.Load()
+
+	// ---- RabbitMQ ----
+	message.Init()
+	publisher := message.GetPublisher()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -51,32 +51,14 @@ func main() {
 	hasher := security.NewBcryptHasher()
 	//tokenService := service.NewJWTSecret([]byte(gcfg.JWT_SECRET))
 	tokenService := service2.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo, userRepo)
-	middlewares.Init(tokenService)
-
-	// ---- RabbitMQ ----
-	conn, ch := messaging2.NewRabbitMQ(rabbitmqURL)
-	defer conn.Close()
-	defer ch.Close()
-
-	err = ch.ExchangeDeclare(
-		cfg.UserExchange,
-		"topic",
-		true,
-		false,
-		false,
-		false,
-		nil,
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-	publisher := messaging2.NewPublisher(ch, cfg.UserExchange)
+	authService := service2.NewAuthService(userRepo, hasher, tokenService, publisher)
+	middlewares.Init(tokenService, authService)
 
 	roleRepo := repository.NewRoleRepository(database.DB)
 	permissionRepo := repository.NewPermissionRepository(database.DB)
 	rbacRepo := repository.NewRBACRepository(database.DB)
 
-	authService := service2.NewAuthService(userRepo, hasher, tokenService, publisher)
+	//authService := service2.NewAuthService(userRepo, hasher, tokenService, publisher)
 	rbacService := service2.NewRBACService(userRepo, roleRepo, permissionRepo, rbacRepo)
 	permissionService := service2.NewPermissionService(permissionRepo)
 	roleService := service2.NewRoleService(roleRepo)

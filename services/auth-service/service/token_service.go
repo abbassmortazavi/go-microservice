@@ -6,10 +6,17 @@ import (
 	"abbassmortazavi/go-microservice/services/auth-service/pkg/response"
 	"context"
 	"errors"
+	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
+
+type TokenServiceInterface interface {
+	GenerateToken(userID int64, name string) (response.TokenResponse, error)
+	RefreshAccessToken(refreshToken string) (response.TokenResponse, error)
+	ValidateToken(token string) (*Claims, error)
+}
 
 var JwtAuthenticator *JWT
 
@@ -44,7 +51,6 @@ func (j *JWT) GenerateToken(userID int64, name string) (response.TokenResponse, 
 		ID:    user.ID,
 		Name:  user.Name,
 		Email: user.Email,
-		Role:  user.Role,
 	}
 	if err != nil {
 		return response.TokenResponse{}, err
@@ -136,6 +142,7 @@ func (j *JWT) RefreshAccessToken(refreshToken string) (response.TokenResponse, e
 }
 
 func (j *JWT) ValidateToken(token string) (*Claims, error) {
+	log.Println("55555555555555555555555555")
 	claims := &Claims{}
 	tkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		return j.SigningKey, nil

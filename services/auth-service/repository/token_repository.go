@@ -38,7 +38,6 @@ func (r *TokenRepository) FindByUserId(ctx context.Context, userId int64) (*enti
 		u.id,
 		u.name,
 		u.email,
-		u.role,
 		u.created_at,
 		u.updated_at
 	FROM users u
@@ -61,7 +60,6 @@ func (r *TokenRepository) FindByUserId(ctx context.Context, userId int64) (*enti
 		&token.User.ID,
 		&token.User.Name,
 		&token.User.Email,
-		&token.User.Role,
 		&token.User.CreatedAt,
 		&token.User.UpdatedAt,
 	)

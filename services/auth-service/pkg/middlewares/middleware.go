@@ -10,11 +10,13 @@ import (
 
 type Middleware struct {
 	authenticator service.TokenServiceInterface
+	authService   service.AuthServiceInterface
 }
 
-func NewAuthMiddleware(authenticator service.TokenServiceInterface) *Middleware {
+func NewAuthMiddleware(authenticator service.TokenServiceInterface, authService service.AuthServiceInterface) *Middleware {
 	return &Middleware{
 		authenticator: authenticator,
+		authService:   authService,
 	}
 }
 
@@ -26,12 +28,14 @@ func (m *Middleware) AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		if m == nil {
+			log.Println(1)
 			log.Println("ERROR: Middleware is nil")
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
 		if m.authenticator == nil {
+			log.Println(2)
 			log.Println("ERROR: Token authenticator is nil")
 			http.Error(w, "Authentication service unavailable", http.StatusServiceUnavailable)
 			return
@@ -39,12 +43,14 @@ func (m *Middleware) AuthMiddleware(next http.Handler) http.Handler {
 
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
+			log.Println(3)
 			log.Println("No Authorization header found")
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
 		parts := strings.Split(authHeader, " ")
 		if len(parts) != 2 || parts[0] != "Bearer" {
+			log.Println(4)
 			log.Println("Invalid Authorization header")
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
@@ -52,7 +58,9 @@ func (m *Middleware) AuthMiddleware(next http.Handler) http.Handler {
 
 		tokenString := parts[1]
 		token, err := m.authenticator.ValidateToken(tokenString)
+		log.Println("token: ", token)
 		if err != nil {
+			log.Println(5)
 			log.Println(err)
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
