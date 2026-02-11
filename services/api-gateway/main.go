@@ -1,14 +1,9 @@
 package main
 
 import (
-	global "abbassmortazavi/go-microservice/pkg/config"
-	"abbassmortazavi/go-microservice/pkg/database"
 	"abbassmortazavi/go-microservice/pkg/env"
+	"abbassmortazavi/go-microservice/pkg/implement"
 	"abbassmortazavi/go-microservice/services/api-gateway/routes"
-	"abbassmortazavi/go-microservice/services/auth-service/pkg/middlewares"
-	"abbassmortazavi/go-microservice/services/auth-service/repository"
-	"abbassmortazavi/go-microservice/services/auth-service/service"
-
 	"context"
 	"log"
 	"net/http"
@@ -26,14 +21,8 @@ var (
 
 func main() {
 	log.Println("Starting API Gateway")
-	gcfg := global.Load()
-	database.Connect()
 
-	tokenRepo := repository.NewTokenRepository(database.DB)
-	userRepo := repository.NewUserRepository(database.DB)
-	tokenService := service.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo, userRepo)
-	middlewares.Init(tokenService)
-
+	implement.Implement()
 	router := mux.NewRouter()
 	routes.SetupRoutes(router)
 

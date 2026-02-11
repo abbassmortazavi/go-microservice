@@ -68,7 +68,6 @@ func (h *AuthHandler) GetUser(ctx context.Context, req *authpb.GetUserRequest) (
 			Id:        res.ID,
 			Name:      res.Name,
 			Email:     res.Email,
-			Role:      res.Role,
 			CreatedAt: res.CreatedAt.Unix(),
 		},
 	}, nil

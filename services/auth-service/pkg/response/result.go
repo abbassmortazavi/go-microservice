@@ -27,7 +27,6 @@ func (l *LoginResponse) ToProto() *authpb.LoginResponse {
 			Id:        l.User.ID,
 			Name:      l.User.Name,
 			Email:     l.User.Email,
-			Role:      l.User.Role,
 			CreatedAt: l.User.CreatedAt.Unix(),
 		},
 	}
