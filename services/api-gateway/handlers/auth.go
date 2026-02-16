@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	authpb "abbassmortazavi/go-microservice/pkg/proto/auth"
 	"abbassmortazavi/go-microservice/pkg/utils"
 	"abbassmortazavi/go-microservice/services/api-gateway/grpc_clients"
 	"abbassmortazavi/go-microservice/services/api-gateway/requests/auth"
@@ -8,6 +9,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func Register(w http.ResponseWriter, r *http.Request) {
@@ -62,30 +64,22 @@ func Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
+	//TODO::
 	user, err := middlewares.User(r.Context())
+	log.Println("auth gateway user: ", user)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = utils.WriteJson(w, http.StatusOK, user)
+	/*err = utils.WriteJson(w, http.StatusOK, user)
 	if err != nil {
 		return
-	}
+	}*/
 
-	/*id := r.PathValue("id")
-	log.Println("get user id:", id)
-	if id == "" {
-		http.Error(w, "User ID is required", http.StatusBadRequest)
-		return
-	}
 	ctx := r.Context()
-	authService, err := grpc_clients.NewAuthServiceClient()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+
 	// Convert string ID to int64
-	userID, err := strconv.ParseInt(id, 10, 64)
+	userID, err := strconv.ParseInt(user.ID, 10, 64)
 	if err != nil {
 		http.Error(w, "Invalid user ID format", http.StatusBadRequest)
 		return
@@ -93,6 +87,11 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 	req := &authpb.GetUserRequest{
 		Id: userID,
+	}
+	authService, err := grpc_clients.NewAuthServiceClient()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	res, err := authService.Client.GetUser(ctx, req)
 
@@ -103,6 +102,6 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	err = utils.WriteJson(w, http.StatusOK, res)
 	if err != nil {
 		return
-	}*/
+	}
 
 }

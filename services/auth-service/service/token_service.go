@@ -6,7 +6,6 @@ import (
 	"abbassmortazavi/go-microservice/services/auth-service/pkg/response"
 	"context"
 	"errors"
-	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -142,7 +141,6 @@ func (j *JWT) RefreshAccessToken(refreshToken string) (response.TokenResponse, e
 }
 
 func (j *JWT) ValidateToken(token string) (*Claims, error) {
-	log.Println("55555555555555555555555555")
 	claims := &Claims{}
 	tkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		return j.SigningKey, nil
