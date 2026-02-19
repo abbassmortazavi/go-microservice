@@ -58,10 +58,7 @@ func (m *Middleware) AuthMiddleware(next http.Handler) http.Handler {
 
 		tokenString := parts[1]
 		token, err := m.authenticator.ValidateToken(tokenString)
-		log.Println("token: ", token)
 		if err != nil {
-			log.Println(5)
-			log.Println(err)
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}

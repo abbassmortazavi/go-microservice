@@ -6,7 +6,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"log"
 )
 
 type UserRepository struct {
@@ -19,7 +18,6 @@ func NewUserRepository(db *sql.DB) repository_interface.UserRepositoryInterface 
 	}
 }
 func (u *UserRepository) Create(ctx context.Context, user *entity.User) error {
-	log.Println("creating user with repo")
 	query := `INSERT INTO users (name, email, password) VALUES ($1, $2, $3, $4)`
 	_, err := u.db.ExecContext(ctx, query, user.Name, user.Email, user.Password)
 	if err != nil {
@@ -28,7 +26,6 @@ func (u *UserRepository) Create(ctx context.Context, user *entity.User) error {
 	return nil
 }
 func (u *UserRepository) FindByEmail(ctx context.Context, email string) (*entity.User, error) {
-	log.Println("finding user by email", email)
 	query := `SELECT id, name, email, password, created_at 
               FROM users WHERE email = $1`
 	row := u.db.QueryRowContext(ctx, query, email)
@@ -40,7 +37,6 @@ func (u *UserRepository) FindByEmail(ctx context.Context, email string) (*entity
 	return &user, nil
 }
 func (u *UserRepository) FindByID(ctx context.Context, id int64) (*entity.User, error) {
-	log.Println("finding user by id", id)
 	query := `SELECT id, name, email, created_at, updated_at FROM users WHERE id = $1`
 	var user entity.User
 	err := u.db.QueryRowContext(ctx, query, id).Scan(
@@ -54,8 +50,7 @@ func (u *UserRepository) FindByID(ctx context.Context, id int64) (*entity.User, 
 		return nil, errors.New("user not found")
 	}
 
-	//Query 2: Get permissions separately
-	/*permQuery := `
+	permQuery := `
 	        SELECT r.id, r.name
 	        FROM roles r
 	        JOIN user_roles ur ON r.id = ur.role_id
@@ -75,7 +70,7 @@ func (u *UserRepository) FindByID(ctx context.Context, id int64) (*entity.User, 
 		roles = append(roles, role)
 	}
 
-	user.Role = roles[0]*/
+	user.Role = roles
 
 	return &user, nil
 }

@@ -62,6 +62,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
+	//TODO::
 	user, err := middlewares.User(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -72,20 +73,10 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	/*id := r.PathValue("id")
-	log.Println("get user id:", id)
-	if id == "" {
-		http.Error(w, "User ID is required", http.StatusBadRequest)
-		return
-	}
-	ctx := r.Context()
-	authService, err := grpc_clients.NewAuthServiceClient()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	//ctx := r.Context()
+
 	// Convert string ID to int64
-	userID, err := strconv.ParseInt(id, 10, 64)
+	/*userID, err := strconv.ParseInt(user.ID, 10, 64)
 	if err != nil {
 		http.Error(w, "Invalid user ID format", http.StatusBadRequest)
 		return
@@ -93,6 +84,11 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 	req := &authpb.GetUserRequest{
 		Id: userID,
+	}
+	authService, err := grpc_clients.NewAuthServiceClient()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	res, err := authService.Client.GetUser(ctx, req)
 
