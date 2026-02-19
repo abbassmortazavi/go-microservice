@@ -50,6 +50,7 @@ func (j *JWT) GenerateToken(userID int64, name string) (response.TokenResponse, 
 		ID:    user.ID,
 		Name:  user.Name,
 		Email: user.Email,
+		Role:  user.Role,
 	}
 	if err != nil {
 		return response.TokenResponse{}, err
@@ -58,22 +59,22 @@ func (j *JWT) GenerateToken(userID int64, name string) (response.TokenResponse, 
 		User:      userInfo,
 		Name:      name,
 		TokenType: "access",
-		RegisteredClaims: jwt.RegisteredClaims{
+		/*RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(accessExpiry),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			Issuer:    "auth-service",
-		},
+		},*/
 	}
 
 	refreshExpiryClaims := &Claims{
 		User:      userInfo,
 		Name:      name,
 		TokenType: "refresh",
-		RegisteredClaims: jwt.RegisteredClaims{
+		/*RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(refreshExpiry),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			Issuer:    "auth",
-		},
+		},*/
 	}
 
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
