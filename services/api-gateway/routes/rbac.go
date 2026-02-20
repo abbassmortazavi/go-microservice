@@ -14,4 +14,5 @@ func RBACRoutes(mux *mux.Router) {
 
 	protected.HandleFunc("/assign-permission-to-role", handlers.AssignPermissionToRole).Methods("POST")
 	protected.HandleFunc("/assign-role-to-user", handlers.AssignRoleToUser).Methods("POST")
+	protected.HandleFunc("/check-user-has-permission", handlers.CheckUserHasPermission).Methods("POST")
 }
