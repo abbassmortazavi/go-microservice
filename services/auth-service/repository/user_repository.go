@@ -18,7 +18,7 @@ func NewUserRepository(db *sql.DB) repository_interface.UserRepositoryInterface 
 	}
 }
 func (u *UserRepository) Create(ctx context.Context, user *entity.User) error {
-	query := `INSERT INTO users (name, email, password) VALUES ($1, $2, $3, $4)`
+	query := `INSERT INTO users (name, email, password) VALUES ($1, $2, $3)`
 	_, err := u.db.ExecContext(ctx, query, user.Name, user.Email, user.Password)
 	if err != nil {
 		return err
