@@ -55,3 +55,15 @@ func (r *RBACRepository) GetPermissionsByUserID(ctx context.Context, userID int6
 	}
 	return permissions, nil
 }
+func (r *RBACRepository) CheckUserHasRole(ctx context.Context, roleID, userID int64) (bool, error) {
+	q := "select * from user_roles where role_id = $1 and user_id = $2;"
+	row := r.db.QueryRow(q, roleID, userID)
+	err := row.Scan(&roleID, &userID)
+	if err != nil {
+		log.Println(555555)
+		return false, err
+	}
+
+	return true, nil
+
+}
