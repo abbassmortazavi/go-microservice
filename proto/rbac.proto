@@ -22,7 +22,7 @@ message AssignRoleToUserRequest{
 }
 
 message CheckUserPermissionRequest{
-  string permission = 1;
+  string permission_name = 1;
   int64 userID = 2;
 }
 
