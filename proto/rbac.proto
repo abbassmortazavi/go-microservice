@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package rbac;
 import "google/protobuf/empty.proto";
-import "google/protobuf/wrappers.proto";
+
 option go_package = "rbac;rbacpb";
 
 
@@ -28,6 +28,6 @@ message CheckUserRoleRequest{
 
 
 message CheckUserRoleResponse {
-  google.protobuf.BoolValue hasRole = 1;
+  bool hasRole = 1;
 }
 

@@ -6,7 +6,6 @@ import (
 	"context"
 
 	"google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 type RabcHandler struct {
@@ -37,11 +36,11 @@ func (r *RabcHandler) CheckUserRole(ctx context.Context, req *rbacpb.CheckUserRo
 	res, err := r.rbacService.CheckUserHasRole(ctx, req.GetRoleName(), req.GetUserID())
 	if err != nil {
 		return &rbacpb.CheckUserRoleResponse{
-			HasRole: wrapperspb.Bool(false),
+			HasRole: false,
 		}, err
 	}
 
 	return &rbacpb.CheckUserRoleResponse{
-		HasRole: wrapperspb.Bool(res),
+		HasRole: res,
 	}, nil
 }
