@@ -4,7 +4,6 @@ import (
 	"abbassmortazavi/go-microservice/pkg/utils"
 	"abbassmortazavi/go-microservice/services/api-gateway/grpc_clients"
 	"abbassmortazavi/go-microservice/services/api-gateway/requests/rbac"
-	"log"
 	"net/http"
 )
 
@@ -50,8 +49,6 @@ func AssignRoleToUser(w http.ResponseWriter, r *http.Request) {
 	utils.Success(w, http.StatusOK, res, "Role Has been Assigned To User Successfully!!")
 }
 
-var x = false
-
 func CheckUserHasRole(w http.ResponseWriter, r *http.Request) {
 	var req rbac.CheckUserHasRoleReq
 	if err := utils.ReadJson(w, r, &req); err != nil {
@@ -71,10 +68,8 @@ func CheckUserHasRole(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	hasRole := res.GetHasRole()
-	log.Println("hasRole", hasRole)
 	response := map[string]interface{}{
 		"hasRole": hasRole,
 	}
-	log.Println("response", response)
 	utils.Success(w, http.StatusOK, response, "User Has Permission Has been Checked Successfully!!")
 }
