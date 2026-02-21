@@ -48,8 +48,9 @@ func AssignRoleToUser(w http.ResponseWriter, r *http.Request) {
 	}
 	utils.Success(w, http.StatusOK, res, "Role Has been Assigned To User Successfully!!")
 }
-func CheckUserHasPermission(w http.ResponseWriter, r *http.Request) {
-	var req rbac.CheckUserHasPermissionReq
+
+func CheckUserHasRole(w http.ResponseWriter, r *http.Request) {
+	var req rbac.CheckUserHasRoleReq
 	if err := utils.ReadJson(w, r, &req); err != nil {
 		utils.BadRequest(w, "Validation request!!", err)
 		return
@@ -61,10 +62,14 @@ func CheckUserHasPermission(w http.ResponseWriter, r *http.Request) {
 		utils.InternalError(w, err)
 		return
 	}
-	res, err := authService.Rbac.CheckUserPermission(ctx, req.ToProto())
+	res, err := authService.Rbac.CheckUserRole(ctx, req.ToProto())
 	if err != nil {
 		utils.InternalError(w, err)
 		return
 	}
-	utils.Success(w, http.StatusOK, res, "User Has Permission Has been Checked Successfully!!")
+	hasRole := res.GetHasRole()
+	response := map[string]interface{}{
+		"hasRole": hasRole,
+	}
+	utils.Success(w, http.StatusOK, response, "User Has Permission Has been Checked Successfully!!")
 }

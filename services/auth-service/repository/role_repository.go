@@ -99,7 +99,7 @@ func (r *RoleRepository) FindById(ctx context.Context, roleId int64) (*entity.Ro
 		return &role, nil*/
 }
 func (r *RoleRepository) FindByName(ctx context.Context, name string) (*entity.Role, error) {
-	query := `SELECT * FROM roles WHERE name=$1`
+	query := `SELECT id,name FROM roles WHERE name=$1`
 	row := r.db.QueryRowContext(ctx, query, name)
 	var role entity.Role
 	if err := row.Scan(&role.ID, &role.Name); err != nil {

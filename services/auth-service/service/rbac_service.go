@@ -5,6 +5,7 @@ import (
 	"abbassmortazavi/go-microservice/services/auth-service/interfaces/repository_interface"
 	"context"
 	"errors"
+	"log"
 )
 
 type RBACService struct {
@@ -84,17 +85,24 @@ func (r *RBACService) AssignRoleToUser(ctx context.Context, roleID, userID int64
 	return r.rbacRepo.AssignRoleToUser(ctx, userID, roleID)
 }
 
-func (r *RBACService) CheckUserPermission(ctx context.Context, permission string, userID int64) (bool, error) {
-	permissions, err := r.rbacRepo.GetPermissionsByUserID(ctx, userID)
+func (r *RBACService) CheckUserHasRole(ctx context.Context, roleName string, userID int64) (bool, error) {
+	role, err := r.roleRepo.FindByName(ctx, roleName)
 	if err != nil {
+		log.Println(1)
+		return false, errors.New("role does not exist")
+	}
+	if role == nil {
+		log.Println(2)
+		return false, errors.New("role does not exist")
+	}
+
+	res, err := r.rbacRepo.CheckUserHasRole(ctx, int64(role.ID), userID)
+
+	if res == false {
 		return false, nil
 	}
-	for _, p := range permissions {
-		if p == permission {
-			return true, nil
-		}
-	}
-	return false, nil
+
+	return true, nil
 }
 
 func (r *RBACService) DeletePermission(ctx context.Context, permissionID int64) error {

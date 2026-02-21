@@ -32,3 +32,15 @@ func (r *RabcHandler) AssignRoleToUser(ctx context.Context, req *rbacpb.AssignRo
 	}
 	return nil, nil
 }
+func (r *RabcHandler) CheckUserRole(ctx context.Context, req *rbacpb.CheckUserRoleRequest) (*rbacpb.CheckUserRoleResponse, error) {
+	res, err := r.rbacService.CheckUserHasRole(ctx, req.GetRoleName(), req.GetUserID())
+	if err != nil {
+		return &rbacpb.CheckUserRoleResponse{
+			HasRole: false,
+		}, err
+	}
+
+	return &rbacpb.CheckUserRoleResponse{
+		HasRole: res,
+	}, nil
+}

@@ -21,7 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 type RBACServiceClient interface {
 	AssignPermissionToRole(ctx context.Context, in *AssignPermissionToRoleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	AssignRoleToUser(ctx context.Context, in *AssignRoleToUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	CheckUserPermission(ctx context.Context, in *CheckUserPermissionRequest, opts ...grpc.CallOption) (*CheckUserPermissionResponse, error)
+	CheckUserRole(ctx context.Context, in *CheckUserRoleRequest, opts ...grpc.CallOption) (*CheckUserRoleResponse, error)
 }
 
 type rBACServiceClient struct {
@@ -50,9 +50,9 @@ func (c *rBACServiceClient) AssignRoleToUser(ctx context.Context, in *AssignRole
 	return out, nil
 }
 
-func (c *rBACServiceClient) CheckUserPermission(ctx context.Context, in *CheckUserPermissionRequest, opts ...grpc.CallOption) (*CheckUserPermissionResponse, error) {
-	out := new(CheckUserPermissionResponse)
-	err := c.cc.Invoke(ctx, "/rbac.RBACService/CheckUserPermission", in, out, opts...)
+func (c *rBACServiceClient) CheckUserRole(ctx context.Context, in *CheckUserRoleRequest, opts ...grpc.CallOption) (*CheckUserRoleResponse, error) {
+	out := new(CheckUserRoleResponse)
+	err := c.cc.Invoke(ctx, "/rbac.RBACService/CheckUserRole", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (c *rBACServiceClient) CheckUserPermission(ctx context.Context, in *CheckUs
 type RBACServiceServer interface {
 	AssignPermissionToRole(context.Context, *AssignPermissionToRoleRequest) (*emptypb.Empty, error)
 	AssignRoleToUser(context.Context, *AssignRoleToUserRequest) (*emptypb.Empty, error)
-	CheckUserPermission(context.Context, *CheckUserPermissionRequest) (*CheckUserPermissionResponse, error)
+	CheckUserRole(context.Context, *CheckUserRoleRequest) (*CheckUserRoleResponse, error)
 	mustEmbedUnimplementedRBACServiceServer()
 }
 
@@ -79,8 +79,8 @@ func (UnimplementedRBACServiceServer) AssignPermissionToRole(context.Context, *A
 func (UnimplementedRBACServiceServer) AssignRoleToUser(context.Context, *AssignRoleToUserRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AssignRoleToUser not implemented")
 }
-func (UnimplementedRBACServiceServer) CheckUserPermission(context.Context, *CheckUserPermissionRequest) (*CheckUserPermissionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CheckUserPermission not implemented")
+func (UnimplementedRBACServiceServer) CheckUserRole(context.Context, *CheckUserRoleRequest) (*CheckUserRoleResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckUserRole not implemented")
 }
 func (UnimplementedRBACServiceServer) mustEmbedUnimplementedRBACServiceServer() {}
 
@@ -131,20 +131,20 @@ func _RBACService_AssignRoleToUser_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
-func _RBACService_CheckUserPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CheckUserPermissionRequest)
+func _RBACService_CheckUserRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckUserRoleRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RBACServiceServer).CheckUserPermission(ctx, in)
+		return srv.(RBACServiceServer).CheckUserRole(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/rbac.RBACService/CheckUserPermission",
+		FullMethod: "/rbac.RBACService/CheckUserRole",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RBACServiceServer).CheckUserPermission(ctx, req.(*CheckUserPermissionRequest))
+		return srv.(RBACServiceServer).CheckUserRole(ctx, req.(*CheckUserRoleRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -165,8 +165,8 @@ var RBACService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _RBACService_AssignRoleToUser_Handler,
 		},
 		{
-			MethodName: "CheckUserPermission",
-			Handler:    _RBACService_CheckUserPermission_Handler,
+			MethodName: "CheckUserRole",
+			Handler:    _RBACService_CheckUserRole_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
