@@ -7,3 +7,7 @@ import (
 func Init(tokenService service.TokenServiceInterface, authService service.AuthServiceInterface) {
 	globalMiddleware = NewAuthMiddleware(tokenService, authService)
 }
+
+func InitAnyRoleMiddleware(authService service.AuthServiceInterface) {
+	anyRoleMiddleware = NewAnyRoleMiddleware(authService)
+}

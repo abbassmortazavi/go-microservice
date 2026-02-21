@@ -16,6 +16,7 @@ type AuthServiceInterface interface {
 	Register(ctx context.Context, email, password, name string) error
 	Login(ctx context.Context, email, password string) (*response.LoginResponse, error)
 	GetUser(ctx context.Context, id int64) (*entity.User, error)
+	CheckUseHasRole(ctx context.Context, userID int64, requiredRoles []string) (bool, error)
 }
 
 type AuthService struct {
@@ -95,4 +96,24 @@ func (a *AuthService) GetUser(ctx context.Context, id int64) (*entity.User, erro
 		CreatedAt: user.CreatedAt,
 	}*/
 	return user, nil
+}
+
+func (a *AuthService) CheckUseHasRole(ctx context.Context, userID int64, requiredRoles []string) (bool, error) {
+	user, err := a.userRepo.FindByID(ctx, userID)
+	if err != nil {
+		return false, nil
+	}
+	if user.ID != userID {
+		return false, nil
+	}
+	userRoles := make(map[string]bool)
+	for _, role := range user.Role {
+		userRoles[role.Name] = true
+	}
+	for _, role := range requiredRoles {
+		if !userRoles[role] {
+			return false, nil
+		}
+	}
+	return true, nil
 }

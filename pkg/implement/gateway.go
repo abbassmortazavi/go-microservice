@@ -23,4 +23,5 @@ func Implement() {
 	tokenService := service.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo, userRepo)
 	authService := service.NewAuthService(userRepo, hasher, tokenService, publisher)
 	middlewares.Init(tokenService, authService)
+	middlewares.InitAnyRoleMiddleware(authService)
 }
