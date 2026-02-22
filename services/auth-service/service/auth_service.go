@@ -17,6 +17,7 @@ type AuthServiceInterface interface {
 	Login(ctx context.Context, email, password string) (*response.LoginResponse, error)
 	GetUser(ctx context.Context, id int64) (*entity.User, error)
 	CheckUseHasRole(ctx context.Context, userID int64, requiredRoles []string) (bool, error)
+	CheckSingleRole(ctx context.Context, userID int64, roleName string) (bool, error)
 }
 
 type AuthService struct {
@@ -116,4 +117,19 @@ func (a *AuthService) CheckUseHasRole(ctx context.Context, userID int64, require
 		}
 	}
 	return true, nil
+}
+func (a *AuthService) CheckSingleRole(ctx context.Context, userID int64, roleName string) (bool, error) {
+	user, err := a.userRepo.FindByID(ctx, userID)
+	if err != nil {
+		return false, nil
+	}
+	if user.ID != userID {
+		return false, nil
+	}
+	for _, role := range user.Role {
+		if role.Name == roleName {
+			return true, nil
+		}
+	}
+	return false, nil
 }

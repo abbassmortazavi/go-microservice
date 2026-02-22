@@ -14,8 +14,8 @@ func PermissionRoutes(mux *mux.Router) {
 	protected.Use(authMiddleware.AuthMiddleware)
 
 	protected.HandleFunc("/create", handlers.CreatePermission).Methods("POST")
-	protected.HandleFunc("/{id}", anyRoleMiddleware.RequireAnyRole([]string{"admin", "superadmin"})(handlers.DeletePermission)).Methods("DELETE")
-	protected.HandleFunc("/lists", handlers.ListPermissions).Methods("GET")
+	protected.HandleFunc("/{id}", anyRoleMiddleware.RequireAnyRole([]string{"admin", "author"})(handlers.DeletePermission)).Methods("DELETE")
+	protected.HandleFunc("/lists", anyRoleMiddleware.RequireAnyRole([]string{"admin", "author"})(handlers.ListPermissions)).Methods("GET")
 	protected.HandleFunc("/{id}", handlers.GetPermission).Methods("GET")
 
 }
