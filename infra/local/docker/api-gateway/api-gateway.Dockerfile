@@ -4,9 +4,9 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /app
 
+COPY build/api-gateway .
 
-COPY build/auth-service /app/
 
-EXPOSE 9092
+EXPOSE 8085
 
-CMD ["./auth-service"]
+CMD ["./api-gateway"]

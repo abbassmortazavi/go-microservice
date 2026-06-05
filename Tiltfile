@@ -14,8 +14,8 @@ k8s_yaml('./infra/development/k8s/configs/app-config.yaml')
 ### End k8s Config ###
 
 ### RabbitMQ ###
-k8s_yaml('./infra/development/k8s/rabbitmq-service/rabbitmq-deployment.yaml')
-k8s_yaml('./infra/development/k8s/rabbitmq-service/rabbitmq-service.yaml')
+k8s_yaml('./infra/local/k8s/rabbitmq-service/deployment.yaml')
+k8s_yaml('./infra/local/k8s/rabbitmq-service/service.yaml')
 k8s_resource('rabbitmq',
              port_forwards=[5672, 15672],
              labels=['tooling', 'infra'],
@@ -23,9 +23,9 @@ k8s_resource('rabbitmq',
 ### End RabbitMQ ###
 
 ### PostgresDB ###
-k8s_yaml('./infra/development/k8s/postgres-service/postgres-pvc.yaml')
-k8s_yaml('./infra/development/k8s/postgres-service/postgres-deployment.yaml')
-k8s_yaml('./infra/development/k8s/postgres-service/postgres-service.yaml')
+k8s_yaml('./infra/local/k8s/postgres-service/pvc.yaml')
+k8s_yaml('./infra/local/k8s/postgres-service/deployment.yaml')
+k8s_yaml('./infra/local/k8s/postgres-service/service.yaml')
 k8s_resource('postgres',
              port_forwards=[5432],
              labels=['databases', 'infra'],
@@ -48,7 +48,7 @@ local_resource(
 docker_build(
     'microservice/api-gateway:dev',
     '.',
-    dockerfile='./infra/development/docker/api-gateway/api-gateway.Dockerfile',
+    dockerfile='./infra/local/docker/api-gateway/api-gateway.Dockerfile',
     only=[
         './services/api-gateway',
         './build/api-gateway',
@@ -62,8 +62,8 @@ docker_build(
 )
 
 # کانفیگ Kubernetes مخصوص development
-k8s_yaml('./infra/development/k8s/api-gateway/api-gateway-deployment.yaml')
-k8s_yaml('./infra/development/k8s/api-gateway/api-gateway-service.yaml')
+k8s_yaml('./infra/local/k8s/api-gateway/deployment.yaml')
+k8s_yaml('./infra/local/k8s/api-gateway/service.yaml')
 
 k8s_resource('api-gateway',
              port_forwards=[8085],
@@ -101,8 +101,8 @@ docker_build(
 )
 
 # کانفیگ Kubernetes مخصوص development
-k8s_yaml('./infra/development/k8s/auth-service/auth-service-deployment.yaml')
-k8s_yaml('./infra/development/k8s/auth-service/auth-service.yaml')
+k8s_yaml('./infra/local/k8s/auth-service/deployment.yaml')
+k8s_yaml('./infra/local/k8s/auth-service/service.yaml')
 
 k8s_resource('auth-service',
              port_forwards=[9092],
