@@ -11,9 +11,9 @@ namespace: development
 
   # Services
 
+#- configs/secrets.yaml
 resources:
 - configs/app-config.yaml
-#- configs/secrets.yaml
 - postgres-service/postgres-deployment.yaml
 - postgres-service/postgres-service.yaml
 - rabbitmq-service/rabbitmq-deployment.yaml
@@ -31,9 +31,9 @@ resources:
 
 images:
 - name: api-gateway
-  newTag: cb65aea821979bfb1ac0e4ef0ce7537f9cf038a8
+  newTag: fb2bc290a49ef92858ef159ea12c3bbbeecd3d05
 - name: auth-service
-  newTag: cb65aea821979bfb1ac0e4ef0ce7537f9cf038a8
+  newTag: fb2bc290a49ef92858ef159ea12c3bbbeecd3d05
 - name: postgres
   newName: postgres
   newTag: 15-alpine
