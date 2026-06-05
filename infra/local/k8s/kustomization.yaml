@@ -1,7 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: development
+namespace: local
 
   # ConfigMaps - Secrets
 
@@ -25,9 +25,9 @@ resources:
 
 labels:
 - pairs:
-    env: development
+    env: local
 images:
 - name: api-gateway
-  newTag: 94da3ab2a1cebfa4056e493d1f8e315e1ed0349c
+  newTag: 138c894c3820b63cec37884da734837e7c14cc1b
 - name: auth-service
-  newTag: 94da3ab2a1cebfa4056e493d1f8e315e1ed0349c
+  newTag: 138c894c3820b63cec37884da734837e7c14cc1b
