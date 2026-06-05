@@ -2,7 +2,7 @@ syntax = "proto3";
 package role;
 import "google/protobuf/empty.proto";
 
-option go_package = "role;rolepb";
+option go_package = "abbassmortazavi/go-microservice/role;rolepb";
 
 service RoleService {
   rpc Create(CreateRoleRequest) returns (CreateRoleResponse);

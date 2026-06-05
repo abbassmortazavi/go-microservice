@@ -1,7 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: Development
+namespace: development
 
   # ConfigMaps - Secrets
 
@@ -13,7 +13,7 @@ namespace: Development
 
 resources:
 - configs/app-config.yaml
-- configs/secrets.yaml
+#- configs/secrets.yaml
 - postgres-service/postgres-deployment.yaml
 - postgres-service/postgres-service.yaml
 - rabbitmq-service/rabbitmq-deployment.yaml

@@ -2,7 +2,7 @@ syntax = "proto3";
 package permission;
 import "google/protobuf/empty.proto";
 
-option go_package = "permission;permissionpb";
+option go_package = "abbassmortazavi/go-microservice/permission;permissionpb";
 
 service PermissionService {
   rpc Create(CreatePermissionRequest) returns (CreatePermissionResponse);

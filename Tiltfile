@@ -10,7 +10,7 @@ allow_k8s_contexts(['docker-desktop', 'minikube', 'docker-for-desktop'])
 
 ### k8s Config ###
 k8s_yaml('./infra/development/k8s/configs/app-config.yaml')
-k8s_yaml('./infra/development/k8s/configs/secrets.yaml')
+#k8s_yaml('./infra/development/k8s/configs/secrets.yaml')
 ### End k8s Config ###
 
 ### RabbitMQ ###

@@ -3,7 +3,7 @@ syntax = "proto3";
 package rbac;
 import "google/protobuf/empty.proto";
 
-option go_package = "rbac;rbacpb";
+option go_package = "abbassmortazavi/go-microservice/rbac;rbacpb";
 
 
 service RBACService {
