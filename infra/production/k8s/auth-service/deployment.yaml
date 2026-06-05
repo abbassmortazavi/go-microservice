@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: auth-service
-  namespace: production
 spec:
   replicas: 1
   selector:
@@ -15,8 +14,9 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: microservice/auth-service:dev
-          imagePullPolicy: IfNotPresent
+          image: abbass69/auth-service:dev
+          imagePullPolicy: Always
+#          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9092
           env:

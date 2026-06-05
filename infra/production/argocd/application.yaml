@@ -9,7 +9,7 @@ spec:
   source:
     repoURL: https://github.com/abbassmortazavi/go-microservice.git
     targetRevision: main
-    path: infra/production/k8s  # ✅ مسیر جدید
+    path: infra/production/k8s
   destination:
     server: https://kubernetes.default.svc
     namespace: production

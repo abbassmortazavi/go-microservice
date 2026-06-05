@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api-gateway
-  namespace: production
 spec:
   replicas: 1
   selector:
@@ -15,8 +14,8 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: microservice/api-gateway:dev
-          imagePullPolicy: IfNotPresent
+          image: abbass69/api-gateway:dev
+          imagePullPolicy: Always
           ports:
             - containerPort: 8085
           env:
