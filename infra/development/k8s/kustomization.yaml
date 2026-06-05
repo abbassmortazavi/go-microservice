@@ -28,6 +28,6 @@ labels:
     env: development
 images:
 - name: api-gateway
-  newTag: f067270045dea08507c7b4012a973df9d26dfe2b
+  newTag: 94da3ab2a1cebfa4056e493d1f8e315e1ed0349c
 - name: auth-service
-  newTag: f067270045dea08507c7b4012a973df9d26dfe2b
+  newTag: 94da3ab2a1cebfa4056e493d1f8e315e1ed0349c
