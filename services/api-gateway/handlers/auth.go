@@ -104,3 +104,13 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	}*/
 
 }
+
+func GetData(w http.ResponseWriter, r *http.Request) {
+	data := make(map[string]interface{})
+	data["message"] = "hello world"
+	data["status"] = true
+	err := utils.WriteJson(w, http.StatusOK, data)
+	if err != nil {
+		return
+	}
+}

@@ -16,6 +16,7 @@ func SetupRoutes(router *mux.Router) {
 	})
 	public.HandleFunc("/register", handlers.Register).Methods("POST")
 	public.HandleFunc("/login", handlers.Login).Methods("POST")
+	public.HandleFunc("/data", handlers.GetData).Methods("GET")
 
 	// Register all service routes
 	PermissionRoutes(router)
