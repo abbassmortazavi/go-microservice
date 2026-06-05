@@ -68,7 +68,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: infra/development/docker/auth-service/auth-service.Dockerfile
+          file: infra/development/docker/auth-service/auth-service-1.Dockerfile
           push: true
           tags: |
             ${{ env.DOCKER_HUB_ORG }}/auth-service:${{ inputs.environment == 'production' && 'latest' || 'dev' }}
