@@ -13,17 +13,21 @@ namespace: development
 
 #- configs/secrets.yaml
 resources:
-  - api-gateway/deployment.yaml
-  - api-gateway/service.yaml
-  - auth-service/deployment.yaml
-  - auth-service/service.yaml
-  - postgres-service/deployment.yaml
-  - postgres-service/service.yaml
-  - postgres-service/pvc.yaml
-  - rabbitmq-service/deployment.yaml
-  - rabbitmq-service/service.yaml
+- api-gateway/deployment.yaml
+- api-gateway/service.yaml
+- auth-service/deployment.yaml
+- auth-service/service.yaml
+- postgres-service/deployment.yaml
+- postgres-service/service.yaml
+- postgres-service/pvc.yaml
+- rabbitmq-service/deployment.yaml
+- rabbitmq-service/service.yaml
 
 labels:
-  - pairs:
-      env: development
-    includeSelectors: false
+- pairs:
+    env: development
+images:
+- name: api-gateway
+  newTag: 98c3d2cb8ecc4cf4cc6107551538c14e8150505f
+- name: auth-service
+  newTag: 98c3d2cb8ecc4cf4cc6107551538c14e8150505f
