@@ -28,6 +28,6 @@ labels:
     env: production
 images:
 - name: api-gateway
-  newTag: 0e1719e6e1602d582f12db147db7b3ed9731244f
+  newTag: 711945025273f8849e6cafdded9535e48d969f1e
 - name: auth-service
-  newTag: 0e1719e6e1602d582f12db147db7b3ed9731244f
+  newTag: 711945025273f8849e6cafdded9535e48d969f1e
