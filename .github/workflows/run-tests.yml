@@ -2,11 +2,8 @@ name: Run Tests
 
 on:
   workflow_call:
-    inputs:
-      environment:
-        required: true  # ✅ اینجا required: true است
-        type: string
-        default: 'production'
+  pull_request:
+    branches: [develop, main]
 
 jobs:
   unit-tests:

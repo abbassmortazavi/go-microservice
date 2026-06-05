@@ -2,17 +2,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: development
+  name: production
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: https://github.com/abbassmortazavi/go-microservice.git
-    targetRevision: develop
-    path: infra/development/k8s  # ✅ مسیر جدید
+    targetRevision: main
+    path: infra/production/k8s  # ✅ مسیر جدید
   destination:
     server: https://kubernetes.default.svc
-    namespace: development
+    namespace: production
   syncPolicy:
     automated:
       prune: true

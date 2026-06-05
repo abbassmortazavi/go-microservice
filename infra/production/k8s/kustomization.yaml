@@ -13,6 +13,15 @@ namespace: development
 
 #- configs/secrets.yaml
 resources:
+#- configs/app-config.yaml
+#- postgres-service/deployment.yaml
+#- postgres-service/service.yaml
+#- rabbitmq-service/deployment.yaml
+#- rabbitmq-service/service.yaml
+#- api-gateway/deployment.yaml
+#- api-gateway/service.yaml
+#- auth-service/deployment.yaml
+#- auth-service/service.yaml
   - api-gateway/deployment.yaml
   - api-gateway/service.yaml
   - auth-service/deployment.yaml
