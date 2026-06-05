@@ -9,9 +9,14 @@ import (
 	"abbassmortazavi/go-microservice/services/auth-service/security"
 	"context"
 	"errors"
-	"log"
 	"strconv"
 )
+
+type AuthServiceInterface interface {
+	Register(ctx context.Context, email, password, name string) error
+	Login(ctx context.Context, email, password string) (*response.LoginResponse, error)
+	GetUser(ctx context.Context, id int64) (*entity.User, error)
+}
 
 type AuthService struct {
 	userRepo     repository_interface.UserRepositoryInterface
@@ -29,7 +34,6 @@ func NewAuthService(repo repository_interface.UserRepositoryInterface, hasher se
 	}
 }
 func (a *AuthService) Register(ctx context.Context, email, password, name string) error {
-	log.Println("auth service")
 	hashed, err := a.hasher.Hash(password)
 	if err != nil {
 		return err
@@ -38,7 +42,6 @@ func (a *AuthService) Register(ctx context.Context, email, password, name string
 		Email:    email,
 		Password: hashed,
 		Name:     name,
-		Role:     "user",
 	}
 	err = a.userRepo.Create(ctx, &user)
 	if err != nil {
@@ -49,7 +52,6 @@ func (a *AuthService) Register(ctx context.Context, email, password, name string
 	event := eventpb.UserRegistered{
 		UserId: strconv.FormatInt(user.ID, 10),
 		Email:  user.Email,
-		Role:   user.Role,
 	}
 
 	return a.publisher.Publish(ctx, "user_registered", event)
@@ -62,7 +64,7 @@ func (a *AuthService) Login(ctx context.Context, email, password string) (*respo
 	if err := a.hasher.Compare(user.Password, password); err == false {
 		return nil, errors.New("password is wrong")
 	}
-	tokens, err := a.TokenService.GenerateToken(int(user.ID), user.Name)
+	tokens, err := a.TokenService.GenerateToken(user.ID, user.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +73,6 @@ func (a *AuthService) Login(ctx context.Context, email, password string) (*respo
 		ID:        user.ID,
 		Name:      user.Name,
 		Email:     user.Email,
-		Role:      user.Role,
 		CreatedAt: user.CreatedAt,
 	}
 
@@ -82,6 +83,7 @@ func (a *AuthService) Login(ctx context.Context, email, password string) (*respo
 }
 func (a *AuthService) GetUser(ctx context.Context, id int64) (*entity.User, error) {
 	user, err := a.userRepo.FindByID(ctx, id)
+
 	if err != nil {
 		return nil, err
 	}

@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 type successResponse struct {
@@ -115,4 +118,12 @@ func writeJson(w http.ResponseWriter, status int, data any) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
 	return json.NewEncoder(w).Encode(data)
+}
+
+func GetPathParamInt(r *http.Request, key string) (int, error) {
+	vars := mux.Vars(r)
+	value := vars[key]
+	// Parse as integer
+	// Use strconv.Atoi or your preferred method
+	return strconv.Atoi(value)
 }

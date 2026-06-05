@@ -10,7 +10,7 @@ allow_k8s_contexts(['docker-desktop', 'minikube', 'docker-for-desktop'])
 
 ### k8s Config ###
 k8s_yaml('./infra/development/k8s/configs/app-config.yaml')
-k8s_yaml('./infra/development/k8s/configs/secrets.yaml')
+#k8s_yaml('./infra/development/k8s/configs/secrets.yaml')
 ### End k8s Config ###
 
 ### RabbitMQ ###
@@ -66,7 +66,7 @@ k8s_yaml('./infra/development/k8s/api-gateway/api-gateway-deployment.yaml')
 k8s_yaml('./infra/development/k8s/api-gateway/api-gateway-service.yaml')
 
 k8s_resource('api-gateway',
-             port_forwards=[8081],
+             port_forwards=[8085],
              labels=['services', 'gateway'],
              extra_pod_selectors=[{'app': 'api-gateway'}])
 ### End of API Gateway ###

@@ -1,0 +1,29 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: production
+
+  # ConfigMaps - Secrets
+
+  # Databases
+
+  # Message Queue
+
+  # Services
+
+#- configs/secrets.yaml
+resources:
+  - api-gateway/deployment.yaml
+  - api-gateway/service.yaml
+  - auth-service/deployment.yaml
+  - auth-service/service.yaml
+  - postgres-service/deployment.yaml
+  - postgres-service/service.yaml
+  - postgres-service/pvc.yaml
+  - rabbitmq-service/deployment.yaml
+  - rabbitmq-service/service.yaml
+
+labels:
+  - pairs:
+      env: production
+    includeSelectors: false

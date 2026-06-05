@@ -1,13 +1,9 @@
 package main
 
 import (
-	global "abbassmortazavi/go-microservice/pkg/config"
-	"abbassmortazavi/go-microservice/pkg/database"
 	"abbassmortazavi/go-microservice/pkg/env"
-	"abbassmortazavi/go-microservice/services/auth-service/pkg/middlewares"
-	"abbassmortazavi/go-microservice/services/auth-service/repository"
-	"abbassmortazavi/go-microservice/services/auth-service/service"
-
+	"abbassmortazavi/go-microservice/pkg/implement"
+	"abbassmortazavi/go-microservice/services/api-gateway/routes"
 	"context"
 	"log"
 	"net/http"
@@ -15,35 +11,24 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 var (
-	httpAddr = env.GetString("GATEWAY_HTTP_ADDR", ":8081")
+	httpAddr = env.GetString("GATEWAY_HTTP_ADDR", ":8085")
 )
 
 func main() {
 	log.Println("Starting API Gateway")
-	gcfg := global.Load()
-	database.Connect()
 
-	tokenRepo := repository.NewTokenRepository(database.DB)
-	tokenService := service.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo)
-	middlewares.Init(tokenService)
-	authMiddleware := middlewares.GetMiddleware()
-
-	mux := http.NewServeMux()
-	mux.HandleFunc("POST /test-url", func(w http.ResponseWriter, r *http.Request) {
-		log.Println("everything work perfectly!!!!!")
-	})
-
-	mux.Handle("POST /register", http.HandlerFunc(handelRegister))
-	mux.Handle("POST /login", http.HandlerFunc(handelLogin))
-
-	mux.Handle("GET /user/{id}", authMiddleware.AuthMiddleware(http.HandlerFunc(handelGetUser)))
+	implement.Implement()
+	router := mux.NewRouter()
+	routes.SetupRoutes(router)
 
 	server := &http.Server{
 		Addr:    httpAddr,
-		Handler: mux,
+		Handler: router,
 	}
 	serverErrors := make(chan error, 1)
 	go func() {

@@ -1,7 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: Development
+namespace: development
 
   # ConfigMaps - Secrets
 
@@ -11,38 +11,23 @@ namespace: Development
 
   # Services
 
+#- configs/secrets.yaml
 resources:
-- configs/app-config.yaml
-- configs/secrets.yaml
-- postgres-service/postgres-deployment.yaml
-- postgres-service/postgres-service.yaml
-- rabbitmq-service/rabbitmq-deployment.yaml
-- rabbitmq-service/rabbitmq-service.yaml
-- api-gateway/api-gateway-deployment.yaml
-- api-gateway/api-gateway-service.yaml
-- auth-service/auth-service-deployment.yaml
-- auth-service/auth-service.yaml
+- api-gateway/deployment.yaml
+- api-gateway/service.yaml
+- auth-service/deployment.yaml
+- auth-service/service.yaml
+- postgres-service/deployment.yaml
+- postgres-service/service.yaml
+- postgres-service/pvc.yaml
+- rabbitmq-service/deployment.yaml
+- rabbitmq-service/service.yaml
 
-
-
-# Image transformers
-
-
-
+labels:
+- pairs:
+    env: development
 images:
 - name: api-gateway
-  newTag: a6903426aae3acc559ea22d0c4bea3c951fd4d3c
+  newTag: 138c894c3820b63cec37884da734837e7c14cc1b
 - name: auth-service
-  newTag: a6903426aae3acc559ea22d0c4bea3c951fd4d3c
-- name: postgres
-  newName: postgres
-  newTag: 15-alpine
-- name: rabbitmq
-  newName: rabbitmq
-  newTag: 3-management-alpine
-
-# Common labels
-commonLabels:
-  app.kubernetes.io/environment: development
-  app.kubernetes.io/managed-by: argocd
-  app.kubernetes.io/part-of: microservice
+  newTag: 138c894c3820b63cec37884da734837e7c14cc1b

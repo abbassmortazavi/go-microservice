@@ -6,63 +6,75 @@ import (
 	"abbassmortazavi/go-microservice/services/auth-service/pkg/response"
 	"context"
 	"errors"
-	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
 type TokenServiceInterface interface {
-	GenerateToken(userID int, name string) (response.TokenResponse, error)
+	GenerateToken(userID int64, name string) (response.TokenResponse, error)
 	RefreshAccessToken(refreshToken string) (response.TokenResponse, error)
 	ValidateToken(token string) (*Claims, error)
 }
 
 var JwtAuthenticator *JWT
 
-func NewJwtAuthenticator(j string, repo repository_interface.TokenRepositoryInterface) *JWT {
+func NewJwtAuthenticator(j string, repo repository_interface.TokenRepositoryInterface, userRepo repository_interface.UserRepositoryInterface) *JWT {
 	JwtAuthenticator = &JWT{
 		SigningKey:      []byte(j),
 		TokenRepository: repo,
+		UserRepository:  userRepo,
 	}
 	return JwtAuthenticator
 }
 
 type Claims struct {
-	UserID    int    `json:"user_id"`
-	Name      string `json:"name"`
-	TokenType string `json:"token_type"`
+	User      entity.User `json:"user"`
+	Name      string      `json:"name"`
+	TokenType string      `json:"token_type"`
 	jwt.RegisteredClaims
 }
 
 type JWT struct {
 	SigningKey      []byte
 	TokenRepository repository_interface.TokenRepositoryInterface
+	UserRepository  repository_interface.UserRepositoryInterface
 }
 
-func (j *JWT) GenerateToken(userID int, name string) (response.TokenResponse, error) {
-	accessExpiry := time.Now().Add(time.Minute * 5)
-	refreshExpiry := time.Now().Add(time.Minute * 10)
+func (j *JWT) GenerateToken(userID int64, name string) (response.TokenResponse, error) {
+	accessExpiry := time.Now().Add(time.Minute * 20)
+	refreshExpiry := time.Now().Add(time.Minute * 30)
+	ctx := context.Background()
+	user, err := j.FindByUserId(ctx, userID)
+	userInfo := entity.User{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+		Role:  user.Role,
+	}
+	if err != nil {
+		return response.TokenResponse{}, err
+	}
 	claims := Claims{
-		UserID:    userID,
+		User:      userInfo,
 		Name:      name,
 		TokenType: "access",
-		RegisteredClaims: jwt.RegisteredClaims{
+		/*RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(accessExpiry),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			Issuer:    "auth-service",
-		},
+		},*/
 	}
 
 	refreshExpiryClaims := &Claims{
-		UserID:    userID,
+		User:      userInfo,
 		Name:      name,
 		TokenType: "refresh",
-		RegisteredClaims: jwt.RegisteredClaims{
+		/*RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(refreshExpiry),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			Issuer:    "auth",
-		},
+		},*/
 	}
 
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -76,17 +88,14 @@ func (j *JWT) GenerateToken(userID int, name string) (response.TokenResponse, er
 		return response.TokenResponse{}, err
 	}
 
-	ctx := context.Background()
 	res, err := j.TokenRepository.FindByUserId(ctx, userID)
 	if err != nil {
-		log.Println(err)
 		return response.TokenResponse{}, err
 	}
 	if res != nil {
 		//delete all current user tokens
 		err := j.TokenRepository.RevokeAllUserTokens(ctx, userID)
 		if err != nil {
-			log.Println(err)
 			return response.TokenResponse{}, err
 		}
 	}
@@ -100,7 +109,6 @@ func (j *JWT) GenerateToken(userID int, name string) (response.TokenResponse, er
 	}
 	err = j.TokenRepository.Create(ctx, &reqAccessToken)
 	if err != nil {
-		log.Println(err)
 		return response.TokenResponse{}, err
 	}
 	reqRefreshToken := entity.Token{
@@ -112,7 +120,6 @@ func (j *JWT) GenerateToken(userID int, name string) (response.TokenResponse, er
 	}
 	err = j.TokenRepository.Create(ctx, &reqRefreshToken)
 	if err != nil {
-		log.Println(err)
 		return response.TokenResponse{}, err
 	}
 
@@ -131,17 +138,15 @@ func (j *JWT) RefreshAccessToken(refreshToken string) (response.TokenResponse, e
 	if claims.TokenType != "refresh" {
 		return response.TokenResponse{}, errors.New("invalid token")
 	}
-	return j.GenerateToken(claims.UserID, claims.Name)
+	return j.GenerateToken(claims.User.ID, claims.Name)
 }
 
 func (j *JWT) ValidateToken(token string) (*Claims, error) {
-	log.Println("ValidateToken", token)
 	claims := &Claims{}
 	tkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		return j.SigningKey, nil
 	})
 	if err != nil {
-		log.Println(err.Error())
 		return nil, err
 	}
 	if !tkn.Valid {
@@ -150,7 +155,6 @@ func (j *JWT) ValidateToken(token string) (*Claims, error) {
 
 	//check in database
 	res, err := j.TokenRepository.FindByToken(context.Background(), token)
-	log.Println("response=======>", res)
 	if err != nil {
 		return nil, err
 	}
@@ -159,4 +163,12 @@ func (j *JWT) ValidateToken(token string) (*Claims, error) {
 	}
 
 	return claims, nil
+}
+
+func (j *JWT) FindByUserId(ctx context.Context, userId int64) (*entity.User, error) {
+	user, err := j.UserRepository.FindByID(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }

@@ -3,35 +3,24 @@ name: Run Tests
 on:
   workflow_call:
     inputs:
-      environment:
-        required: true  # ✅ اینجا required: true است
+      environment:        # ← اضافه کن
+        required: false
         type: string
-        default: 'production'
+        default: 'development'
+  pull_request:
+    branches: [develop, main]
 
 jobs:
-  unit-tests:
-    name: Run Unit Tests
+  test:
+    name: Run Tests
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}  # ✅ استفاده از input
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.25'
 
-      - name: Run simple tests
-        run: |
-          echo "🧪 Running tests for environment: ${{ inputs.environment }}"
-          
-          # فقط چک می‌کنیم پروژه build می‌شود
-          echo "🔨 Checking if project builds..."
-          if go build ./...; then
-            echo "✅ Build successful!"
-          else
-            echo "❌ Build failed!"
-            exit 1
-          fi
+      - name: Run tests
+        run: go test ./...

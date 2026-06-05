@@ -1,17 +1,7 @@
 package main
 
 import (
-	global "abbassmortazavi/go-microservice/pkg/config"
-	"abbassmortazavi/go-microservice/pkg/database"
-	"abbassmortazavi/go-microservice/pkg/env"
-	authpb "abbassmortazavi/go-microservice/pkg/proto/auth"
-	"abbassmortazavi/go-microservice/services/auth-service/config"
-	"abbassmortazavi/go-microservice/services/auth-service/grpc"
-	messaging2 "abbassmortazavi/go-microservice/services/auth-service/messaging"
-	"abbassmortazavi/go-microservice/services/auth-service/pkg/middlewares"
-	"abbassmortazavi/go-microservice/services/auth-service/repository"
-	"abbassmortazavi/go-microservice/services/auth-service/security"
-	service2 "abbassmortazavi/go-microservice/services/auth-service/service"
+	"abbassmortazavi/go-microservice/services/auth-service/pkg/implement"
 	"context"
 	"log"
 	"net"
@@ -20,18 +10,13 @@ import (
 	"syscall"
 
 	_ "github.com/lib/pq"
-	grpc2 "google.golang.org/grpc"
 )
 
 func main() {
 	log.Println("Starting service Auth Service...")
-	rabbitmqURL := env.GetString("RABBITMQ_URL", "amqp://guest:guest@rabbitmq:5672/")
-	gcfg := global.Load()
-	cfg := config.Load()
-
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-
+	implement.Init()
 	// Setup signal handling
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
@@ -40,41 +25,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	database.Connect()
 
-	userRepo := repository.NewUserRepository(database.DB)
-	tokenRepo := repository.NewTokenRepository(database.DB)
-
-	hasher := security.NewBcryptHasher()
-	//tokenService := service.NewJWTSecret([]byte(gcfg.JWT_SECRET))
-	tokenService := service2.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo)
-	middlewares.Init(tokenService)
-
-	// ---- RabbitMQ ----
-	conn, ch := messaging2.NewRabbitMQ(rabbitmqURL)
-	defer conn.Close()
-	defer ch.Close()
-
-	err = ch.ExchangeDeclare(
-		cfg.UserExchange,
-		"topic",
-		true,
-		false,
-		false,
-		false,
-		nil,
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-	publisher := messaging2.NewPublisher(ch, cfg.UserExchange)
-
-	authService := service2.NewAuthService(userRepo, hasher, tokenService, publisher)
-
-	authHandler := grpc.NewAuthHandler(authService)
-
-	server := grpc2.NewServer()
-	authpb.RegisterAuthServiceServer(server, authHandler)
+	server := implement.GetServer()
 
 	// Run server in a goroutine
 	serverErr := make(chan error, 1)

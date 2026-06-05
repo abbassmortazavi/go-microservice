@@ -1,57 +1,53 @@
 name: Deploy to Kubernetes
 
-# ✅ اضافه کردن workflow_call برای reusable بودن
 on:
   workflow_call:
     inputs:
       environment:
         required: true
         type: string
-        default: "production"
-      cluster:
-        required: false
-        type: string
-        default: "default"
-
-# ❌ حذف triggers دیگر اگر دارید
-# on:
-#   workflow_dispatch:
-#   push:
 
 jobs:
   deploy:
     name: Deploy to ${{ inputs.environment }}
     runs-on: ubuntu-latest
-
-    # ✅ استفاده از environment variable اگر تنظیم شده
     environment:
       name: ${{ inputs.environment }}
       url: ${{ vars.DEPLOYMENT_URL || '' }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          # pull latest commit که kustomize update کرده
+          fetch-depth: 0
 
       - name: Setup kubectl
         uses: azure/setup-kubectl@v3
 
-      - name: Display deployment info
+      - name: Configure kubeconfig
         run: |
-          echo "🚀 Starting deployment..."
-          echo "Environment: ${{ inputs.environment }}"
-          echo "Cluster: ${{ inputs.cluster }}"
-          echo "Commit SHA: ${{ github.sha }}"
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
 
-      - name: Mock deployment (برای تست)
+      - name: Set namespace
         run: |
-          echo "🧪 Mock deployment for ${{ inputs.environment }}"
-          
           if [ "${{ inputs.environment }}" = "development" ]; then
-            echo "📦 Would deploy to development cluster"
-            echo "🔧 Using: infra/development/k8s/"
+            echo "NAMESPACE=microservice-dev" >> $GITHUB_ENV
+            echo "K8S_PATH=infra/development/k8s" >> $GITHUB_ENV
           else
-            echo "👑 Would deploy to production cluster"
-            echo "🔧 Using: infra/k8s/production/"
+            echo "NAMESPACE=microservice-prod" >> $GITHUB_ENV
+            echo "K8S_PATH=infra/production/k8s" >> $GITHUB_ENV
           fi
-          
-          echo "✅ Mock deployment completed successfully"
+
+      - name: Apply manifests
+        run: |
+          echo "🚀 Deploying to ${{ inputs.environment }}"
+          echo "📁 Path: ${{ env.K8S_PATH }}"
+          kubectl apply -k ${{ env.K8S_PATH }}/
+
+      - name: Wait for rollout
+        run: |
+          kubectl rollout status deployment/api-gateway -n ${{ env.NAMESPACE }} --timeout=120s
+          kubectl rollout status deployment/auth-service -n ${{ env.NAMESPACE }} --timeout=120s
+          echo "✅ Deployment complete"

@@ -1,7 +1,8 @@
 syntax = "proto3";
 package auth;
 
-option go_package = "auth;authpb";
+option go_package = "abbassmortazavi/go-microservice/auth;authpb";
+
 
 service AuthService {
   rpc Register (RegisterRequest) returns (RegisterResponse);
@@ -39,8 +40,7 @@ message Token {
 message User {
   int64 id = 1;
   string name = 2;
-  string email = 3;
-  string role = 4;
+  string email = 4;
   int64 created_at = 5;
 
 }
@@ -60,4 +60,10 @@ message GetUserRequest {
 
 message GetUserResponse {
   User user = 1;
+  repeated Role roles = 2;
+}
+
+message Role {
+  int64 id = 1;
+  string name = 2;
 }
