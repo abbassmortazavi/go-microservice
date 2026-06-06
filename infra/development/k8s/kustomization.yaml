@@ -20,6 +20,8 @@ labels:
 
 images:
 - name: api-gateway
-  newTag: e7892aa85d1d190b75f549bc6c6795738051cdcc
+  newName: abbass69/api-gateway
+  newTag: 61ff2d4ce814a5f0aaa672c43768594530bde922
 - name: auth-service
-  newTag: e7892aa85d1d190b75f549bc6c6795738051cdcc
+  newName: abbass69/auth-service
+  newTag: 61ff2d4ce814a5f0aaa672c43768594530bde922
