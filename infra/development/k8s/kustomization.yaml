@@ -18,10 +18,9 @@ labels:
 - pairs:
     env: development
 
+
 images:
-  - name: api-gateway
-    newName: abbass69/api-gateway
+  - name: abbass69/api-gateway
     newTag: 13d1b81086f42cf5ffc745b9a2f493b4d4203e39
-  - name: auth-service
-    newName: abbass69/auth-service
+  - name: abbass69/auth-service
     newTag: 13d1b81086f42cf5ffc745b9a2f493b4d4203e39
