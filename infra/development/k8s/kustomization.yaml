@@ -3,31 +3,26 @@ kind: Kustomization
 
 namespace: development
 
-  # ConfigMaps - Secrets
-
-  # Databases
-
-  # Message Queue
-
-  # Services
-
-#- configs/secrets.yaml
 resources:
-- api-gateway/deployment.yaml
-- api-gateway/service.yaml
-- auth-service/deployment.yaml
-- auth-service/service.yaml
-- postgres-service/deployment.yaml
-- postgres-service/service.yaml
-- postgres-service/pvc.yaml
-- rabbitmq-service/deployment.yaml
-- rabbitmq-service/service.yaml
+  - api-gateway/deployment.yaml
+  - api-gateway/service.yaml
+  - auth-service/deployment.yaml
+  - auth-service/service.yaml
+  - postgres-service/deployment.yaml
+  - postgres-service/service.yaml
+  - postgres-service/pvc.yaml
+  - rabbitmq-service/deployment.yaml
+  - rabbitmq-service/service.yaml
 
 labels:
-- pairs:
-    env: development
+  - pairs:
+      env: development
+    includeSelectors: false
+
 images:
-- name: api-gateway
-  newTag: 85a35ef5396c560ece5de683fee2fadf3619f7b5
-- name: auth-service
-  newTag: 85a35ef5396c560ece5de683fee2fadf3619f7b5
+  - name: api-gateway
+    newName: abbass69/api-gateway
+    newTag: latest
+  - name: auth-service
+    newName: abbass69/auth-service
+    newTag: latest
