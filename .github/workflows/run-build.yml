@@ -10,7 +10,6 @@ on:
 
 env:
   DOCKER_HUB_ORG: abbass69
-  GITHUB_SHA_SHORT: ${{ github.sha }}
 
 jobs:
   build-api-gateway:
@@ -18,14 +17,20 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     outputs:
-      image_name: ${{ env.DOCKER_HUB_ORG }}/api-gateway
-      image_tag: ${{ env.GITHUB_SHA_SHORT }}
+      image_name: ${{ steps.meta.outputs.image_name }}
+      image_tag: ${{ steps.meta.outputs.image_tag }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: docker/setup-qemu-action@v3      # ← اضافه شد برای arm64
+      - name: Set image meta
+        id: meta
+        run: |
+          echo "image_name=abbass69/api-gateway" >> $GITHUB_OUTPUT
+          echo "image_tag=${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - uses: docker/setup-qemu-action@v3
 
       - uses: docker/setup-buildx-action@v3
 
@@ -41,25 +46,31 @@ jobs:
           file: infra/development/docker/api-gateway/api-gateway.Dockerfile
           push: true
           tags: |
-            ${{ env.DOCKER_HUB_ORG }}/api-gateway:${{ inputs.environment == 'production' && 'latest' || 'dev' }}
-            ${{ env.DOCKER_HUB_ORG }}/api-gateway:${{ env.GITHUB_SHA_SHORT }}
+            abbass69/api-gateway:${{ inputs.environment == 'production' && 'latest' || 'dev' }}
+            abbass69/api-gateway:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64   # ← آپدیت شد
+          platforms: linux/amd64,linux/arm64
 
   build-auth-service:
     name: Build Auth Service
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     outputs:
-      image_name: ${{ env.DOCKER_HUB_ORG }}/auth-service
-      image_tag: ${{ env.GITHUB_SHA_SHORT }}
+      image_name: ${{ steps.meta.outputs.image_name }}
+      image_tag: ${{ steps.meta.outputs.image_tag }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: docker/setup-qemu-action@v3      # ← اضافه شد برای arm64
+      - name: Set image meta
+        id: meta
+        run: |
+          echo "image_name=abbass69/auth-service" >> $GITHUB_OUTPUT
+          echo "image_tag=${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - uses: docker/setup-qemu-action@v3
 
       - uses: docker/setup-buildx-action@v3
 
@@ -75,11 +86,11 @@ jobs:
           file: infra/development/docker/auth-service/auth-service.Dockerfile
           push: true
           tags: |
-            ${{ env.DOCKER_HUB_ORG }}/auth-service:${{ inputs.environment == 'production' && 'latest' || 'dev' }}
-            ${{ env.DOCKER_HUB_ORG }}/auth-service:${{ env.GITHUB_SHA_SHORT }}
+            abbass69/auth-service:${{ inputs.environment == 'production' && 'latest' || 'dev' }}
+            abbass69/auth-service:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64   # ← آپدیت شد
+          platforms: linux/amd64,linux/arm64
 
   update-kustomize:
     name: Update Kustomize Images
@@ -100,15 +111,21 @@ jobs:
       - name: Update kustomization
         run: |
           if [ "${{ inputs.environment }}" = "development" ]; then
-            cd infra/development/k8s
+            K8S_PATH="infra/development/k8s"
           else
-            cd infra/production/k8s
+            K8S_PATH="infra/production/k8s"
           fi
 
+          cd $K8S_PATH
+
+          # این دستور هم newName هم newTag رو با هم ست میکنه
           kustomize edit set image \
             api-gateway=${{ needs.build-api-gateway.outputs.image_name }}:${{ needs.build-api-gateway.outputs.image_tag }}
           kustomize edit set image \
             auth-service=${{ needs.build-auth-service.outputs.image_name }}:${{ needs.build-auth-service.outputs.image_tag }}
+
+          echo "✅ kustomization.yaml updated:"
+          cat kustomization.yaml
 
       - name: Commit updated image tags
         env:
