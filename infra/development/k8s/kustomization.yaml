@@ -20,6 +20,6 @@ labels:
 
 images:
 - name: api-gateway
-  newTag: 12d3108dd190286d8d35b59143576059773281d4
+  newTag: 30de9a25d4f94a389c54feb4f60bb38bc378382f
 - name: auth-service
-  newTag: 12d3108dd190286d8d35b59143576059773281d4
+  newTag: 30de9a25d4f94a389c54feb4f60bb38bc378382f
