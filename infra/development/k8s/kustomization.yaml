@@ -3,34 +3,27 @@ kind: Kustomization
 
 namespace: development
 
+  # ConfigMaps - Secrets
+
+  # Databases
+
+  # Message Queue
+
+# Services
+
+#- configs/secrets.yaml
 resources:
-- api-gateway/deployment.yaml
-- api-gateway/service.yaml
-- auth-service/deployment.yaml
-- auth-service/service.yaml
-- postgres-service/deployment.yaml
-- postgres-service/service.yaml
-- postgres-service/pvc.yaml
-- rabbitmq-service/deployment.yaml
-- rabbitmq-service/service.yaml
+  - api-gateway/deployment.yaml
+  - api-gateway/service.yaml
+  - auth-service/deployment.yaml
+  - auth-service/service.yaml
+  - postgres-service/deployment.yaml
+  - postgres-service/service.yaml
+  - postgres-service/pvc.yaml
+  - rabbitmq-service/deployment.yaml
+  - rabbitmq-service/service.yaml
 
 labels:
-- pairs:
-    env: development
-
-
-images:
-- name: abbass69/api-gateway
-  newTag: 984188d8f274e58aa2f4d3dce515fc27decc5b7e
-- name: abbass69/auth-service
-  newTag: 984188d8f274e58aa2f4d3dce515fc27decc5b7e
-
-patchesStrategicMerge:
-- image-pull-secret-patch.yaml
-
-secretGenerator:
-- literals:
-  - .dockerconfigjson={"auths":{"https://index.docker.io/v1/":{"username":"${DOCKER_HUB_USERNAME}","password":"${DOCKER_HUB_TOKEN}","auth":"$(echo
-    -n ${DOCKER_HUB_USERNAME}:${DOCKER_HUB_TOKEN} | base64)"}}}
-  name: dockerhub-secret
-  type: kubernetes.io/dockerconfigjson
+  - pairs:
+      env: production
+    includeSelectors: false
