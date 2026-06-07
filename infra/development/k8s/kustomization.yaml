@@ -21,15 +21,16 @@ labels:
 
 images:
 - name: abbass69/api-gateway
-  newTag: 1fa0d6c6660642930fec1b58a8a632bb71e8e91f
+  newTag: 984188d8f274e58aa2f4d3dce515fc27decc5b7e
 - name: abbass69/auth-service
-  newTag: 1fa0d6c6660642930fec1b58a8a632bb71e8e91f
+  newTag: 984188d8f274e58aa2f4d3dce515fc27decc5b7e
 
 patchesStrategicMerge:
-  - image-pull-secret-patch.yaml
+- image-pull-secret-patch.yaml
 
 secretGenerator:
-  - name: dockerhub-secret
-    type: kubernetes.io/dockerconfigjson
-    literals:
-    - .dockerconfigjson={"auths":{"https://index.docker.io/v1/":{"username":"${DOCKER_HUB_USERNAME}","password":"${DOCKER_HUB_TOKEN}","auth":"$(echo -n ${DOCKER_HUB_USERNAME}:${DOCKER_HUB_TOKEN} | base64)"}}}
+- literals:
+  - .dockerconfigjson={"auths":{"https://index.docker.io/v1/":{"username":"${DOCKER_HUB_USERNAME}","password":"${DOCKER_HUB_TOKEN}","auth":"$(echo
+    -n ${DOCKER_HUB_USERNAME}:${DOCKER_HUB_TOKEN} | base64)"}}}
+  name: dockerhub-secret
+  type: kubernetes.io/dockerconfigjson
