@@ -112,75 +112,18 @@ jobs:
         run: |
           if [ "${{ inputs.environment }}" = "development" ]; then
             K8S_PATH="infra/development/k8s"
-            NAMESPACE="microservice-dev"
           else
             K8S_PATH="infra/production/k8s"
-            NAMESPACE="microservice-prod"
           fi
 
           cd $K8S_PATH
 
-          # استفاده از نام کامل image (با org) برای set image
-          kustomize edit set image \
-            abbass69/api-gateway=${{ needs.build-api-gateway.outputs.image_name }}:${{ needs.build-api-gateway.outputs.image_tag }}
-          kustomize edit set image \
-            abbass69/auth-service=${{ needs.build-auth-service.outputs.image_name }}:${{ needs.build-auth-service.outputs.image_tag }}
-
-          # همچنین برای اطمینان از اینکه imagePullSecret تنظیم شده، patch رو اضافه می‌کنیم
-          # اگر فایل patch وجود نداشته باشد، ایجاد می‌کنیم
-          cat > image-pull-secret-patch.yaml << 'EOF'
-          apiVersion: apps/v1
-          kind: Deployment
-          metadata:
-            name: api-gateway
-          spec:
-            template:
-              spec:
-                imagePullSecrets:
-                - name: dockerhub-secret
-          ---
-          apiVersion: apps/v1
-          kind: Deployment
-          metadata:
-            name: auth-service
-          spec:
-            template:
-              spec:
-                imagePullSecrets:
-                - name: dockerhub-secret
-          EOF
-
-          # اگر kustomization.yaml imagePullSecret patch را ندارد، اضافه کن
-          if ! grep -q "image-pull-secret-patch.yaml" kustomization.yaml; then
-            echo "" >> kustomization.yaml
-            echo "patchesStrategicMerge:" >> kustomization.yaml
-            echo "  - image-pull-secret-patch.yaml" >> kustomization.yaml
-          fi
+          # فقط image tag رو آپدیت کن - ساده و بدون دردسر
+          kustomize edit set image abbass69/api-gateway=${{ needs.build-api-gateway.outputs.image_name }}:${{ needs.build-api-gateway.outputs.image_tag }}
+          kustomize edit set image abbass69/auth-service=${{ needs.build-auth-service.outputs.image_name }}:${{ needs.build-auth-service.outputs.image_tag }}
 
           echo "✅ kustomization.yaml updated:"
           cat kustomization.yaml
-
-      - name: Create docker registry secret (if needed)
-        run: |
-          if [ "${{ inputs.environment }}" = "development" ]; then
-            K8S_PATH="infra/development/k8s"
-          else
-            K8S_PATH="infra/production/k8s"
-          fi
-
-          cd $K8S_PATH
-
-          # ایجاد secretGenerator برای docker registry credentials
-          if ! grep -q "secretGenerator:" kustomization.yaml; then
-            cat >> kustomization.yaml << 'EOF'
-
-          secretGenerator:
-            - name: dockerhub-secret
-              type: kubernetes.io/dockerconfigjson
-              literals:
-              - .dockerconfigjson={"auths":{"https://index.docker.io/v1/":{"username":"${DOCKER_HUB_USERNAME}","password":"${DOCKER_HUB_TOKEN}","auth":"$(echo -n ${DOCKER_HUB_USERNAME}:${DOCKER_HUB_TOKEN} | base64)"}}}
-          EOF
-          fi
 
       - name: Commit updated image tags
         env:
