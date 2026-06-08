@@ -109,7 +109,6 @@ func GetData(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
 	data["message"] = "hello world"
 	data["jafar"] = "its ok!"
-	data["my love"] = "Mina"
 	err := utils.WriteJson(w, http.StatusOK, data)
 	if err != nil {
 		return
