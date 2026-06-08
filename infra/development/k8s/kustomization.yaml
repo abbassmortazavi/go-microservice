@@ -9,7 +9,7 @@ namespace: development
 
   # Message Queue
 
-  # Services
+# Services
 
 #- configs/secrets.yaml
 resources:
@@ -25,9 +25,9 @@ resources:
 
 labels:
 - pairs:
-    env: development
+    env: production
 images:
-- name: api-gateway
-  newTag: 85a35ef5396c560ece5de683fee2fadf3619f7b5
-- name: auth-service
-  newTag: 85a35ef5396c560ece5de683fee2fadf3619f7b5
+- name: abbass69/api-gateway
+  newTag: 875e1ad1dd68fe17770bf45607995f8524d940c2
+- name: abbass69/auth-service
+  newTag: 875e1ad1dd68fe17770bf45607995f8524d940c2
