@@ -28,6 +28,6 @@ labels:
     env: production
 images:
 - name: abbass69/api-gateway
-  newTag: 875e1ad1dd68fe17770bf45607995f8524d940c2
+  newTag: ca93e129c94f18cc610db4fa7e17d47776c6f170
 - name: abbass69/auth-service
-  newTag: 875e1ad1dd68fe17770bf45607995f8524d940c2
+  newTag: ca93e129c94f18cc610db4fa7e17d47776c6f170
