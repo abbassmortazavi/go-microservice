@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	rolepb "abbassmortazavi/go-microservice/pkg/proto/role"
+	rolepb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/role"
 	"abbassmortazavi/go-microservice/pkg/utils"
 	role2 "abbassmortazavi/go-microservice/services/api-gateway/dto/role"
 	"abbassmortazavi/go-microservice/services/api-gateway/grpc_clients"

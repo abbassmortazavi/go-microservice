@@ -1,7 +1,7 @@
 package role
 
 import (
-	rolepb "abbassmortazavi/go-microservice/pkg/proto/role"
+	rolepb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/role"
 )
 
 type CreateRoleReq struct {

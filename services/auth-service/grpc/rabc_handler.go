@@ -1,7 +1,7 @@
 package grpc
 
 import (
-	rbacpb "abbassmortazavi/go-microservice/pkg/proto/rbac"
+	rbacpb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/rbac"
 	"abbassmortazavi/go-microservice/services/auth-service/service"
 	"context"
 
