@@ -5,7 +5,6 @@ import (
 	"abbassmortazavi/go-microservice/services/auth-service/interfaces/repository_interface"
 	"context"
 	"errors"
-	"log"
 )
 
 type RoleService struct {
@@ -18,7 +17,6 @@ func NewRoleService(roleRepo repository_interface.RoleRepositoryInterface) *Role
 	}
 }
 func (r *RoleService) Create(ctx context.Context, name string) (*entity.Role, error) {
-	log.Println("injaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 	res, _ := r.roleRepo.FindByName(ctx, name)
 	if res != nil && res.Name != "" {
 		return nil, errors.New(res.Name + " already exists")

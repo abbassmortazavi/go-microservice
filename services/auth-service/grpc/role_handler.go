@@ -1,7 +1,7 @@
 package grpc
 
 import (
-	rolepb "abbassmortazavi/go-microservice/pkg/proto/role"
+	rolepb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/role"
 	"abbassmortazavi/go-microservice/services/auth-service/service"
 	"context"
 
@@ -25,7 +25,7 @@ func (r *RoleHandler) Create(ctx context.Context, req *rolepb.CreateRoleRequest)
 		return nil, err
 	}
 	role := &rolepb.Role{
-		Id:   int64(res.ID),
+		Id:   res.ID,
 		Name: res.Name,
 	}
 	return &rolepb.CreateRoleResponse{

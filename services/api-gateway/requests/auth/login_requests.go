@@ -1,6 +1,6 @@
 package auth
 
-import authpb "abbassmortazavi/go-microservice/pkg/proto/auth"
+import authpb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/auth"
 
 type LoginRequest struct {
 	Email    string `json:"email"`

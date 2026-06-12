@@ -1,6 +1,6 @@
 package auth
 
-import authpb "abbassmortazavi/go-microservice/pkg/proto/auth"
+import authpb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/auth"
 
 type RegisterReq struct {
 	Email    string `json:"email"`

@@ -1,7 +1,7 @@
 package response
 
 import (
-	authpb "abbassmortazavi/go-microservice/pkg/proto/auth"
+	authpb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/auth"
 	"abbassmortazavi/go-microservice/services/auth-service/entity"
 )
 
