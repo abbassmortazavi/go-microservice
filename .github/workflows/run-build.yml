@@ -161,7 +161,7 @@ jobs:
           # فقط image tag رو آپدیت کن - ساده و بدون دردسر
           kustomize edit set image abbass69/api-gateway=${{ needs.build-api-gateway.outputs.image_name }}:${{ needs.build-api-gateway.outputs.image_tag }}
           kustomize edit set image abbass69/auth-service=${{ needs.build-auth-service.outputs.image_name }}:${{ needs.build-auth-service.outputs.image_tag }}
-          kustomize edit set image abbass69/notifiaction-service=${{ needs.build-auth-service.outputs.image_name }}:${{ needs.build-auth-service.outputs.image_tag }}
+          kustomize edit set image abbass69/notifiaction-service=${{ needs.build-notification-service.outputs.image_name }}:${{ needs.build-notification-service.outputs.image_tag }}
 
           echo "✅ kustomization.yaml updated:"
           cat kustomization.yaml
