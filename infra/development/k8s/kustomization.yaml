@@ -22,12 +22,15 @@ resources:
 - postgres-service/pvc.yaml
 - rabbitmq-service/deployment.yaml
 - rabbitmq-service/service.yaml
+- notification-service/deployment.yml
 
 labels:
 - pairs:
-    env: production
+    env: development
 images:
 - name: abbass69/api-gateway
   newTag: b478a73615b79ca549db645bb6ffebb3343703c5
 - name: abbass69/auth-service
+  newTag: b478a73615b79ca549db645bb6ffebb3343703c5
+- name: abbass69/notification-service
   newTag: b478a73615b79ca549db645bb6ffebb3343703c5
