@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+    spec:
+      containers:
+        - name: notification-service
+          image: abbass69/notification-service:dev
+          env:
+            - name: ENVIRONMENT
+              value: "development"
+            - name: SMTP_HOST
+              value: "sandbox.smtp.mailtrap.io"
+            - name: SMTP_USERNAME
+              value: "ceddf8b2b5de1d"
+            - name: SMTP_PASSWORD
+              value: "9b1825ca7c514f"
+            - name: SMTP_FROM
+              value: "abbassmortazavi@gmail.com"
+

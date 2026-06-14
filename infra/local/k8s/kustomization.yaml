@@ -22,6 +22,7 @@ resources:
 - postgres-service/pvc.yaml
 - rabbitmq-service/deployment.yaml
 - rabbitmq-service/service.yaml
+- notification-service/deployment.yml
 
 labels:
 - pairs:
@@ -31,3 +32,5 @@ images:
   newTag: 138c894c3820b63cec37884da734837e7c14cc1b
 - name: auth-service
   newTag: 138c894c3820b63cec37884da734837e7c14cc1b
+- name: abbass69/notification-service
+  newTag: b478a73615b79ca549db645bb6ffebb3343703c5
