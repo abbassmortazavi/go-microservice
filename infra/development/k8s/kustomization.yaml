@@ -22,7 +22,7 @@ resources:
 - postgres-service/pvc.yaml
 - rabbitmq-service/deployment.yaml
 - rabbitmq-service/service.yaml
-- notification-service/deployment.yml
+- notification-service/deployment.yaml
 
 labels:
 - pairs:

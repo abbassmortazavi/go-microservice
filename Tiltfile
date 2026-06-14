@@ -141,7 +141,7 @@ docker_build(
 )
 
 # کانفیگ Kubernetes مخصوص development
-k8s_yaml('./infra/local/k8s/notification-service/deployment.yml')
+k8s_yaml('./infra/local/k8s/notification-service/deployment.yaml')
 
 k8s_resource('notification-service',
              port_forwards=[9092],
