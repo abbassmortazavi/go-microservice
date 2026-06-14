@@ -123,11 +123,11 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: infra/development/docker/notifiaction-service/notifiaction-service.Dockerfile
+          file: infra/development/docker/notification-service/notification-service.Dockerfile
           push: true
           tags: |
-            abbass69/notifiaction-service:${{ inputs.environment == 'production' && 'latest' || 'dev' }}
-            abbass69/notifiaction-service:${{ github.sha }}
+            abbass69/notification-service:${{ inputs.environment == 'production' && 'latest' || 'dev' }}
+            abbass69/notification-service:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
@@ -161,7 +161,7 @@ jobs:
           # فقط image tag رو آپدیت کن - ساده و بدون دردسر
           kustomize edit set image abbass69/api-gateway=${{ needs.build-api-gateway.outputs.image_name }}:${{ needs.build-api-gateway.outputs.image_tag }}
           kustomize edit set image abbass69/auth-service=${{ needs.build-auth-service.outputs.image_name }}:${{ needs.build-auth-service.outputs.image_tag }}
-          kustomize edit set image abbass69/notifiaction-service=${{ needs.build-notification-service.outputs.image_name }}:${{ needs.build-notification-service.outputs.image_tag }}
+          kustomize edit set image abbass69/notification-service=${{ needs.build-notification-service.outputs.image_name }}:${{ needs.build-notification-service.outputs.image_tag }}
 
           echo "✅ kustomization.yaml updated:"
           cat kustomization.yaml
