@@ -11,7 +11,7 @@ RUN go mod download
 COPY . .
 
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o notification-service ./services/notification-service/cmd/
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/notification-service ./services/notification-service/cmd/
 
 
 # Runtime stage
