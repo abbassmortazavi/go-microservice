@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+	log.Println("Starting notification-service")
 	cfg := config.Load()
 	emailWrrker := worker.NewEmailWorker(cfg)
 	go emailWrrker.Start()

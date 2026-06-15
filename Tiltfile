@@ -144,7 +144,7 @@ docker_build(
 k8s_yaml('./infra/local/k8s/notification-service/deployment.yaml')
 
 k8s_resource('notification-service',
-             port_forwards=[9092],
+             port_forwards=[9093],
              labels=['services', 'notification'],
              extra_pod_selectors=[{'app': 'notification-service'}])
 ### End Notification Service ###

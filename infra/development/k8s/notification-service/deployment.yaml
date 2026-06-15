@@ -26,4 +26,8 @@ spec:
               value: "9b1825ca7c514f"
             - name: SMTP_FROM
               value: "abbassmortazavi@gmail.com"
+            - name: RABBITMQ_EXCHANGE
+              value: "user.events"
+            - name: RABBITMQ_URL
+              value: "amqp://guest:guest@rabbitmq:5672/"
 
