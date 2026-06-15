@@ -1,12 +1,12 @@
 package service
 
 import (
-	eventpb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/events"
+	"abbassmortazavi/go-microservice/pkg/events"
 	"abbassmortazavi/go-microservice/services/auth-service/entity"
 	"abbassmortazavi/go-microservice/services/auth-service/interfaces/repository_interface"
-	"abbassmortazavi/go-microservice/services/auth-service/messaging"
 	"abbassmortazavi/go-microservice/services/auth-service/pkg/response"
 	"abbassmortazavi/go-microservice/services/auth-service/security"
+	"abbassmortazavi/go-microservice/services/notification-service/messaging"
 	"context"
 	"errors"
 )
@@ -48,10 +48,16 @@ func (a *AuthService) Register(ctx context.Context, email, password, name string
 	}
 
 	//
-	event := eventpb.UserRegistered{
+	//event := eventpb.UserRegistered{
+	//	UserId: user.ID,
+	//	Email:  user.Email,
+	//	Name:   user.Name,
+	//}
+
+	event := events.UserRegistered{
 		UserId: user.ID,
-		Email:  user.Email,
-		Name:   user.Name,
+		Email:  email,
+		Name:   name,
 	}
 
 	return a.publisher.Publish(ctx, "user.registered", &event)
