@@ -1,10 +1,10 @@
 package grpc_clients
 
 import (
-	authpb "abbassmortazavi/go-microservice/pkg/proto/auth"
-	permissionpb "abbassmortazavi/go-microservice/pkg/proto/permission"
-	rbacpb "abbassmortazavi/go-microservice/pkg/proto/rbac"
-	rolepb "abbassmortazavi/go-microservice/pkg/proto/role"
+	authpb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/auth"
+	permissionpb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/permission"
+	rbacpb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/rbac"
+	rolepb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/role"
 	"os"
 
 	"google.golang.org/grpc"

@@ -10,6 +10,7 @@ import (
 
 func SetupRoutes(router *mux.Router) {
 
+	log.Println("Setting up routes")
 	public := router.PathPrefix("/api/v1").Subrouter()
 	public.HandleFunc("/test-url", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("everything work perfectly!!!!!")

@@ -1,7 +1,7 @@
 package rbac
 
 import (
-	rbac "abbassmortazavi/go-microservice/pkg/proto/rbac"
+	rbacpb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/rbac"
 )
 
 type CreateAssignPermissionToRoleReq struct {
@@ -9,8 +9,8 @@ type CreateAssignPermissionToRoleReq struct {
 	PermissionID int64 `json:"permission_id"`
 }
 
-func (p *CreateAssignPermissionToRoleReq) ToProto() *rbac.AssignPermissionToRoleRequest {
-	return &rbac.AssignPermissionToRoleRequest{
+func (p *CreateAssignPermissionToRoleReq) ToProto() *rbacpb.AssignPermissionToRoleRequest {
+	return &rbacpb.AssignPermissionToRoleRequest{
 		RoleID:       p.RoleID,
 		PermissionID: p.PermissionID,
 	}

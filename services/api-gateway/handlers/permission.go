@@ -1,10 +1,11 @@
 package handlers
 
 import (
-	permissionpb "abbassmortazavi/go-microservice/pkg/proto/permission"
+	permissionpb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/permission"
 	"abbassmortazavi/go-microservice/pkg/utils"
 	"abbassmortazavi/go-microservice/services/api-gateway/grpc_clients"
 	"abbassmortazavi/go-microservice/services/api-gateway/requests/permission"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -103,6 +104,7 @@ func ListPermissions(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPermission(w http.ResponseWriter, r *http.Request) {
+	log.Println("GetPermission")
 	id, err := utils.GetPathParamInt(r, "id")
 	if err != nil {
 		utils.BadRequest(w, "invalid id", err)

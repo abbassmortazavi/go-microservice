@@ -110,6 +110,47 @@ k8s_resource('auth-service',
              extra_pod_selectors=[{'app': 'auth-service'}])
 ### End Auth Service ###
 
+
+### Notification Service ###
+# کامپایل Notification Service
+auth_compile_cmd = 'CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/notification-service ./services/notification-service/cmd'
+
+local_resource(
+    name='notification-service-compile',
+    cmd=auth_compile_cmd,
+    deps=['./services/notification-service'],
+    ignore=['./services/notification-service/vendor'],
+    labels=['compiles'],
+    trigger_mode=TRIGGER_MODE_AUTO)
+
+# ساخت Docker image برای Auth Service
+docker_build(
+    'microservice/notification-service:dev',
+    '.',
+    dockerfile='./services/notification-service/docker/notification-service.Dockerfile',
+    only=[
+        './services/notification-service',
+        './build/notification-service',
+        './env'
+    ],
+    live_update=[
+        sync('./services/notification-service', '/app'),
+        sync('./build/notification-service', '/app/build/notification-service'),
+        sync('./env', '/app/.env')
+    ]
+)
+
+# کانفیگ Kubernetes مخصوص development
+k8s_yaml('./infra/local/k8s/notification-service/deployment.yaml')
+
+k8s_resource('notification-service',
+             port_forwards=[9093],
+             labels=['services', 'notification'],
+             extra_pod_selectors=[{'app': 'notification-service'}])
+### End Notification Service ###
+
+
+
 ### نمایش وضعیت ###
 # غیرفعال کردن حذف خودکار images
 docker_prune_settings(disable=True)

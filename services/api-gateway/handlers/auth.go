@@ -11,7 +11,6 @@ import (
 )
 
 func Register(w http.ResponseWriter, r *http.Request) {
-	log.Println("Register fired.....")
 	var req auth.RegisterReq
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -109,6 +108,7 @@ func GetData(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
 	data["message"] = "hello world"
 	data["jafar"] = "its ok!"
+	data["status"] = true
 	err := utils.WriteJson(w, http.StatusOK, data)
 	if err != nil {
 		return

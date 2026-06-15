@@ -1,4 +1,3 @@
-# argocd/apps/argocd-app.yml (یا microservice-production.yaml)
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -9,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/abbassmortazavi/go-microservice.git
     targetRevision: develop
-    path: infra/development/k8s  # ✅ مسیر جدید
+    path: infra/development/k8s
   destination:
     server: https://kubernetes.default.svc
     namespace: development

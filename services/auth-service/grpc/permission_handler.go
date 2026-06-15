@@ -1,7 +1,7 @@
 package grpc
 
 import (
-	permissionpb "abbassmortazavi/go-microservice/pkg/proto/permission"
+	permissionpb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/permission"
 	"abbassmortazavi/go-microservice/services/auth-service/service"
 	"context"
 	"log"

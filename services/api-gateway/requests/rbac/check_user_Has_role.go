@@ -1,7 +1,7 @@
 package rbac
 
 import (
-	rbac "abbassmortazavi/go-microservice/pkg/proto/rbac"
+	rbacpb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/rbac"
 )
 
 type CheckUserHasRoleReq struct {
@@ -9,8 +9,8 @@ type CheckUserHasRoleReq struct {
 	RoleName string `json:"role_name"`
 }
 
-func (p *CheckUserHasRoleReq) ToProto() *rbac.CheckUserRoleRequest {
-	return &rbac.CheckUserRoleRequest{
+func (p *CheckUserHasRoleReq) ToProto() *rbacpb.CheckUserRoleRequest {
+	return &rbacpb.CheckUserRoleRequest{
 		RoleName: p.RoleName,
 		UserID:   p.UserID,
 	}

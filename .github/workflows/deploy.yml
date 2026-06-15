@@ -50,4 +50,5 @@ jobs:
         run: |
           kubectl rollout status deployment/api-gateway -n ${{ env.NAMESPACE }} --timeout=120s
           kubectl rollout status deployment/auth-service -n ${{ env.NAMESPACE }} --timeout=120s
+          kubectl rollout status deployment/notification-service -n ${{ env.NAMESPACE }} --timeout=120s
           echo "✅ Deployment complete"
