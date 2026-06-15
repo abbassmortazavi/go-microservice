@@ -27,4 +27,10 @@ resources:
 labels:
   - pairs:
       env: production
-    includeSelectors: false
+    images:
+    - name: abbass69/api-gateway
+      newTag: ae2093b2dea4a405c7c1507eb2c9b924a0cd2d09
+    - name: abbass69/auth-service
+      newTag: ae2093b2dea4a405c7c1507eb2c9b924a0cd2d09
+    - name: abbass69/notification-service
+      newTag: ae2093b2dea4a405c7c1507eb2c9b924a0cd2d09
