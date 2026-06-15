@@ -2,7 +2,7 @@
   kind: ConfigMap
   metadata:
     name: app-config
-    namespace: microservice-dev
+    namespace: development
     labels:
       app.kubernetes.io/name: app-config
   data:
