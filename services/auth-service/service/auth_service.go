@@ -9,12 +9,14 @@ import (
 	"abbassmortazavi/go-microservice/services/notification-service/messaging"
 	"context"
 	"errors"
+	"log"
 )
 
 type AuthServiceInterface interface {
 	Register(ctx context.Context, email, password, name string) error
-	Login(ctx context.Context, email, password string) (*response.LoginResponse, error)
+	Login(ctx context.Context, email, password string) (*response.TokenResponseResult, error)
 	GetUser(ctx context.Context, id int64) (*entity.User, error)
+	RefreshToken(ctx context.Context, refreshToken string) (*response.TokenResponseResult, error)
 }
 
 type AuthService struct {
@@ -62,7 +64,7 @@ func (a *AuthService) Register(ctx context.Context, email, password, name string
 
 	return a.publisher.Publish(ctx, "user.registered", &event)
 }
-func (a *AuthService) Login(ctx context.Context, email, password string) (*response.LoginResponse, error) {
+func (a *AuthService) Login(ctx context.Context, email, password string) (*response.TokenResponseResult, error) {
 	user, err := a.userRepo.FindByEmail(ctx, email)
 	if err != nil {
 		return nil, err
@@ -82,7 +84,7 @@ func (a *AuthService) Login(ctx context.Context, email, password string) (*respo
 		CreatedAt: user.CreatedAt,
 	}
 
-	return &response.LoginResponse{
+	return &response.TokenResponseResult{
 		Tokens: tokens,
 		User:   userEntity,
 	}, nil
@@ -101,4 +103,13 @@ func (a *AuthService) GetUser(ctx context.Context, id int64) (*entity.User, erro
 		CreatedAt: user.CreatedAt,
 	}*/
 	return user, nil
+}
+
+func (a *AuthService) RefreshToken(ctx context.Context, refreshToken string) (*response.TokenResponseResult, error) {
+	findUserByToken, err := a.TokenService.FindByToken(refreshToken)
+	log.Println("token data : ", findUserByToken)
+	if err != nil {
+		return nil, err
+	}
+	return nil, nil
 }

@@ -4,6 +4,7 @@ import (
 	authpb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/auth"
 	"abbassmortazavi/go-microservice/services/auth-service/service"
 	"context"
+	"log"
 )
 
 type AuthHandler struct {
@@ -71,4 +72,23 @@ func (h *AuthHandler) GetUser(ctx context.Context, req *authpb.GetUserRequest) (
 			CreatedAt: res.CreatedAt.Unix(),
 		},
 	}, nil
+}
+func (h *AuthHandler) RefreshToken(ctx context.Context, req *authpb.GetRefreshTokenRequest) (*authpb.GetRefreshTokenResponse, error) {
+	log.Println("GetRefreshToken")
+	res, err := h.authService.RefreshToken(ctx, req.Token)
+	if err != nil {
+		return nil, err
+	}
+	log.Println("Refresh Token: ", res)
+	//return &authpb.GetRefreshTokenResponse{
+	//	Tokens: authpb.Token{
+	//		AccessToken:  res.AccessToken,
+	//		RefreshToken: res.RefreshToken,
+	//		ExpiredAt:    res.ExpiresAt,
+	//	},
+	//	User: authpb.User{
+	//		Id: res.
+	//	}
+	//}
+	return nil, nil
 }

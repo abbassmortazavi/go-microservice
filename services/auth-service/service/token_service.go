@@ -15,6 +15,7 @@ type TokenServiceInterface interface {
 	GenerateToken(userID int64, name string) (response.TokenResponse, error)
 	RefreshAccessToken(refreshToken string) (response.TokenResponse, error)
 	ValidateToken(token string) (*Claims, error)
+	FindByToken(token string) (*entity.Token, error)
 }
 
 var JwtAuthenticator *JWT
@@ -171,4 +172,15 @@ func (j *JWT) FindByUserId(ctx context.Context, userId int64) (*entity.User, err
 		return nil, err
 	}
 	return user, nil
+}
+
+func (j *JWT) FindByToken(token string) (*entity.Token, error) {
+	res, err := j.TokenRepository.FindByToken(context.Background(), token)
+	if err != nil {
+		return nil, err
+	}
+	if res == nil {
+		return nil, errors.New("token is invalid")
+	}
+	return res, nil
 }

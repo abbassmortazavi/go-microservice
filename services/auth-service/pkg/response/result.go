@@ -11,12 +11,12 @@ type TokenResponse struct {
 	ExpiresAt    int64  `json:"expires_at"`
 }
 
-type LoginResponse struct {
+type TokenResponseResult struct {
 	Tokens TokenResponse `json:"tokens"`
 	User   entity.User   `json:"user"`
 }
 
-func (l *LoginResponse) ToProto() *authpb.LoginResponse {
+func (l *TokenResponseResult) ToProto() *authpb.LoginResponse {
 	return &authpb.LoginResponse{
 		Tokens: &authpb.Token{
 			AccessToken:  l.Tokens.AccessToken,
