@@ -23,7 +23,7 @@ const (
 
 type GetRefreshTokenRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	RefreshToken  string                 `protobuf:"bytes,1,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -58,9 +58,9 @@ func (*GetRefreshTokenRequest) Descriptor() ([]byte, []int) {
 	return file_auth_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *GetRefreshTokenRequest) GetToken() string {
+func (x *GetRefreshTokenRequest) GetRefreshToken() string {
 	if x != nil {
-		return x.Token
+		return x.RefreshToken
 	}
 	return ""
 }
@@ -702,9 +702,9 @@ var File_auth_proto protoreflect.FileDescriptor
 const file_auth_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"auth.proto\x12\x04auth\".\n" +
-	"\x16GetRefreshTokenRequest\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\"^\n" +
+	"auth.proto\x12\x04auth\"=\n" +
+	"\x16GetRefreshTokenRequest\x12#\n" +
+	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"^\n" +
 	"\x17GetRefreshTokenResponse\x12#\n" +
 	"\x06tokens\x18\x01 \x01(\v2\v.auth.TokenR\x06tokens\x12\x1e\n" +
 	"\x04user\x18\x02 \x01(\v2\n" +

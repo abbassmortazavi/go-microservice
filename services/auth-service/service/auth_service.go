@@ -9,7 +9,6 @@ import (
 	"abbassmortazavi/go-microservice/services/notification-service/messaging"
 	"context"
 	"errors"
-	"log"
 )
 
 type AuthServiceInterface interface {
@@ -106,10 +105,13 @@ func (a *AuthService) GetUser(ctx context.Context, id int64) (*entity.User, erro
 }
 
 func (a *AuthService) RefreshToken(ctx context.Context, refreshToken string) (*response.TokenResponseResult, error) {
-	findUserByToken, err := a.TokenService.FindByToken(refreshToken)
-	log.Println("token data : ", findUserByToken)
+	res, err := a.TokenService.FindByToken(refreshToken)
 	if err != nil {
 		return nil, err
 	}
-	return nil, nil
+	tokens, err := a.TokenService.RefreshAccessToken(refreshToken)
+	return &response.TokenResponseResult{
+		Tokens: tokens,
+		User:   res.User,
+	}, nil
 }
