@@ -6,9 +6,11 @@ import (
 	"abbassmortazavi/go-microservice/services/auth-service/pkg/response"
 	"context"
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 type TokenServiceInterface interface {
@@ -45,6 +47,7 @@ type JWT struct {
 func (j *JWT) GenerateToken(userID int64, name string) (response.TokenResponse, error) {
 	accessExpiry := time.Now().Add(time.Minute * 20)
 	refreshExpiry := time.Now().Add(time.Minute * 30)
+	now := time.Now()
 	ctx := context.Background()
 	user, err := j.FindByUserId(ctx, userID)
 	userInfo := entity.User{
@@ -60,22 +63,26 @@ func (j *JWT) GenerateToken(userID int64, name string) (response.TokenResponse, 
 		User:      userInfo,
 		Name:      name,
 		TokenType: "access",
-		/*RegisteredClaims: jwt.RegisteredClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(accessExpiry),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			Issuer:    "auth-service",
-		},*/
+			IssuedAt:  jwt.NewNumericDate(now),
+			NotBefore: jwt.NewNumericDate(now),
+			ID:        uuid.NewString(),
+			Subject:   strconv.FormatInt(user.ID, 10),
+		},
 	}
 
 	refreshExpiryClaims := &Claims{
 		User:      userInfo,
 		Name:      name,
 		TokenType: "refresh",
-		/*RegisteredClaims: jwt.RegisteredClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(refreshExpiry),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			Issuer:    "auth",
-		},*/
+			IssuedAt:  jwt.NewNumericDate(now),
+			NotBefore: jwt.NewNumericDate(now),
+			ID:        uuid.NewString(),
+			Subject:   strconv.FormatInt(user.ID, 10),
+		},
 	}
 
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

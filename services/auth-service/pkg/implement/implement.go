@@ -31,7 +31,6 @@ func Init() {
 	tokenRepo := repository.NewTokenRepository(database.DB)
 
 	hasher := security.NewBcryptHasher()
-	//tokenService := service.NewJWTSecret([]byte(gcfg.JWT_SECRET))
 	tokenService := service2.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo, userRepo)
 	authService := service2.NewAuthService(userRepo, hasher, tokenService, publisher)
 	middlewares.Init(tokenService, authService)
