@@ -12,5 +12,6 @@ func UserRoutes(mux *mux.Router) {
 	protected := mux.PathPrefix("/api/v1/users").Subrouter()
 	protected.Use(authMiddleware.AuthMiddleware)
 	protected.HandleFunc("/me", handlers.GetUser).Methods("GET")
+	protected.HandleFunc("/refresh-token", handlers.RefreshToken).Methods("POST")
 
 }

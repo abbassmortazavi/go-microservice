@@ -72,3 +72,23 @@ func (h *AuthHandler) GetUser(ctx context.Context, req *authpb.GetUserRequest) (
 		},
 	}, nil
 }
+func (h *AuthHandler) RefreshToken(ctx context.Context, req *authpb.GetRefreshTokenRequest) (*authpb.GetRefreshTokenResponse, error) {
+	res, err := h.authService.RefreshToken(ctx, req.RefreshToken)
+	if err != nil {
+		return nil, err
+	}
+
+	return &authpb.GetRefreshTokenResponse{
+		Tokens: &authpb.Token{
+			AccessToken:  res.Tokens.AccessToken,
+			RefreshToken: res.Tokens.RefreshToken,
+			ExpiredAt:    res.Tokens.ExpiresAt,
+		},
+		User: &authpb.User{
+			Id:        res.User.ID,
+			Name:      res.User.Name,
+			Email:     res.User.Email,
+			CreatedAt: res.User.CreatedAt.Unix(),
+		},
+	}, nil
+}

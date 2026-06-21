@@ -131,7 +131,16 @@ func (r *TokenRepository) Create(ctx context.Context, token *entity.Token) error
 }
 func (r *TokenRepository) FindByToken(ctx context.Context, token string) (*entity.Token, error) {
 	tokenModel := &entity.Token{}
-	query := `SELECT * FROM tokens WHERE hash_token = $1`
+	query := `
+        SELECT 
+            t.id, t.user_id, t.token_type, t.hash_token, 
+            t.expired_at, t.is_revoked, t.created_at, t.updated_at,
+            u.id, u.email, u.name, u.created_at, u.updated_at
+        FROM tokens t
+        JOIN users u ON t.user_id = u.id
+        WHERE t.hash_token = $1
+    `
+	user := &entity.User{}
 	err := r.db.QueryRowContext(ctx, query, token).Scan(
 		&tokenModel.ID,
 		&tokenModel.UserID,
@@ -140,13 +149,20 @@ func (r *TokenRepository) FindByToken(ctx context.Context, token string) (*entit
 		&tokenModel.ExpiredAt,
 		&tokenModel.IsRevoked,
 		&tokenModel.CreatedAt,
-		&tokenModel.UpdatedAt)
+		&tokenModel.UpdatedAt,
+		&user.ID,
+		&user.Email,
+		&user.Name,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
 		}
 		return nil, err
 	}
+	tokenModel.User = *user
 	return tokenModel, nil
 }
 func (r *TokenRepository) Revoke(ctx context.Context, token string) error {

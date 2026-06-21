@@ -17,9 +17,9 @@ func Implement() {
 	// ---- RabbitMQ ----
 	message.Init()
 	publisher := message.GetPublisher()
-
-	tokenRepo := repository.NewTokenRepository(database.DB)
 	userRepo := repository.NewUserRepository(database.DB)
+	tokenRepo := repository.NewTokenRepository(database.DB)
+
 	tokenService := service.NewJwtAuthenticator(gcfg.JWT_SECRET, tokenRepo, userRepo)
 	authService := service.NewAuthService(userRepo, hasher, tokenService, publisher)
 	middlewares.Init(tokenService, authService)

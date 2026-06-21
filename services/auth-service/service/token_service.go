@@ -6,15 +6,18 @@ import (
 	"abbassmortazavi/go-microservice/services/auth-service/pkg/response"
 	"context"
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 type TokenServiceInterface interface {
 	GenerateToken(userID int64, name string) (response.TokenResponse, error)
 	RefreshAccessToken(refreshToken string) (response.TokenResponse, error)
 	ValidateToken(token string) (*Claims, error)
+	FindByToken(token string) (*entity.Token, error)
 }
 
 var JwtAuthenticator *JWT
@@ -44,6 +47,7 @@ type JWT struct {
 func (j *JWT) GenerateToken(userID int64, name string) (response.TokenResponse, error) {
 	accessExpiry := time.Now().Add(time.Minute * 20)
 	refreshExpiry := time.Now().Add(time.Minute * 30)
+	now := time.Now()
 	ctx := context.Background()
 	user, err := j.FindByUserId(ctx, userID)
 	userInfo := entity.User{
@@ -59,22 +63,26 @@ func (j *JWT) GenerateToken(userID int64, name string) (response.TokenResponse, 
 		User:      userInfo,
 		Name:      name,
 		TokenType: "access",
-		/*RegisteredClaims: jwt.RegisteredClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(accessExpiry),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			Issuer:    "auth-service",
-		},*/
+			IssuedAt:  jwt.NewNumericDate(now),
+			NotBefore: jwt.NewNumericDate(now),
+			ID:        uuid.NewString(),
+			Subject:   strconv.FormatInt(user.ID, 10),
+		},
 	}
 
 	refreshExpiryClaims := &Claims{
 		User:      userInfo,
 		Name:      name,
 		TokenType: "refresh",
-		/*RegisteredClaims: jwt.RegisteredClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(refreshExpiry),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			Issuer:    "auth",
-		},*/
+			IssuedAt:  jwt.NewNumericDate(now),
+			NotBefore: jwt.NewNumericDate(now),
+			ID:        uuid.NewString(),
+			Subject:   strconv.FormatInt(user.ID, 10),
+		},
 	}
 
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -171,4 +179,15 @@ func (j *JWT) FindByUserId(ctx context.Context, userId int64) (*entity.User, err
 		return nil, err
 	}
 	return user, nil
+}
+
+func (j *JWT) FindByToken(token string) (*entity.Token, error) {
+	res, err := j.TokenRepository.FindByToken(context.Background(), token)
+	if err != nil {
+		return nil, err
+	}
+	if res == nil {
+		return nil, errors.New("token is invalid")
+	}
+	return res, nil
 }
