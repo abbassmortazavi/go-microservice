@@ -9,6 +9,16 @@ service AuthService {
   rpc Login (LoginRequest) returns (LoginResponse);
   rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse);
   rpc GetUser (GetUserRequest) returns (GetUserResponse);
+  rpc RefreshToken (GetRefreshTokenRequest) returns (GetRefreshTokenResponse);
+}
+
+message GetRefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message GetRefreshTokenResponse {
+  Token tokens = 1;
+  User user = 2;
 }
 
 message RegisterRequest {
