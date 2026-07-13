@@ -200,7 +200,11 @@ jobs:
             exit 0
           fi
           
+          # پیام آخرین کامیت (قبل از تغییرات ربات) رو می‌گیریم
+          LAST_COMMIT_MSG=$(git log -1 --pretty=%s)
+          LAST_COMMIT_SHA=$(git rev-parse --short HEAD)
+          
           git add infra/
-          git commit -m "ci: update image tags for ${{ inputs.environment }} [skip ci]"
+          git commit -m "ci: update image tags for ${{ inputs.environment }} [skip ci]" -m "Source: ${LAST_COMMIT_SHA} - ${LAST_COMMIT_MSG}"
           git pull origin ${{ github.ref_name }} --rebase --autostash
           git push origin ${{ github.ref_name }}
