@@ -166,21 +166,41 @@ jobs:
           echo "✅ kustomization.yaml updated:"
           cat kustomization.yaml
 
+#      - name: Commit updated image tags
+#        env:
+#          GIT_USER: "github-actions[bot]"
+#          GIT_EMAIL: "github-actions[bot]@users.noreply.github.com"
+#        run: |
+#          if git diff --quiet; then
+#            echo "No changes to commit"
+#            exit 0
+#          fi
+#
+#          git config user.name "$GIT_USER"
+#          git config user.email "$GIT_EMAIL"
+#          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+#
+#          git add infra/
+#          git commit -m "ci: update image tags for ${{ inputs.environment }} [skip ci]"
+#          git pull origin ${{ github.ref_name }} --rebase
+#          git push origin ${{ github.ref_name }}
+
+
       - name: Commit updated image tags
         env:
           GIT_USER: "github-actions[bot]"
-          GIT_EMAIL: "github-actions[bot]@users.noreply.github.com"
+          GIT_EMAIL: "41898282+github-actions[bot]@users.noreply.github.com"
         run: |
+          git config --global user.name "$GIT_USER"
+          git config --global user.email "$GIT_EMAIL"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          
           if git diff --quiet; then
             echo "No changes to commit"
             exit 0
           fi
-
-          git config user.name "$GIT_USER"
-          git config user.email "$GIT_EMAIL"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-
+          
           git add infra/
           git commit -m "ci: update image tags for ${{ inputs.environment }} [skip ci]"
-          git pull origin ${{ github.ref_name }} --rebase
+          git pull origin ${{ github.ref_name }} --rebase --autostash
           git push origin ${{ github.ref_name }}
