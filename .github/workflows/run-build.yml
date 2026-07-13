@@ -188,8 +188,8 @@ jobs:
 
       - name: Commit updated image tags
         env:
-          GIT_USER: "github-actions[bot]"
-          GIT_EMAIL: "41898282+github-actions[bot]@users.noreply.github.com"
+          GIT_USER: ${{ github.event.head_commit.author.name || github.actor }}
+          GIT_EMAIL: ${{ github.event.head_commit.author.email || format('{0}@users.noreply.github.com', github.actor) }}
         run: |
           git config --global user.name "$GIT_USER"
           git config --global user.email "$GIT_EMAIL"
