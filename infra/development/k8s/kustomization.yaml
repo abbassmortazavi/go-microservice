@@ -29,8 +29,8 @@ labels:
     env: development
 images:
 - name: abbass69/api-gateway
-  newTag: fc74f7e7f37c0ff18c3b0500142afd93df91a63a
+  newTag: ec70296120f68be3226535eedbb8b318c8aab95d
 - name: abbass69/auth-service
-  newTag: fc74f7e7f37c0ff18c3b0500142afd93df91a63a
+  newTag: ec70296120f68be3226535eedbb8b318c8aab95d
 - name: abbass69/notification-service
-  newTag: fc74f7e7f37c0ff18c3b0500142afd93df91a63a
+  newTag: ec70296120f68be3226535eedbb8b318c8aab95d
