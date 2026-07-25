@@ -4,6 +4,7 @@ metadata:
   name: auth-service
 spec:
   replicas: 1
+  revisionHistoryLimit: 1
   selector:
     matchLabels:
       app: auth-service
