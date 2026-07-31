@@ -5,7 +5,7 @@ import "google/protobuf/empty.proto";
 option go_package = "abbassmortazavi/go-microservice/post;postpb";
 
 
-service AuthService {
+service PostService {
   rpc List (google.protobuf.Empty) returns (ListResponse);
 }
 

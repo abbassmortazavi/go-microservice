@@ -111,7 +111,7 @@ const file_post_proto_rawDesc = "" +
 	"\vListRequest\"(\n" +
 	"\fListResponse\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage2A\n" +
-	"\vAuthService\x122\n" +
+	"\vPostService\x122\n" +
 	"\x04List\x12\x16.google.protobuf.Empty\x1a\x12.post.ListResponseB-Z+abbassmortazavi/go-microservice/post;postpbb\x06proto3"
 
 var (
@@ -133,8 +133,8 @@ var file_post_proto_goTypes = []any{
 	(*emptypb.Empty)(nil), // 2: google.protobuf.Empty
 }
 var file_post_proto_depIdxs = []int32{
-	2, // 0: post.AuthService.List:input_type -> google.protobuf.Empty
-	1, // 1: post.AuthService.List:output_type -> post.ListResponse
+	2, // 0: post.PostService.List:input_type -> google.protobuf.Empty
+	1, // 1: post.PostService.List:output_type -> post.ListResponse
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
