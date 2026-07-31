@@ -18,7 +18,7 @@ spec:
           image: abbass69/notification-service:dev
           env:
             - name: ENVIRONMENT
-              value: "development"
+              value: "production"
             - name: SMTP_HOST
               value: "sandbox.smtp.mailtrap.io"
             - name: SMTP_USERNAME
