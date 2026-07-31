@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: abbass69/auth-service:dev
+          image: abbass69/auth-service:prod
           imagePullPolicy: Always
 #          imagePullPolicy: IfNotPresent
           ports:

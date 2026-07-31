@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: notification-service
-          image: abbass69/notification-service:dev
+          image: abbass69/notification-service:prod
           env:
             - name: ENVIRONMENT
               value: "production"

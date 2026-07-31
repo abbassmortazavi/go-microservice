@@ -46,7 +46,7 @@ jobs:
           file: infra/development/docker/api-gateway/api-gateway.Dockerfile
           push: true
           tags: |
-            abbass69/api-gateway:${{ inputs.environment == 'production' && 'latest' || 'dev' }}
+            abbass69/api-gateway:${{ inputs.environment == 'production' && 'prod' || 'dev' }}
             abbass69/api-gateway:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -86,7 +86,7 @@ jobs:
           file: infra/development/docker/auth-service/auth-service.Dockerfile
           push: true
           tags: |
-            abbass69/auth-service:${{ inputs.environment == 'production' && 'latest' || 'dev' }}
+            abbass69/auth-service:${{ inputs.environment == 'production' && 'prod' || 'dev' }}
             abbass69/auth-service:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -126,7 +126,7 @@ jobs:
           file: infra/development/docker/notification-service/notification-service.Dockerfile
           push: true
           tags: |
-            abbass69/notification-service:${{ inputs.environment == 'production' && 'latest' || 'dev' }}
+            abbass69/notification-service:${{ inputs.environment == 'production' && 'prod' || 'dev' }}
             abbass69/notification-service:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -166,7 +166,7 @@ jobs:
           file: infra/development/docker/post-service/post-service.Dockerfile
           push: true
           tags: |
-            abbass69/post-service:${{ inputs.environment == 'production' && 'latest' || 'dev' }}
+            abbass69/post-service:${{ inputs.environment == 'production' && 'prod' || 'dev' }}
             abbass69/post-service:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

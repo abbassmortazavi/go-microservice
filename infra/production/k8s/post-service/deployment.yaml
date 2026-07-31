@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: post-service
-          image: abbass69/post-service:dev
+          image: abbass69/post-service:prod
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9094
