@@ -17,7 +17,7 @@ spec:
           image: microservice/post-service:dev
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 9093
+            - containerPort: 9094
           env:
             - name: ENVIRONMENT
               value: "local"

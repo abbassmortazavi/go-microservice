@@ -21,7 +21,7 @@ func main() {
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 
-	lis, err := net.Listen("tcp", ":9093")
+	lis, err := net.Listen("tcp", ":9094")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}

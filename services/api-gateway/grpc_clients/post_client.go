@@ -16,7 +16,7 @@ type PostClientService struct {
 func NewPostClientService() (*PostClientService, error) {
 	postServiceUrl := os.Getenv("POST_SERVICE_URL")
 	if postServiceUrl == "" {
-		postServiceUrl = "post-service:9093"
+		postServiceUrl = "post-service:9094"
 	}
 	conn, err := grpc.NewClient(postServiceUrl, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {

@@ -151,7 +151,7 @@ k8s_resource('notification-service',
 
 ### Post Service ###
 # کامپایل Post Service
-auth_compile_cmd = 'CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/post-service ./services/post-service/cmd'
+post_compile_cmd = 'CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/post-service ./services/post-service/cmd'
 
 local_resource(
     name='post-service-compile',
@@ -183,7 +183,7 @@ k8s_yaml('./infra/local/k8s/post-service/deployment.yaml')
 k8s_yaml('./infra/local/k8s/post-service/service.yaml')
 
 k8s_resource('post-service',
-             port_forwards=[9093],
+             port_forwards=[9094],
              labels=['services', 'post'],
              extra_pod_selectors=[{'app': 'post-service'}])
 ### End Post Service ###
