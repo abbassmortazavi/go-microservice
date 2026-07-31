@@ -23,6 +23,8 @@ resources:
 - rabbitmq-service/deployment.yaml
 - rabbitmq-service/service.yaml
 - notification-service/deployment.yaml
+- post-service/deployment.yaml
+- post-service/service.yaml
 
 labels:
 - pairs:
@@ -34,3 +36,5 @@ images:
   newTag: 3acf3cc082b3ac64f6bf98ccb3e7910db1ac9b74
 - name: abbass69/notification-service
   newTag: 3acf3cc082b3ac64f6bf98ccb3e7910db1ac9b74
+- name: abbass69/post-service
+  newTag: b478a73615b79ca549db645bb6ffebb3343703c5
