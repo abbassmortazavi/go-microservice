@@ -1,25 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-service
+  name: post-service
 spec:
   replicas: 1
-  revisionHistoryLimit: 1
   selector:
     matchLabels:
-      app: auth-service
+      app: post-service
   template:
     metadata:
       labels:
-        app: auth-service
+        app: post-service
     spec:
       containers:
-        - name: auth-service
-          image: abbass69/auth-service:prod
-          imagePullPolicy: Always
-#          imagePullPolicy: IfNotPresent
+        - name: post-service
+          image: abbass69/post-service:prod
+          imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 9092
+            - containerPort: 9094
           env:
             - name: ENVIRONMENT
               value: "production"

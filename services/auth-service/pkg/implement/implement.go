@@ -6,13 +6,15 @@ import (
 	"abbassmortazavi/go-microservice/pkg/message"
 	authpb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/auth"
 	permissionpb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/permission"
+	postpb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/post"
 	rbacpb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/rbac"
 	rolepb "abbassmortazavi/go-microservice/pkg/proto/abbassmortazavi/go-microservice/role"
-	"abbassmortazavi/go-microservice/services/auth-service/grpc"
+	grpcAuth "abbassmortazavi/go-microservice/services/auth-service/grpc"
 	"abbassmortazavi/go-microservice/services/auth-service/pkg/middlewares"
 	"abbassmortazavi/go-microservice/services/auth-service/repository"
 	"abbassmortazavi/go-microservice/services/auth-service/security"
 	service2 "abbassmortazavi/go-microservice/services/auth-service/service"
+	grpcPost "abbassmortazavi/go-microservice/services/post-service/grpc"
 
 	grpc2 "google.golang.org/grpc"
 )
@@ -44,16 +46,18 @@ func Init() {
 	permissionService := service2.NewPermissionService(permissionRepo)
 	roleService := service2.NewRoleService(roleRepo)
 
-	authHandler := grpc.NewAuthHandler(authService)
-	rbacHandler := grpc.NewRabcHandler(rbacService)
-	permissionHandler := grpc.NewPermissionHandler(permissionService)
-	roleHandler := grpc.NewRoleHandler(roleService)
+	authHandler := grpcAuth.NewAuthHandler(authService)
+	rbacHandler := grpcAuth.NewRabcHandler(rbacService)
+	permissionHandler := grpcAuth.NewPermissionHandler(permissionService)
+	roleHandler := grpcAuth.NewRoleHandler(roleService)
+	postHandler := grpcPost.NewPostHandler()
 
 	Server = grpc2.NewServer()
 	authpb.RegisterAuthServiceServer(Server, authHandler)
 	rbacpb.RegisterRBACServiceServer(Server, rbacHandler)
 	permissionpb.RegisterPermissionServiceServer(Server, permissionHandler)
 	rolepb.RegisterRoleServiceServer(Server, roleHandler)
+	postpb.RegisterPostServiceServer(Server, postHandler)
 
 }
 
