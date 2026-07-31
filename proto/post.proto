@@ -1,0 +1,18 @@
+syntax = "proto3";
+package post;
+import "google/protobuf/empty.proto";
+
+option go_package = "abbassmortazavi/go-microservice/post;postpb";
+
+
+service AuthService {
+  rpc List (google.protobuf.Empty) returns (ListResponse);
+}
+
+message ListRequest {
+
+}
+message ListResponse {
+  string message = 1;
+}
+
