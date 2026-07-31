@@ -149,6 +149,44 @@ k8s_resource('notification-service',
              extra_pod_selectors=[{'app': 'notification-service'}])
 ### End Notification Service ###
 
+### Post Service ###
+# کامپایل Post Service
+auth_compile_cmd = 'CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/post-service ./services/post-service/cmd'
+
+local_resource(
+    name='post-service-compile',
+    cmd=post_compile_cmd,
+    deps=['./services/post-service'],
+    ignore=['./services/post-service/vendor'],
+    labels=['compiles'],
+    trigger_mode=TRIGGER_MODE_AUTO)
+
+# ساخت Docker image برای Post Service
+docker_build(
+    'microservice/post-service:dev',
+    '.',
+    dockerfile='./services/post-service/docker/post-service.Dockerfile',
+    only=[
+        './services/post-service',
+        './build/post-service',
+        './env'
+    ],
+    live_update=[
+        sync('./services/post-service', '/app'),
+        sync('./build/post-service', '/app/build/post-service'),
+        sync('./env', '/app/.env')
+    ]
+)
+
+# کانفیگ Kubernetes مخصوص development
+k8s_yaml('./infra/local/k8s/post-service/deployment.yaml')
+k8s_yaml('./infra/local/k8s/post-service/service.yaml')
+
+k8s_resource('post-service',
+             port_forwards=[9093],
+             labels=['services', 'post'],
+             extra_pod_selectors=[{'app': 'post-service'}])
+### End Post Service ###
 
 
 ### نمایش وضعیت ###
