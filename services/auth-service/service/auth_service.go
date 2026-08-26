@@ -71,7 +71,7 @@ func (a *AuthService) Login(ctx context.Context, email, password string) (*respo
 	if err := a.hasher.Compare(user.Password, password); err == false {
 		return nil, errors.New("password is wrong")
 	}
-	tokens, err := a.TokenService.GenerateToken(user.ID, user.Name)
+	tokens, err := a.TokenService.GenerateToken(user)
 	if err != nil {
 		return nil, err
 	}
