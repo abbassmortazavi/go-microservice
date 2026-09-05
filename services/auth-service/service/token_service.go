@@ -14,7 +14,7 @@ import (
 )
 
 type TokenServiceInterface interface {
-	GenerateToken(userID int64, name string) (response.TokenResponse, error)
+	GenerateToken(user *entity.User) (response.TokenResponse, error)
 	RefreshAccessToken(refreshToken string) (response.TokenResponse, error)
 	ValidateToken(token string) (*Claims, error)
 	FindByToken(token string) (*entity.Token, error)
@@ -44,24 +44,22 @@ type JWT struct {
 	UserRepository  repository_interface.UserRepositoryInterface
 }
 
-func (j *JWT) GenerateToken(userID int64, name string) (response.TokenResponse, error) {
+func (j *JWT) GenerateToken(user *entity.User) (response.TokenResponse, error) {
 	accessExpiry := time.Now().Add(time.Minute * 20)
 	refreshExpiry := time.Now().Add(time.Minute * 30)
 	now := time.Now()
 	ctx := context.Background()
-	user, err := j.FindByUserId(ctx, userID)
+	//user, err := j.FindByUserId(ctx, userID)
 	userInfo := entity.User{
 		ID:    user.ID,
 		Name:  user.Name,
 		Email: user.Email,
 		Role:  user.Role,
 	}
-	if err != nil {
-		return response.TokenResponse{}, err
-	}
+
 	claims := Claims{
 		User:      userInfo,
-		Name:      name,
+		Name:      user.Name,
 		TokenType: "access",
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(accessExpiry),
@@ -74,7 +72,7 @@ func (j *JWT) GenerateToken(userID int64, name string) (response.TokenResponse, 
 
 	refreshExpiryClaims := &Claims{
 		User:      userInfo,
-		Name:      name,
+		Name:      user.Name,
 		TokenType: "refresh",
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(refreshExpiry),
@@ -96,20 +94,29 @@ func (j *JWT) GenerateToken(userID int64, name string) (response.TokenResponse, 
 		return response.TokenResponse{}, err
 	}
 
-	res, err := j.TokenRepository.FindByUserId(ctx, userID)
+	res, err := j.TokenRepository.FindByUserId(ctx, user.ID)
 	if err != nil {
 		return response.TokenResponse{}, err
 	}
 	if res != nil {
 		//delete all current user tokens
-		err := j.TokenRepository.RevokeAllUserTokens(ctx, userID)
-		if err != nil {
-			return response.TokenResponse{}, err
-		}
+		//err := j.TokenRepository.RevokeAllUserTokens(ctx, userID)
+		//if err != nil {
+		//	return response.TokenResponse{}, err
+		//}
+
+		go func() {
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			err := j.TokenRepository.RevokeAllUserTokens(ctx, user.ID)
+			if err != nil {
+				return
+			}
+		}()
 	}
 
 	reqAccessToken := entity.Token{
-		UserID:    userID,
+		UserID:    user.ID,
 		TokenType: "access",
 		HashToken: accessTokenString,
 		ExpiredAt: accessExpiry,
@@ -120,7 +127,7 @@ func (j *JWT) GenerateToken(userID int64, name string) (response.TokenResponse, 
 		return response.TokenResponse{}, err
 	}
 	reqRefreshToken := entity.Token{
-		UserID:    userID,
+		UserID:    user.ID,
 		TokenType: "refresh",
 		HashToken: refreshTokenString,
 		ExpiredAt: refreshExpiry,
@@ -146,7 +153,13 @@ func (j *JWT) RefreshAccessToken(refreshToken string) (response.TokenResponse, e
 	if claims.TokenType != "refresh" {
 		return response.TokenResponse{}, errors.New("invalid token")
 	}
-	return j.GenerateToken(claims.User.ID, claims.Name)
+	user := entity.User{
+		ID:    claims.User.ID,
+		Name:  claims.User.Name,
+		Email: claims.User.Email,
+		Role:  claims.User.Role,
+	}
+	return j.GenerateToken(&user)
 }
 
 func (j *JWT) ValidateToken(token string) (*Claims, error) {
