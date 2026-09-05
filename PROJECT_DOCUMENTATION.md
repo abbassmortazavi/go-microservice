@@ -279,6 +279,231 @@ service PostService {
 - **google/uuid v1.6.0**: برای تولید UUID
 - **go-playground/validator v10.29.0**: برای input validation
 
+---
+
+## 📡 gRPC Communication
+
+### gRPC چیست؟
+
+gRPC (Google Remote Procedure Call) یک فریمورک RPC مدرن و با کارایی بالا است که از Protocol Buffers برای تعریف سرویس‌ها و serialization داده‌ها استفاده می‌کند. در این پروژه از gRPC برای ارتباط بین سرویس‌ها (به‌ویژه Auth Service و Post Service) استفاده می‌شود.
+
+### ✅ مزایای gRPC
+
+#### 1. کارایی بالا (Performance)
+- **HTTP/2**: استفاده از HTTP/2 برای multiplexing و reduction overhead
+- **Protocol Buffers**: serialization باینری که 3-10 برابر سریع‌تر و کوچک‌تر از JSON است
+- **Binary Format**: پیام‌های باینری کمتر از JSON/XML فضا اشغال می‌کنند
+- **Compression**: فشرده‌سازی خودکار داده‌ها
+
+#### 2. تایپ‌های قوی (Strong Typing)
+- **Compile-time Type Safety**: خطاهای تایپ در زمان کامپایل شناسایی می‌شوند
+- **Code Generation**: تولید خودکار client و server stubs از فایل‌های .proto
+- **Interface Definition**: تعریف واضح و یکنواخت APIها
+- **Schema Evolution**: مدیریت بهتر تغییرات در schema
+
+#### 3. استریم دوطرفه (Bidirectional Streaming)
+```protobuf
+// مثال استریم دوطرفه
+rpc ChatStream(stream ChatMessage) returns (stream ChatResponse);
+```
+- **Client Streaming**: کلاینت می‌تواند چندین پیام بفرستد
+- **Server Streaming**: سرور می‌تواند چندین پیام بفرستد
+- **Bidirectional Streaming**: هر دو طرف می‌توانند همزمان پیام بفرستند
+- **Real-time Communication**: مناسب برای ارتباطات بلادرنگ
+
+#### 4. Multi-language Support
+- **Official Support**: پشتیبانی رسمی از Go، Java، Python، C++، Ruby، JavaScript، و ...
+- **Polyglot Architecture**: سرویس‌ها می‌توانند با زبان‌های مختلف نوشته شوند
+- **Consistent API**: یکسان بودن API در تمام زبان‌ها
+- **Generated Code**: تولید خودکار کد برای تمام زبان‌های پشتیبانی شده
+
+#### 5. ارتباطات کارآمد (Efficient Communication)
+- **Connection Reuse**: استفاده از یک اتصال TCP برای چندین درخواست
+- **Multiplexing**: ارسال همزمان چندین درخواست در یک اتصال
+- **Header Compression**: فشرده‌سازی هدرها برای کاهش overhead
+- **No JSON Overhead**: حذف overhead مربوط به JSON
+
+#### 6. ابزارهای مدرن (Modern Tooling)
+- **Protocol Buffers Compiler**: protoc برای تولید کد
+- **gRPC Web**: پشتیبانی از مرورگرهای وب
+- **Interceptors**: middleware برای logging, authentication, metrics
+- **Plugins**: قابلیت افزودن افزونه‌های شخصی
+
+### ⚠️ معایب و چالش‌های gRPC
+
+#### 1. محدودیت در مرورگرها (Browser Support)
+- **Limited Native Support**: مرورگرها به‌طور مستقیم از gRPC پشتیبانی نمی‌کنند
+- **Requires gRPC-Web**: نیاز به گRPC-Web polyfill برای کلاینت‌های وب
+- **Not Standard**: استاندارد وب نیست
+- **Workaround Required**: نیاز به proxy یا polyfill برای وب
+
+#### 2. دیباگ کردن سخت‌تر (Debugging Complexity)
+- **Binary Format**: فرمت باینری قابل خواندن برای انسان نیست
+- **Requires Tools**: نیاز به ابزارهای خاص برای نمایش پیام‌ها
+- **JSON Advantage**: JSON قابل خواندن است اما gRPC نیست
+- **Learning Curve**: یادگیری ابزارهای دیباگ مورد نیاز است
+
+#### 3. منحنی یادگیری (Learning Curve)
+- **Protocol Buffers Syntax**: نیاز به یادگیری سینتکس .proto
+- **Toolchain**: ناشناخته بودن ابزارها برای توسعه‌دهندگان جدید
+- **Code Generation**: درک فرآیند تولید کد
+- **Different Paradigm**: تفاوت با RESTful APIها
+
+#### 4. مدیریت خطا متفاوت (Error Handling)
+- **No HTTP Status Codes**: استفاده از status codes گRPC به جای HTTP
+- **Limited Error Context**: اطلاعات محدود در خطاها
+- **Custom Status**: نیاز به تعریف statusهای سفارشی
+- **Learning Curve**: یادگیری نحوه مدیریت خطاها در gRPC
+
+#### 5. اکوسیستم کوچک‌تر (Smaller Ecosystem)
+- **Fewer Tools**: ابزارهای کمتر نسبت به REST
+- **Limited Frameworks**: فریمورک‌های کمتر برای توسعه سریع
+- **Documentation**: مستندات کمتر نسبت به REST
+- **Community**: جامعه کاربری کوچک‌تر
+
+#### 6. چالش‌های Load Balancing
+- **HTTP/2 Requirements**: نیاز به load balancerهای HTTP/2-aware
+- **Connection State**: حفظ state اتصال‌ها چالش‌برانگیز است
+- **Sticky Sessions**: گاهی نیاز به sticky sessions
+- **Traditional LB Issues**: load balancerهای سنتی ممکن است خوب کار نکنند
+
+#### 7. محدودیت Caching
+- **No HTTP Caching**: پشتیبانی از cachingهای HTTP وجود ندارد
+- **Manual Caching**: نیاز به caching سفارشی
+- **CDN Limitations**: محدودیت در استفاده از CDNها
+- **Cache Invalidation**: مدیریت invalidation سخت‌تر است
+
+#### 8. پشتیبانی محدود Proxy
+- **HTTP Proxies**: برخی پروکسی‌های HTTP از gRPC پشتیبانی نمی‌کنند
+- **Firewall Issues**: ممکن است فایروال‌ها بلاک کنند
+- **Network Restriction**: محدودیت‌های شبکه‌ای
+- **Workaround Required**: نیاز به راهکارهای جایگزین
+
+### 🎯 چه زمانی از gRPC استفاده کنیم؟
+
+#### ✅ مناسب برای استفاده:
+
+1. **میکروسرویس‌های داخلی (Internal Microservices)**
+   - ارتباط بین سرویس‌های backend
+   - محیط‌های کنترل شده
+   - نیازمندی کارایی بالا
+
+2. **ویژگی‌های بلادرنگ (Real-time Features)**
+   - استریم داده
+   - اطلاع‌رسانی‌های زنده
+   - پیام‌رسانی بلادرنگ
+   - سیستم‌های chat
+
+3. **سناریوهای Throughput بالا (High Throughput)**
+   - اپلیکیشن‌هایی با درخواست‌های همزمان زیاد
+   - سیستم‌های با ترافیک سنگین
+   - نیازمندی low latency
+
+4. **قراردادهای دقیق (Strict Contracts)**
+   - نیازمندی type safety
+   - نیاز به schema evolution
+   - پروژه‌های با APIهای پیچیده
+
+5. **محیط‌های Polyglot (Polyglot Environments)**
+   - سرویس‌های نوشته شده با زبان‌های مختلف
+   - نیاز به یکنواختی API
+   - تیم‌های مختلف با تخصص‌های متفاوت
+
+6. **سیستم‌های با حجم داده بزرگ (Large Data Volume)**
+   - کاهش اندازه پیام‌ها مهم است
+   - نیاز به compression
+   - باندویت محدود
+
+#### ⚠️ بهتر است از REST استفاده کنیم:
+
+1. **APIهای عمومی (Public APIs)**
+   - در دسترس بودن برای توسعه‌دهندگان شخص ثالث
+   - نیاز به استانداردهای وب
+   - سادگی استفاده
+
+2. **کلاینت‌های وب (Browser-based Clients)**
+   - دسترسی مستقیم از مرورگرها
+   - عدم نیاز به polyfill
+   - سادگی integration
+
+3. **عملیات ساده CRUD (Simple CRUD Operations)**
+   - همنخوانی با معنایی HTTP
+   - سادگی پیاده‌سازی
+   - نیازمندی‌های ساده
+
+4. **نیازمندی‌های Caching (Caching Requirements)**
+   - استفاده از cachingهای HTTP
+   - نیاز به CDN
+   - نیازمندی‌های cache-aware
+
+### 📝 پیاده‌سازی gRPC در این پروژه
+
+#### فایل‌های Protocol Buffers
+```protobuf
+// proto/auth/auth.proto
+syntax = "proto3";
+
+package auth;
+
+service AuthService {
+    rpc Register(RegisterRequest) returns (RegisterResponse);
+    rpc Login(LoginRequest) returns (LoginResponse);
+    rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse);
+}
+
+message RegisterRequest {
+    string email = 1;
+    string username = 2;
+    string password = 3;
+}
+
+message RegisterResponse {
+    bool success = 1;
+    string message = 2;
+    string user_id = 3;
+}
+```
+
+#### ارتباط سرویس‌ها
+- **API Gateway → Auth Service**: ارتباط با gRPC برای احراز هویت
+- **Post Service → Auth Service**: اعتبارسنجی کاربر از طریق gRPC
+- **Future Expansion**: افزودن سرویس‌های جدید با gRPC
+
+#### پیکربندی شبکه
+- **Internal Network**: gRPC در شبکه داخلی استفاده می‌شود
+- **Port Configuration**: هر سرویس در پورت اختصاصی خود
+- **Load Balancing**: استفاده از Kubernetes services برای balancing
+- **TLS**: امکان فعال‌سازی TLS برای security
+
+### 🔧 بهترین روش‌ها (Best Practices)
+
+1. **مدل‌سازی داده‌ها (Data Modeling)**
+   - استفاده از message types برای پیچیدگی
+   - تعریف versioning برای APIها
+   - استفاده از enums برای مقادیر ثابت
+
+2. **مدیریت خطا (Error Handling)**
+   - استفاده از status codes گRPC استاندارد
+   - تعریف error messages واضح
+   - استفاده از metadata برای context اضافه
+
+3. **مدیریت اتصال (Connection Management)**
+   - استفاده از connection pooling
+   - مدیریت retry logic
+   - handling timeoutها
+
+4. **استقرار (Deployment)**
+   - استفاده از Kubernetes services
+   - پیکربندی health checks
+   - monitoring و observability
+
+5. **تست (Testing)**
+   - نوشتن integration tests برای gRPC
+   - استفاده از mock servers
+   - testing error scenarios
+
+---
+
 ### Infrastructure
 
 #### Containerization
