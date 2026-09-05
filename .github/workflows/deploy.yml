@@ -19,7 +19,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
-          # pull latest commit که kustomize update کرده
           fetch-depth: 0
 
       - name: Setup kubectl

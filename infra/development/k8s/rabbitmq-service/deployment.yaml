@@ -38,7 +38,7 @@ spec:
             failureThreshold: 3
           resources:
             requests:
-              memory: "512Mi"  # کاهش برای محیط توسعه
+              memory: "512Mi"
               cpu: "250m"
             limits:
               memory: "1Gi"
