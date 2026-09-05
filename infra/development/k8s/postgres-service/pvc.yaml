@@ -7,5 +7,5 @@ spec:
     - ReadWriteOnce  # فقط یک pod می‌تواند همزمان write کند
   resources:
     requests:
-      storage: 1Gi  # 1 گیگابایت فضای ذخیره‌سازی
-  storageClassName: standard  # یا "hostpath" در minikube
+      storage: 1Gi
+  storageClassName: standard

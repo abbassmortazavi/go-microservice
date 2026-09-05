@@ -26,7 +26,6 @@ spec:
               value: microservice_db
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata  # مشخص کردن مسیر دیتا
-          # اصلاح probeها - اضافه کردن پارامتر -d برای اشاره به دیتابیس موجود
           readinessProbe:
             exec:
               command:

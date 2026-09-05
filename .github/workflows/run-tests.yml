@@ -3,7 +3,7 @@ name: Run Tests
 on:
   workflow_call:
     inputs:
-      environment:        # ← اضافه کن
+      environment:
         required: false
         type: string
         default: 'development'
